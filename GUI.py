@@ -88,10 +88,10 @@ if __name__ == '__main__':
 #        pass
     
     def test_update(dt):
-        core.multiupdate(test_em, 25)
+        core.multiupdate(test_em, 200)
         window.update_from_em()
     try:
-        pyglet.clock.schedule_interval(test_update, 0.03)
+        pyglet.clock.schedule(test_update)
         
         pyglet.app.run()
     finally:
