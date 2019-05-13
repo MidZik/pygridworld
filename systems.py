@@ -670,4 +670,3 @@ def judge_system(em: EntityManager):
         new_entity_queue.queue.append(new_entity)
     
     events.queue_event('judgement', judge_stats, 1)
-    print("Judge debug: T", em.tick, judge_stats)
