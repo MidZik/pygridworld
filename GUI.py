@@ -5,11 +5,13 @@ Created on Fri May  3 18:24:23 2019
 @author: MidZik
 """
 
-from weakref import WeakValueDictionary
 import core
 import components as com
 from ECS import ECS
+
+from weakref import WeakValueDictionary
 import pyglet
+import matplotlib.pyplot as plt
 
 _image_cache = WeakValueDictionary()
 
@@ -78,8 +80,62 @@ class WorldWindow(pyglet.window.Window):
             if not eid in position_map:
                 del _entity_object_map[eid]
 
+class _Plotter:
+    def __init__(self):
+        plt.ion()
+        self.fig = plt.figure()
+        self.majname_data = {}
+        self.tick_data = [0]
+        self.winner_mean_score_data = [0]
+        self.all_mean_score_data = [0]
+        self.winners_mean_score_plot, = plt.plot(self.tick_data, self.winner_mean_score_data, label='winners')
+        self.all_mean_score_plot, = plt.plot(self.tick_data, self.all_mean_score_data, label='all')
+        
+        plt.xlabel('Tick')
+        plt.ylabel('Score')
+        plt.title('Judge Stats')
+        plt.show()
+    
+    def on_event(self, event_data):
+        name = event_data[0]
+        
+        if name == 'judgement':
+            details = event_data[1]
+            entity_scores = details['entity_scores']
+            entity_details_log = details['entity_details_log']
+            winners = details['winners']
+            losers = details['losers']
+            
+            winner_total = sum(entity_scores[eid] for eid in winners)
+            loser_total = sum(entity_scores[eid] for eid in losers)
+            total = winner_total + loser_total
+            
+            winner_mean = winner_total / len(winners)
+            total_mean = total / len(entity_scores)
+            
+            self.tick_data.append(test_em.tick)
+            self.winner_mean_score_data.append(winner_mean)
+            self.all_mean_score_data.append(total_mean)
+            
+            if test_em.tick % 10000 == 0:
+                self.winners_mean_score_plot.set_data(self.tick_data, self.winner_mean_score_data)
+                self.all_mean_score_plot.set_data(self.tick_data, self.all_mean_score_data)
+                
+                ax = plt.gca()
+                ax.relim()
+                ax.autoscale_view()
+                
+                self.fig.canvas.draw()
+                self.fig.canvas.flush_events()
+
 if __name__ == '__main__':
     test_em = core.setup_test_em()
+    
+    # some debug plotting stuff
+    plotter = _Plotter()
+    
+    events: com.SEvents = test_em.scomponents_map[com.SEvents]
+    events._sig_event.connect(plotter.on_event)
     
     window = WorldWindow(test_em)
     
