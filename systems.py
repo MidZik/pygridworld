@@ -589,13 +589,16 @@ def judge_system(em: EntityManager):
     
     cmaps = em.component_maps
     position_map = cmaps[com.Position]
+    name_map = cmaps[com.Name]
     
     # judge stats
     stat_entity_scores = {}
+    log_entity_details = {}
     stat_winners = []
     stat_losers= []
     judge_stats = {
             'entity_scores': stat_entity_scores,
+            'entity_details_log': log_entity_details,
             'winners': stat_winners,
             'losers': stat_losers
             }
@@ -610,6 +613,16 @@ def judge_system(em: EntityManager):
     
     for index, (eid, scorable) in enumerate(sorted_scorables):
         stat_entity_scores[eid] = scorable.score
+        
+        try:
+            name: com.Name = name_map[eid]
+        except LookupError:
+            log_entity_details[eid] = {}
+        else:
+            log_entity_details[eid] = {
+                    'maj_name': name.major_name,
+                    'min_name': name.minor_name
+                    }
         
         if index < 4:
             # top 4 scorables are the winners that live and reproduce
