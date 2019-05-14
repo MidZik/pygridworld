@@ -19,7 +19,6 @@ class Signal:
         Connects a method to the signal. Whenever the signal is emitted,
         all connected methods will be fired immediately.
         """
-        print(binds)
         self._slots.insert(0, (weakref.ref(slot.__self__), slot.__func__, binds))
     
     def emit(self, *args):
