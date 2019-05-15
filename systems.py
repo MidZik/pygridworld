@@ -461,10 +461,10 @@ def simple_brain_mover_system(em: EntityManager):
         neuron_offset = mover.neuron_offset
         output_neurons = brain.neurons[-1]
         
-        moveable.x_force += int(output_neurons[0, neuron_offset])
-        moveable.x_force -= int(output_neurons[0, neuron_offset + 1])
-        moveable.y_force += int(output_neurons[0, neuron_offset + 2])
-        moveable.y_force -= int(output_neurons[0, neuron_offset + 3])
+        moveable.x_force += 4 * int(output_neurons[0, neuron_offset])
+        moveable.x_force -= 4 * int(output_neurons[0, neuron_offset + 1])
+        moveable.y_force += 4 * int(output_neurons[0, neuron_offset + 2])
+        moveable.y_force -= 4 * int(output_neurons[0, neuron_offset + 3])
 
 """
 SIMPLE BRAIN CALC SYSTEM
