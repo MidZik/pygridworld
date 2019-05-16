@@ -624,8 +624,8 @@ def judge_system(em: EntityManager):
                     'min_name': name.minor_name
                     }
         
-        if index < 4:
-            # top 4 scorables are the winners that live and reproduce
+        if index < 6:
+            # top 6 scorables are the winners that live and reproduce
             stat_winners.append(eid)
             
             child_creation.pending_child_creators.append(eid)
@@ -642,7 +642,7 @@ def judge_system(em: EntityManager):
             em.delete_entity(eid)
     
     # finally, part of the judge's duty is to queue brand new entities for creation
-    for i in range(2):
+    for i in range(3):
         new_entity = {}
         
         # current brain creation scheme: give all synapses a random value between -1 and 1.
@@ -651,7 +651,7 @@ def judge_system(em: EntityManager):
         for synapse_array in new_brain.synapses:
             synapse_unravled = np.reshape(synapse_array, -1)
             for index in range(len(synapse_unravled)):
-                synapse_unravled[index] = (srng.randd() - 0.5) * 2
+                synapse_unravled[index] = (srng.randd() < 0.5) * (srng.randd() - 0.5) * 2
         new_entity[com.SimpleBrain] = new_brain
         
         new_entity[com.SimpleBrainMover] = com.SimpleBrainMover()
@@ -670,7 +670,7 @@ def judge_system(em: EntityManager):
         new_entity[com.RNG] = new_rng
         
         new_display_data = com.DisplayData()
-        new_display_data.blend = (srng.randi() % 256, srng.randi() % 256, srng.randi() % 256)
+        new_display_data.blend = (srng.randi() % 200 + 56, srng.randi() % 200 + 56, srng.randi() % 200 + 56)
         new_entity[com.DisplayData] = new_display_data
         
         new_entity[com.Scorable] = com.Scorable()
