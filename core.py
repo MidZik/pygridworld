@@ -10,7 +10,7 @@ import systems as sys
 import components as com
 import util
 
-def create_brain_entity(em: ECS.EntityManager, x, y):
+def create_brain_entity(em: ECS.EntityManager, x, y, seed, seq):
     coms = []
     
     coms.append(com.Moveable())
@@ -30,7 +30,7 @@ def create_brain_entity(em: ECS.EntityManager, x, y):
     coms.append(display_data)
     
     rng = com.RNG()
-    rng.rng.seed(x + y + 65123, x + y + 16384)
+    rng.rng.seed(seed, seq)
     coms.append(rng)
     
     position = com.Position()
@@ -40,7 +40,7 @@ def create_brain_entity(em: ECS.EntityManager, x, y):
     
     util.create_entity(em, {type(c): c for c in coms})
 
-def create_predator(em: ECS.EntityManager, x, y):
+def create_predator(em: ECS.EntityManager, x, y, seed, seq):
     coms = []
     
     coms.append(com.Moveable())
@@ -53,7 +53,7 @@ def create_predator(em: ECS.EntityManager, x, y):
     coms.append(display_data)
     
     rng = com.RNG()
-    rng.rng.seed(x + y + 2850, x + y + 75228)
+    rng.rng.seed(seed, seq)
     coms.append(rng)
     
     position = com.Position()
@@ -93,11 +93,14 @@ def setup_test_em():
     em.create_scomponent(com.SJudge)
     em.create_scomponent(com.SNewEntityQueue)
     srng = em.create_scomponent(com.RNG)
-    srng.rng.seed(54321,12345)
+    srng.rng.seed(54321669,12345667)
     
     for i in range(5):
-        create_brain_entity(em, i, i)
-        create_predator(em, i + 2, i + 5)
+        create_brain_entity(em, i, i, srng.rng.randi(), srng.rng.randi())
+        create_predator(em, i + 2, i + 5, srng.rng.randi(), srng.rng.randi())
+    
+    for i in range(6):
+        create_predator(em, i + 5, i + 9, srng.rng.randi(), srng.rng.randi())
     
     return em
 
