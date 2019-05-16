@@ -91,7 +91,7 @@ class _Plotter:
         self.winner_mean_score_data = [0]
         self.all_mean_score_data = [0]
         
-        plt.subplot(211)
+        plt.subplot(211, label="scores")
         self.winners_mean_score_plot, = plt.plot(self.tick_data, self.winner_mean_score_data, label='winners')
         self.all_mean_score_plot, = plt.plot(self.tick_data, self.all_mean_score_data, label='all')
         plt.xlabel('Tick')
@@ -127,7 +127,7 @@ class _Plotter:
             self.log_pop_counts(self.em)
             
             if self.em.tick % 50000 == 0:
-                plt.subplot(211)
+                plt.subplot(211, label="scores")
                 self.winners_mean_score_plot.set_data(self.tick_data, self.winner_mean_score_data)
                 self.all_mean_score_plot.set_data(self.tick_data, self.all_mean_score_data)
                 
@@ -161,7 +161,7 @@ class _Plotter:
             y[-1] += 1
     
     def plot_pop_counts(self):
-        plt.subplot(212)
+        plt.subplot(212, label="populations")
         for maj, (x, y) in self.majname_data.items():
             # only plot populations that have lived a non-trivial amount of time
             if len(x) >= 10:
