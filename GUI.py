@@ -85,21 +85,26 @@ class _Plotter:
         plt.ion()
         self.em = em
         self.fig = plt.figure()
-        self.majname_data = {}
+        
+        self.majname_pop_data = {}
         self.pop_plots = {}
+        
+        self.majname_median_data = {}
+        self.median_plots = {}
+        
         self.tick_data = [0]
         self.winner_mean_score_data = [0]
         self.all_mean_score_data = [0]
         
-        plt.subplot(211, label="scores")
-        self.winners_mean_score_plot, = plt.plot(self.tick_data, self.winner_mean_score_data, label='winners')
-        self.all_mean_score_plot, = plt.plot(self.tick_data, self.all_mean_score_data, label='all')
+        self.plot_aggregate_scores()
         plt.xlabel('Tick')
         plt.ylabel('Score')
         plt.title('Judge Stats')
         
         self.log_pop_counts(em)
         self.plot_pop_counts()
+        
+        self.plot_median_scores()
         
         plt.show()
     
@@ -112,6 +117,32 @@ class _Plotter:
             entity_details_log = details['entity_details_log']
             winners = details['winners']
             losers = details['losers']
+            
+            maj_scores = {}
+            
+            for eid, score in entity_scores.items():
+                maj_name = entity_details_log[eid]['maj_name']
+                try:
+                    maj_score = maj_scores[maj_name]
+                except LookupError:
+                    maj_score = []
+                    maj_scores[maj_name] = maj_score
+                
+                maj_score.append(score)
+            
+            for maj_name, maj_score in maj_scores.items():
+                maj_sorted_score = sorted(maj_score)
+                median = maj_sorted_score[len(maj_sorted_score)//2]
+                
+                try:
+                    x, y = self.majname_median_data[maj_name]
+                except LookupError:
+                    x = []
+                    y = []
+                    self.majname_median_data[maj_name] = (x, y)
+                
+                x.append(self.em.tick)
+                y.append(median)
             
             winner_total = sum(entity_scores[eid] for eid in winners)
             loser_total = sum(entity_scores[eid] for eid in losers)
@@ -127,15 +158,11 @@ class _Plotter:
             self.log_pop_counts(self.em)
             
             if self.em.tick % 50000 == 0:
-                plt.subplot(211, label="scores")
-                self.winners_mean_score_plot.set_data(self.tick_data, self.winner_mean_score_data)
-                self.all_mean_score_plot.set_data(self.tick_data, self.all_mean_score_data)
-                
-                ax = plt.gca()
-                ax.relim()
-                ax.autoscale_view()
+                self.plot_aggregate_scores()
                 
                 self.plot_pop_counts()
+                
+                self.plot_median_scores()
                 
                 self.fig.canvas.draw()
                 self.fig.canvas.flush_events()
@@ -148,11 +175,11 @@ class _Plotter:
             maj = name.major_name
             
             try:
-                x,y = self.majname_data[maj]
+                x,y = self.majname_pop_data[maj]
             except LookupError:
                 x = []
                 y = []
-                self.majname_data[maj] = (x, y)
+                self.majname_pop_data[maj] = (x, y)
             
             if not x or x[-1] != em.tick:
                 x.append(em.tick)
@@ -161,8 +188,8 @@ class _Plotter:
             y[-1] += 1
     
     def plot_pop_counts(self):
-        plt.subplot(212, label="populations")
-        for maj, (x, y) in self.majname_data.items():
+        plt.subplot(222, label="populations")
+        for maj, (x, y) in self.majname_pop_data.items():
             # only plot populations that have lived a non-trivial amount of time
             if len(x) >= 10:
                 try:
@@ -170,6 +197,38 @@ class _Plotter:
                 except LookupError:
                     plot, = plt.plot(x, y)
                     self.pop_plots[maj] = plot
+                else:
+                    plot.set_data(x, y)
+        
+        ax = plt.gca()
+        ax.relim()
+        ax.autoscale_view()
+    
+    def plot_aggregate_scores(self):
+        plt.subplot(221, label="scores")
+        
+        try:
+            self.winners_mean_score_plot.set_data(self.tick_data, self.winner_mean_score_data)
+            self.all_mean_score_plot.set_data(self.tick_data, self.all_mean_score_data)
+        except AttributeError:
+            self.winners_mean_score_plot, = plt.plot(self.tick_data, self.winner_mean_score_data, label='winners')
+            self.all_mean_score_plot, = plt.plot(self.tick_data, self.all_mean_score_data, label='all')
+        
+        ax = plt.gca()
+        ax.relim()
+        ax.autoscale_view()
+    
+    def plot_median_scores(self):
+        plt.subplot(224, label="median scores")
+        
+        for maj, (x, y) in self.majname_median_data.items():
+            # only plot medians that have lived a non-trivial amount of time
+            if len(x) >= 10:
+                try:
+                    plot = self.median_plots[maj]
+                except LookupError:
+                    plot, = plt.plot(x, y)
+                    self.median_plots[maj] = plot
                 else:
                     plot.set_data(x, y)
         
