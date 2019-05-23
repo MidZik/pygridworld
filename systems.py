@@ -396,7 +396,7 @@ def predation_system(em: EntityManager):
             scorable = scorables_found[random_index]
             scorable.score -= 1
             util.mark_component_changed(change_tracker, scorable)
-            predation.no_predation_until_tick = em.tick + 20
+            predation.no_predation_until_tick = em.tick + 7
             events.queue_event("predation", {"location": predate_event_locations[random_index]}, 0) 
 
 """

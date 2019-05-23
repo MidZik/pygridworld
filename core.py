@@ -90,7 +90,9 @@ def setup_test_em():
     em.create_scomponent(com.SChangeTracker)
     em.create_scomponent(com.SChildCreation)
     em.create_scomponent(com.SEvents)
-    em.create_scomponent(com.SJudge)
+    judge = em.create_scomponent(com.SJudge)
+    judge.ticks_between_judgements = 5000
+    judge.next_judgement_tick = 5000
     em.create_scomponent(com.SNewEntityQueue)
     srng = em.create_scomponent(com.RNG)
     srng.rng.seed(54321669,12345667)
