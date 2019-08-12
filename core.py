@@ -5,108 +5,75 @@ Created on Thu May  2 03:03:18 2019
 @author: MidZik
 """
 
-from ECS import ECS
-import systems as sys
-import components as com
-import util
+import gridworld as gw
 
-def create_brain_entity(em: ECS.EntityManager, x, y, seed, seq):
-    coms = []
+def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
+    eid = em.create();
     
-    coms.append(com.Moveable())
-    coms.append(com.Scorable())
+    pos: gw.Position = em.assign_or_replace_Position(eid)
+    pos.x = x
+    pos.y = y
     
-    name = com.Name()
+    em.assign_or_replace_Moveable(eid)
+    
+    em.assign_or_replace_Scorable(eid)
+    
+    name = em.assign_or_replace_Name(eid)
     name.major_name = f"I({x},{y})"
     name.minor_name = "Eve"
-    coms.append(name)
     
-    coms.append(com.SimpleBrain())
-    coms.append(com.SimpleBrainMover())
-    coms.append(com.SimpleBrainSeer())
+    em.assign_or_replace_SimpleBrain(eid)
     
-    display_data = com.DisplayData()
-    display_data.imagepath = 'assets/DefaultEntity.png'
-    coms.append(display_data)
+    em.assign_or_replace_SimpleBrainSeer(eid)
     
-    rng = com.RNG()
-    rng.rng.seed(seed, seq)
-    coms.append(rng)
+    em.assign_or_replace_SimpleBrainMover(eid)
     
-    position = com.Position()
-    position.x = x
-    position.y = y
-    coms.append(position)
-    
-    util.create_entity(em, {type(c): c for c in coms})
+    rng = em.assign_or_replace_RNG(eid)
+    rng.seed(seed, seq)
 
-def create_predator(em: ECS.EntityManager, x, y, seed, seq):
-    coms = []
+def create_predator(em: gw.EntityManager, x, y, seed, seq):
+    eid = em.create();
     
-    coms.append(com.Moveable())
-    coms.append(com.Predation())
-    coms.append(com.RandomMover())
+    pos: gw.Position = em.assign_or_replace_Position(eid)
+    pos.x = x
+    pos.y = y
     
-    display_data = com.DisplayData()
-    display_data.blend = (255, 0, 0)
-    display_data.imagepath = 'assets/PredatorEntity.png'
-    coms.append(display_data)
+    em.assign_or_replace_Moveable(eid)
     
-    rng = com.RNG()
-    rng.rng.seed(seed, seq)
-    coms.append(rng)
+    name = em.assign_or_replace_Name(eid)
+    name.major_name = f"I({x},{y})"
+    name.minor_name = "PREDATOR"
     
-    position = com.Position()
-    position.x = x
-    position.y = y
-    coms.append(position)
+    em.assign_or_replace_RandomMover(eid)
     
-    util.create_entity(em, {type(c): c for c in coms})
-
-def print_com_state(em: ECS.EntityManager, eid, com_class):
-    print(em.component_maps[com_class][eid].__getstate__())
-
-def multiupdate(em, count):
-    for i in range(count):
-        em.update()
+    em.assign_or_replace_Predation(eid)
+    
+    rng = em.assign_or_replace_RNG(eid)
+    rng.seed(seed, seq)
 
 def setup_test_em():
-    em = ECS.EntityManager()
+    em = gw.EntityManager()
     
-    em.systems.append(sys.simple_brain_seer_system)
-    em.systems.append(sys.simple_brain_calc)
-    em.systems.append(sys.simple_brain_mover_system)
-    em.systems.append(sys.random_movement_system)
-    em.systems.append(sys.movement_system)
-    em.systems.append(sys.predation_system)
-    em.systems.append(sys.judge_system)
-    em.systems.append(sys.child_creation_system)
-    em.systems.append(sys.new_entity_system)
-    em.systems.append(sys.change_notification_system)
-    em.systems.append(sys.event_system)
+    world = em.assign_or_replace_singleton_SWorld()
+    world.reset_world(20, 20)
     
-    world = em.create_scomponent(com.SWorld)
-    world.resize(20, 20)
-    em.create_scomponent(com.SChangeTracker)
-    em.create_scomponent(com.SChildCreation)
-    em.create_scomponent(com.SEvents)
-    judge = em.create_scomponent(com.SJudge)
-    judge.ticks_between_judgements = 5000
-    judge.next_judgement_tick = 5000
-    em.create_scomponent(com.SNewEntityQueue)
-    srng = em.create_scomponent(com.RNG)
-    srng.rng.seed(54321669,12345667)
+    
+    rng = em.assign_or_replace_singleton_RNG()
+    rng.seed(54321669,12345667)
     
     for i in range(5):
-        create_brain_entity(em, i, i, srng.rng.randi(), srng.rng.randi())
-        create_predator(em, i + 2, i + 5, srng.rng.randi(), srng.rng.randi())
+        create_brain_entity(em, i, i, rng.rand(), rng.rand())
+        create_predator(em, i + 2, i + 5, rng.rand(), rng.rand())
     
     for i in range(6):
-        create_predator(em, i + 5, i + 9, srng.rng.randi(), srng.rng.randi())
+        create_predator(em, i + 5, i + 9, rng.rand(), rng.rand())
+    
+    # After populating the world, need to refresh the world data
+    gw.rebuild_world(em)
     
     return em
 
 def run_perf_test():
     em = setup_test_em()
     
-    multiupdate(em, 10000)
+    em.multiupdate(10000)
