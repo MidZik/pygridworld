@@ -127,7 +127,7 @@ def judge_and_proliferate(em: gw.EntityManager):
     available_spaces = []
     for x in range(world.width):
         for y in range(world.height):
-            if world.get_map_data(x, y) != gw.null:
+            if world.get_map_data(x, y) == gw.null:
                 available_spaces.append((x, y))
 
     # create duplicate entities from winners, modifying them slightly
@@ -137,9 +137,9 @@ def judge_and_proliferate(em: gw.EntityManager):
         parent_rng = em.get_RNG(parent_eid)
 
         child_rng = em.get_RNG(child_eid)
-        child_rng.seed(parent_rng.rand(), parent_rng.rand())
+        child_rng.seed(parent_rng.randi(), parent_rng.randi())
 
-        new_pos = available_spaces.pop(child_rng.rand() % len(available_spaces))
+        new_pos = available_spaces.pop(child_rng.randi() % len(available_spaces))
         position = em.get_Position(child_eid)
         position.x = new_pos[0]
         position.y = new_pos[1]
@@ -166,7 +166,7 @@ def judge_and_proliferate(em: gw.EntityManager):
 
         em.assign_or_replace_SimpleBrainMover(eid)
 
-        new_pos = available_spaces.pop(srng.rand() % len(available_spaces))
+        new_pos = available_spaces.pop(srng.randi() % len(available_spaces))
         position = em.assign_or_replace_Position(eid)
         position.x = new_pos[0]
         position.y = new_pos[1]
@@ -175,7 +175,7 @@ def judge_and_proliferate(em: gw.EntityManager):
         em.assign_or_replace_Moveable(eid)
 
         rng = em.assign_or_replace_RNG(eid)
-        rng.seed(srng.rand(), srng.rand())
+        rng.seed(srng.randi(), srng.randi())
 
         em.assign_or_replace_Scorable(eid)
 
@@ -196,11 +196,11 @@ def setup_test_em():
     rng.seed(54321669, 12345667)
 
     for i in range(5):
-        create_brain_entity(em, i, i, rng.rand(), rng.rand())
-        create_predator(em, i + 2, i + 5, rng.rand(), rng.rand())
+        create_brain_entity(em, i, i, rng.randi(), rng.randi())
+        create_predator(em, i + 2, i + 5, rng.randi(), rng.randi())
 
     for i in range(6):
-        create_predator(em, i + 5, i + 9, rng.rand(), rng.rand())
+        create_predator(em, i + 5, i + 9, rng.randi(), rng.randi())
 
     # After populating the world, need to refresh the world data
     gw.rebuild_world(em)
