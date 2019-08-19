@@ -10,7 +10,7 @@ import numpy as np
 
 
 def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
-    eid = em.create();
+    eid = em.create()
 
     pos: gw.Position = em.assign_or_replace_Position(eid)
     pos.x = x
@@ -35,7 +35,7 @@ def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
 
 
 def create_predator(em: gw.EntityManager, x, y, seed, seq):
-    eid = em.create();
+    eid = em.create()
 
     pos: gw.Position = em.assign_or_replace_Position(eid)
     pos.x = x
@@ -189,10 +189,10 @@ def judge_and_proliferate(em: gw.EntityManager):
 def setup_test_em():
     em = gw.EntityManager()
 
-    world = em.assign_or_replace_singleton_SWorld()
+    world = em.set_singleton_SWorld()
     world.reset_world(20, 20)
 
-    rng = em.assign_or_replace_singleton_RNG()
+    rng = em.set_singleton_RNG()
     rng.seed(54321669, 12345667)
 
     for i in range(5):
