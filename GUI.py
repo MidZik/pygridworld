@@ -6,8 +6,6 @@ Created on Fri May  3 18:24:23 2019
 """
 
 import core
-import components as com
-from ECS import ECS
 
 from weakref import WeakValueDictionary
 import pyglet
@@ -21,20 +19,21 @@ _entity_object_map = {}
 
 fps_display = pyglet.clock.ClockDisplay()
 
+
 class PositionEntityObject:
-    def __init__(self, display_data: com.DisplayData):
-        if display_data and display_data.imagepath:
-            imagepath = display_data.imagepath
+    def __init__(self, display_data):
+        if display_data and display_data.image_path:
+            image_path = display_data.image_path
         else:
-            imagepath = 'assets/DefaultEntity.png'
+            image_path = 'assets/DefaultEntity.png'
         
         try:
-            image = _image_cache[imagepath]
+            image = _image_cache[image_path]
         except LookupError:
-            image = pyglet.image.load(imagepath)
+            image = pyglet.image.load(image_path)
             image.anchor_x = image.width // 2
             image.anchor_y = image.height // 2
-            _image_cache[imagepath] = image
+            _image_cache[image_path] = image
         
         self.sprite = pyglet.sprite.Sprite(image, batch=_entity_batch)
         if display_data:
@@ -45,10 +44,9 @@ class PositionEntityObject:
         
 
 class WorldWindow(pyglet.window.Window):
-    def __init__(self, em: ECS.EntityManager):
+    def __init__(self, em):
         super().__init__(resizable=True, width=800, height=800)
         self.em = em
-        #em.sig_update_complete.connect(self.on_em_update_complete)
         self.update_from_em()
     
     def on_draw(self):
@@ -57,17 +55,17 @@ class WorldWindow(pyglet.window.Window):
         fps_display.draw()
     
     def update_from_em(self):
-        cmaps = self.em.component_maps
-        position_map = cmaps[com.Position]
-        display_data_map = cmaps[com.DisplayData]
+        matching_eids = self.em.get_matching_entities(["GridWorld::Component::Position"])
         
-        for eid, position in position_map.items():
+        for eid in matching_eids:
+            position = self.em.get_Position(eid)
+
             try:
                 entity_obj = _entity_object_map[eid]
             except LookupError:
                 try:
-                    display_data = display_data_map[eid]
-                except LookupError:
+                    display_data = self.em.get_PyMeta(eid)["DisplayData"]
+                except (ValueError, LookupError):
                     display_data = None
                 
                 entity_obj = PositionEntityObject(display_data)
@@ -77,11 +75,16 @@ class WorldWindow(pyglet.window.Window):
         
         # clear out expired sprites
         for eid in list(_entity_object_map.keys()):
-            if not eid in position_map:
+            try:
+                if not self.em.has_Position(eid):
+                    # EID valid, but no longer has position
+                    del _entity_object_map[eid]
+            except KeyError:
+                # EID no longer valid
                 del _entity_object_map[eid]
 
 class _Plotter:
-    def __init__(self, em: ECS.EntityManager):
+    def __init__(self, em):
         plt.ion()
         self.em = em
         self.fig = plt.figure()
@@ -108,70 +111,66 @@ class _Plotter:
         
         plt.show()
     
-    def on_event(self, event_data):
-        name = event_data[0]
-        
-        if name == 'judgement':
-            details = event_data[1]
-            entity_scores = details['entity_scores']
-            entity_details_log = details['entity_details_log']
-            winners = details['winners']
-            losers = details['losers']
-            
-            maj_scores = {}
-            
-            for eid, score in entity_scores.items():
-                maj_name = entity_details_log[eid]['maj_name']
-                try:
-                    maj_score = maj_scores[maj_name]
-                except LookupError:
-                    maj_score = []
-                    maj_scores[maj_name] = maj_score
-                
-                maj_score.append(score)
-            
-            for maj_name, maj_score in maj_scores.items():
-                maj_sorted_score = sorted(maj_score)
-                median = maj_sorted_score[len(maj_sorted_score)//2]
-                
-                try:
-                    x, y = self.majname_median_data[maj_name]
-                except LookupError:
-                    x = []
-                    y = []
-                    self.majname_median_data[maj_name] = (x, y)
-                
-                x.append(self.em.tick)
-                y.append(median)
-            
-            winner_total = sum(entity_scores[eid] for eid in winners)
-            loser_total = sum(entity_scores[eid] for eid in losers)
-            total = winner_total + loser_total
-            
-            winner_mean = winner_total / len(winners)
-            total_mean = total / len(entity_scores)
-            
-            self.tick_data.append(self.em.tick)
-            self.winner_mean_score_data.append(winner_mean)
-            self.all_mean_score_data.append(total_mean)
-            
-            self.log_pop_counts(self.em)
-            
-            if self.em.tick % 50000 == 0:
-                self.plot_aggregate_scores()
-                
-                self.plot_pop_counts()
-                
-                self.plot_median_scores()
-                
-                self.fig.canvas.draw()
-                self.fig.canvas.flush_events()
+    def process_judgement(self, judgement_stats):
+        entity_scores = judgement_stats['entity_scores']
+        entity_details_log = judgement_stats['entity_details_log']
+        winners = judgement_stats['winners']
+        losers = judgement_stats['losers']
+
+        maj_scores = {}
+
+        for eid, score in entity_scores.items():
+            maj_name = entity_details_log[eid]['maj_name']
+            try:
+                maj_score = maj_scores[maj_name]
+            except LookupError:
+                maj_score = []
+                maj_scores[maj_name] = maj_score
+
+            maj_score.append(score)
+
+        for maj_name, maj_score in maj_scores.items():
+            maj_sorted_score = sorted(maj_score)
+            median = maj_sorted_score[len(maj_sorted_score)//2]
+
+            try:
+                x, y = self.majname_median_data[maj_name]
+            except LookupError:
+                x = []
+                y = []
+                self.majname_median_data[maj_name] = (x, y)
+
+            x.append(self.em.tick)
+            y.append(median)
+
+        winner_total = sum(entity_scores[eid] for eid in winners)
+        loser_total = sum(entity_scores[eid] for eid in losers)
+        total = winner_total + loser_total
+
+        winner_mean = winner_total / len(winners)
+        total_mean = total / len(entity_scores)
+
+        self.tick_data.append(self.em.tick)
+        self.winner_mean_score_data.append(winner_mean)
+        self.all_mean_score_data.append(total_mean)
+
+        self.log_pop_counts(self.em)
+
+        if self.em.tick % 50000 == 0:
+            self.plot_aggregate_scores()
+
+            self.plot_pop_counts()
+
+            self.plot_median_scores()
+
+            self.fig.canvas.draw()
+            self.fig.canvas.flush_events()
     
-    def log_pop_counts(self, em: ECS.EntityManager):
-        name_map = em.component_maps[com.Name]
-        
-        name: com.Name
-        for eid, name in name_map.items():
+    def log_pop_counts(self, em):
+        name_eids = em.get_matching_entities(["GridWorld::Component::Name"])
+
+        for eid in name_eids:
+            name = em.get_Name(eid)
             maj = name.major_name
             
             try:
@@ -236,15 +235,13 @@ class _Plotter:
         ax.relim()
         ax.autoscale_view()
 
+
 if __name__ == '__main__':
     test_em = core.setup_test_em()
     
     # some debug plotting stuff
     plotter = _Plotter(test_em)
-    
-    events: com.SEvents = test_em.scomponents_map[com.SEvents]
-    events._sig_event.connect(plotter.on_event)
-    
+
     window = WorldWindow(test_em)
     
 #    @window.event
@@ -252,8 +249,9 @@ if __name__ == '__main__':
 #        pass
     
     def test_update(dt):
-        core.multiupdate(test_em, 200)
+        core.run_epochs(test_em, 1, plotter.process_judgement)
         window.update_from_em()
+
     try:
         pyglet.clock.schedule(test_update)
         

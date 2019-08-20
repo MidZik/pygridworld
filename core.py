@@ -9,6 +9,14 @@ import gridworld as gw
 import numpy as np
 
 
+class DisplayData:
+    __slots__ = ('image_path', 'blend')
+
+    def __init__(self):
+        self.image_path = None
+        self.blend = (255, 255, 255)
+
+
 def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
     eid = em.create()
 
@@ -33,6 +41,14 @@ def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
     rng = em.assign_or_replace_RNG(eid)
     rng.seed(seed, seq)
 
+    meta = em.assign_or_replace_PyMeta(eid)
+    display_data = DisplayData()
+    display_data.image_path = None
+    display_data.blend = (0, 255, 0)
+    meta["DisplayData"] = display_data
+
+    return eid
+
 
 def create_predator(em: gw.EntityManager, x, y, seed, seq):
     eid = em.create()
@@ -53,6 +69,14 @@ def create_predator(em: gw.EntityManager, x, y, seed, seq):
 
     rng = em.assign_or_replace_RNG(eid)
     rng.seed(seed, seq)
+
+    meta = em.assign_or_replace_PyMeta(eid)
+    display_data = DisplayData()
+    display_data.image_path = 'assets/PredatorEntity.png'
+    display_data.blend = (255, 0, 0)
+    meta["DisplayData"] = display_data
+
+    return eid
 
 
 def mutate_brain(brain: gw.SimpleBrain, rng):
@@ -218,8 +242,9 @@ def run_perf_test():
     em.multiupdate(10000)
 
 
-def run_epochs(em, n):
+def run_epochs(em, n, on_judge=None):
     for i in range(n):
-        gw.multiupdate(em, 10000)
-        print(f"TICK = {em.tick}")
-        print(judge_and_proliferate(em))
+        gw.multiupdate(em, 25000)
+        judge_results = judge_and_proliferate(em)
+        if on_judge:
+            on_judge(judge_results)
