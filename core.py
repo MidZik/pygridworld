@@ -85,7 +85,7 @@ def mutate_brain(brain: gw.SimpleBrain, rng):
 
     synapse_array: np.nparray
     for synapse_array in brain.synapses:
-        synapse_unraveled = np.reshape(synapse_array, -1)
+        synapse_unraveled = np.reshape(synapse_array, -1, order='F')
         for index in range(len(synapse_unraveled)):
             mutation_occurs = rng.randd() <= mutation_chance
             mutation_amount = (rng.randd() - 0.5) * mutation_strength
@@ -186,7 +186,7 @@ def judge_and_proliferate(em: gw.EntityManager):
         new_brain = em.assign_or_replace_SimpleBrain(eid)
         synapse_array: np.nparray
         for synapse_array in new_brain.synapses:
-            synapse_unraveled = np.reshape(synapse_array, -1)
+            synapse_unraveled = np.reshape(synapse_array, -1, order='F')
             for index in range(len(synapse_unraveled)):
                 synapse_unraveled[index] = (srng.randd() < 0.5) * (srng.randd() - 0.5) * 2
 
