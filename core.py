@@ -242,9 +242,9 @@ def run_perf_test():
     em.multiupdate(10000)
 
 
-def run_epochs(em, n, on_judge=None):
-    for i in range(n):
-        gw.multiupdate(em, 25000)
-        judge_results = judge_and_proliferate(em)
-        if on_judge:
-            on_judge(judge_results)
+def run_super_tick(em):
+    gw.multiupdate(em, 500)
+    if em.tick % 25000 == 0:
+        return judge_and_proliferate(em)
+    else:
+        return None

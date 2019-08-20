@@ -156,20 +156,10 @@ class _Plotter:
 
         self.log_pop_counts(self.em)
 
-        if self.em.tick % 50000 == 0:
-            self.plot_aggregate_scores()
-
-            self.plot_pop_counts()
-
-            self.plot_median_scores()
-
-            self.fig.canvas.draw()
-            self.fig.canvas.flush_events()
-    
     def log_pop_counts(self, em):
-        name_eids = em.get_matching_entities(["GridWorld::Component::Name"])
+        named_scorables_eids = em.get_matching_entities(["GridWorld::Component::Name", "GridWorld::Component::Scorable"])
 
-        for eid in name_eids:
+        for eid in named_scorables_eids:
             name = em.get_Name(eid)
             maj = name.major_name
             
@@ -235,6 +225,16 @@ class _Plotter:
         ax.relim()
         ax.autoscale_view()
 
+    def plot_all(self):
+        self.plot_aggregate_scores()
+
+        self.plot_pop_counts()
+
+        self.plot_median_scores()
+
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+
 
 if __name__ == '__main__':
     test_em = core.setup_test_em()
@@ -249,7 +249,11 @@ if __name__ == '__main__':
 #        pass
     
     def test_update(dt):
-        core.run_epochs(test_em, 1, plotter.process_judgement)
+        judge_results = core.run_super_tick(test_em)
+        if judge_results:
+            plotter.process_judgement(judge_results)
+            if test_em.tick % 100000 == 0:
+                plotter.plot_all()
         window.update_from_em()
 
     try:
