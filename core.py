@@ -112,16 +112,20 @@ def judge_and_proliferate(em: gw.EntityManager):
 
             scorable.score = 0
         else:
-            # the remaining entities are losers and are immediately removed from the world
+            # the remaining entities are losers and will be removed
+            # (cannot remove entities here because we are iterating over the
+            # sorted scorables, not in storage order)
             stat_losers.append(eid)
 
-            try:
-                position = em.get_Position(eid)
-                world.set_map_data(position.x, position.y, gw.null)
-            except ValueError:
-                pass
+    # After all entities are judged, remove the losers.
+    for loser_eid in stat_losers:
+        try:
+            position = em.get_Position(loser_eid)
+            world.set_map_data(position.x, position.y, gw.null)
+        except ValueError:
+            pass
 
-            em.destroy(eid)
+        em.destroy(loser_eid)
 
     # Entity creation is next, create a list of available spaces to put entities into.
     available_spaces = []
@@ -212,3 +216,10 @@ def run_perf_test():
     em = setup_test_em()
 
     em.multiupdate(10000)
+
+
+def run_epochs(em, n):
+    for i in range(n):
+        gw.multiupdate(em, 10000)
+        print(f"TICK = {em.tick}")
+        print(judge_and_proliferate(em))
