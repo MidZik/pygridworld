@@ -211,6 +211,12 @@ def judge_and_proliferate(em: gw.EntityManager):
         name.major_name = f"T{em.tick}-{i}"
         name.minor_name = f"T{em.tick}-Eve"
 
+        meta = em.assign_or_replace_PyMeta(eid)
+        display_data = DisplayData()
+        display_data.image_path = None
+        display_data.blend = (rng.randi() % 200 + 56, rng.randi() % 200 + 56, rng.randi() % 200 + 56)
+        meta["DisplayData"] = display_data
+
     return judge_stats
 
 
