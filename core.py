@@ -7,6 +7,7 @@ Created on Thu May  2 03:03:18 2019
 
 import gridworld as gw
 import numpy as np
+import threading
 
 
 class DisplayData:
@@ -15,6 +16,46 @@ class DisplayData:
     def __init__(self):
         self.image_path = None
         self.blend = (255, 255, 255)
+
+
+class EntityManagerRunner:
+    def __init__(self):
+        self.em = gw.EntityManager()
+
+        self.max_ticks_per_loop = 1000
+
+        self.ticks_between_judgements = 25000
+        self.judgements = []
+
+        self._keep_running = False
+
+        self._runner_thread = None
+
+    def start(self):
+        if self._runner_thread is not None:
+            raise RuntimeError("Runner is already running, unable to start again.")
+
+        self._runner_thread = threading.Thread(target=self._thread_run())
+
+        self._keep_running = True
+        self._runner_thread.start()
+
+    def stop(self):
+        self._keep_running = False
+        self._runner_thread.join()
+        self._runner_thread = None
+
+    def get_epoch(self):
+        return self.em.tick // self.ticks_between_judgements
+
+    def _thread_run(self):
+        while self._keep_running:
+            ticks_to_do = self.ticks_between_judgements - self.em.tick % self.ticks_between_judgements
+            ticks_to_do = min(ticks_to_do, self.max_ticks_per_loop)
+            gw.multiupdate(self.em, ticks_to_do)
+            if self.em.tick % self.ticks_between_judgements == 0:
+                judgement_info = judge_and_proliferate(self.em)
+                self.judgements.append(judgement_info)
 
 
 def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
@@ -83,7 +124,7 @@ def mutate_brain(brain: gw.SimpleBrain, rng):
     mutation_chance = brain.child_mutation_chance
     mutation_strength = brain.child_mutation_strength
 
-    synapse_array: np.nparray
+    synapse_array: np.ndarray
     for synapse_array in brain.synapses:
         synapse_unraveled = np.reshape(synapse_array, -1, order='F')
         for index in range(len(synapse_unraveled)):
@@ -184,7 +225,7 @@ def judge_and_proliferate(em: gw.EntityManager):
         eid = em.create()
 
         new_brain = em.assign_or_replace_SimpleBrain(eid)
-        synapse_array: np.nparray
+        synapse_array: np.ndarray
         for synapse_array in new_brain.synapses:
             synapse_unraveled = np.reshape(synapse_array, -1, order='F')
             for index in range(len(synapse_unraveled)):
