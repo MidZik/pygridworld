@@ -8,6 +8,7 @@ Created on Thu May  2 03:03:18 2019
 import gridworld as gw
 import numpy as np
 import threading
+import weakref
 
 
 class DisplayData:
@@ -18,6 +19,30 @@ class DisplayData:
         self.blend = (255, 255, 255)
 
 
+class Signal:
+    __slots__ = ('_slots',)
+
+    def __init__(self):
+        self._slots = []
+
+    def connect(self, slot, *binds):
+        """
+        Connects a method to the signal. Whenever the signal is emitted,
+        all connected methods will be fired immediately.
+        """
+        self._slots.insert(0, (weakref.ref(slot.__self__), slot.__func__, binds))
+
+    def emit(self, *args):
+        for i in range(len(self._slots) - 1, -1, -1):
+            slot = self._slots[i]
+            obj = slot[0]()
+            if obj:
+                slot[1](obj, *args, *slot[2])
+            else:
+                # slot object was deleted earlier, remove it.
+                del self._slots[i]
+
+
 class EntityManagerRunner:
     def __init__(self):
         self.em = gw.EntityManager()
@@ -26,6 +51,7 @@ class EntityManagerRunner:
 
         self.ticks_between_judgements = 25000
         self.judgements = []
+        self.judgement_occurred = Signal()
 
         self._keep_running = False
 
@@ -56,6 +82,7 @@ class EntityManagerRunner:
             if self.em.tick % self.ticks_between_judgements == 0:
                 judgement_info = judge_and_proliferate(self.em)
                 self.judgements.append(judgement_info)
+                self.judgement_occurred.emit(judgement_info)
 
 
 def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
