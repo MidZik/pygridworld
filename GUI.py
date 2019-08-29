@@ -6,6 +6,7 @@ Created on Fri May  3 18:24:23 2019
 """
 
 import core
+import threading
 
 from weakref import WeakValueDictionary
 import pyglet
@@ -34,27 +35,50 @@ class PositionEntityObject:
             image.anchor_x = image.width // 2
             image.anchor_y = image.height // 2
             _image_cache[image_path] = image
-        
-        self.sprite = pyglet.sprite.Sprite(image, batch=_entity_batch)
+
         if display_data:
-            self.sprite.color = display_data.blend
+            self.color = display_data.blend
+        else:
+            self.color = (255, 255, 255)
+        self.image = image
+        self.sprite = None
+
+        self.position = (0, 0)
+
+    def update_sprite(self):
+        if not self.sprite:
+            self.sprite = pyglet.sprite.Sprite(self.image, batch=_entity_batch)
+            self.sprite.color = self.color
+
+        self.sprite.update(self.position[0] * 40 + 20, self.position[1] * 40 + 20)
     
     def __del__(self):
-        self.sprite.delete()
+        if self.sprite:
+            self.sprite.delete()
         
 
 class WorldWindow(pyglet.window.Window):
     def __init__(self, em):
         super().__init__(resizable=True, width=800, height=800)
+        self.window_lock = threading.Lock()
         self.em = em
         self.update_from_em()
     
     def on_draw(self):
+        self.window_lock.acquire()
+
+        for peo in _entity_object_map.values():
+            peo.update_sprite()
+
         self.clear()
         _entity_batch.draw()
         fps_display.draw()
+
+        self.window_lock.release()
     
     def update_from_em(self):
+        self.window_lock.acquire()
+
         matching_eids = self.em.get_matching_entities(["GridWorld::Component::Position"])
         
         for eid in matching_eids:
@@ -71,7 +95,7 @@ class WorldWindow(pyglet.window.Window):
                 entity_obj = PositionEntityObject(display_data)
                 _entity_object_map[eid] = entity_obj
             
-            entity_obj.sprite.update(position.x * 40 + 20, position.y * 40 + 20)
+            entity_obj.position = (position.x, position.y)
         
         # clear out expired sprites
         for eid in list(_entity_object_map.keys()):
@@ -82,6 +106,8 @@ class WorldWindow(pyglet.window.Window):
             except KeyError:
                 # EID no longer valid
                 del _entity_object_map[eid]
+
+        self.window_lock.release()
 
 class _Plotter:
     def __init__(self, em):
@@ -238,29 +264,30 @@ class _Plotter:
 
 if __name__ == '__main__':
     test_em = core.setup_test_em()
+    test_em_runner = core.EntityManagerRunner(test_em)
     
     # some debug plotting stuff
     plotter = _Plotter(test_em)
 
     window = WorldWindow(test_em)
-    
-#    @window.event
-#    def on_mouse_press(x, y, button, mods):
-#        pass
-    
-    def test_update(dt):
-        judge_results = core.run_super_tick(test_em)
-        if judge_results:
-            plotter.process_judgement(judge_results)
-            if test_em.tick % 100000 == 0:
-                plotter.plot_all()
+
+    def blah(delta):
+        pass
+
+    def on_loop_finished():
         window.update_from_em()
 
+    def on_judgement_occurred(judgement):
+        global old_perf
+        plotter.process_judgement(judgement)
+        plotter.plot_all()
+
     try:
-        pyglet.clock.schedule(test_update)
-        
+        pyglet.clock.schedule_interval(blah, 1/30)
+        test_em_runner.judgement_occurred.connect(on_judgement_occurred)
+        test_em_runner.loop_finished.connect(on_loop_finished)
+        test_em_runner.start()
         pyglet.app.run()
     finally:
-        pyglet.clock.unschedule(test_update)
         pyglet.app.exit()
         window.close()

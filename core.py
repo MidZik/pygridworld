@@ -9,6 +9,7 @@ import gridworld as gw
 import numpy as np
 import threading
 import weakref
+import inspect
 
 
 class DisplayData:
@@ -27,27 +28,41 @@ class Signal:
 
     def connect(self, slot, *binds):
         """
-        Connects a method to the signal. Whenever the signal is emitted,
+        Connects a method or function to the signal. Whenever the signal is emitted,
         all connected methods will be fired immediately.
         """
-        self._slots.insert(0, (weakref.ref(slot.__self__), slot.__func__, binds))
+        if inspect.ismethod(slot):
+            # Bound method case
+            self._slots.insert(0, (weakref.ref(slot.__self__), slot.__func__, binds))
+        else:
+            # Function/callable case
+            self._slots.insert(0, (None, slot, binds))
 
     def emit(self, *args):
         for i in range(len(self._slots) - 1, -1, -1):
             slot = self._slots[i]
-            obj = slot[0]()
-            if obj:
-                slot[1](obj, *args, *slot[2])
+            ref = slot[0]
+            func = slot[1]
+            binds = slot[2]
+            if ref:
+                # Bound method case
+                obj = ref()
+                if obj:
+                    func(obj, *args, *binds)
+                else:
+                    # slot object was deleted earlier, remove it.
+                    del self._slots[i]
             else:
-                # slot object was deleted earlier, remove it.
-                del self._slots[i]
+                # Function case
+                func(*args, *binds)
 
 
 class EntityManagerRunner:
-    def __init__(self):
-        self.em = gw.EntityManager()
+    def __init__(self, em):
+        self.em = em
 
         self.max_ticks_per_loop = 1000
+        self.loop_finished = Signal()
 
         self.ticks_between_judgements = 25000
         self.judgements = []
@@ -61,7 +76,7 @@ class EntityManagerRunner:
         if self._runner_thread is not None:
             raise RuntimeError("Runner is already running, unable to start again.")
 
-        self._runner_thread = threading.Thread(target=self._thread_run())
+        self._runner_thread = threading.Thread(target=self._thread_run)
 
         self._keep_running = True
         self._runner_thread.start()
@@ -83,6 +98,7 @@ class EntityManagerRunner:
                 judgement_info = judge_and_proliferate(self.em)
                 self.judgements.append(judgement_info)
                 self.judgement_occurred.emit(judgement_info)
+            self.loop_finished.emit()
 
 
 def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
