@@ -6,7 +6,6 @@ Created on Fri May  3 18:24:23 2019
 """
 
 import core
-import threading
 
 from weakref import WeakValueDictionary
 import pyglet
@@ -14,100 +13,80 @@ import matplotlib.pyplot as plt
 
 _image_cache = WeakValueDictionary()
 
-_entity_batch = pyglet.graphics.Batch()
-
-_entity_object_map = {}
-
 fps_display = pyglet.clock.ClockDisplay()
 
 
-class PositionEntityObject:
-    def __init__(self, display_data):
-        if display_data and display_data.image_path:
-            image_path = display_data.image_path
-        else:
-            image_path = 'assets/DefaultEntity.png'
-        
-        try:
-            image = _image_cache[image_path]
-        except LookupError:
-            image = pyglet.image.load(image_path)
-            image.anchor_x = image.width // 2
-            image.anchor_y = image.height // 2
-            _image_cache[image_path] = image
+class RenderData:
+    __slots__ = ('x', 'y', 'image_path', 'color')
 
-        if display_data:
-            self.color = display_data.blend
-        else:
-            self.color = (255, 255, 255)
-        self.image = image
-        self.sprite = None
-
-        self.position = (0, 0)
-
-    def update_sprite(self):
-        if not self.sprite:
-            self.sprite = pyglet.sprite.Sprite(self.image, batch=_entity_batch)
-            self.sprite.color = self.color
-
-        self.sprite.update(self.position[0] * 40 + 20, self.position[1] * 40 + 20)
-    
-    def __del__(self):
-        if self.sprite:
-            self.sprite.delete()
+    def __init__(self, x, y, image_path, color):
+        self.x = x
+        self.y = y
+        self.image_path = image_path
+        self.color = color
         
 
 class WorldWindow(pyglet.window.Window):
     def __init__(self, em):
         super().__init__(resizable=True, width=800, height=800)
-        self.window_lock = threading.Lock()
         self.em = em
+        self._latest_frame_data = {}
+        self._sprite_cache = {}
+        self._entity_batch = pyglet.graphics.Batch()
         self.update_from_em()
     
     def on_draw(self):
-        self.window_lock.acquire()
+        current_frame_data = self._latest_frame_data
+        sprite_cache = self._sprite_cache
+        entity_batch = self._entity_batch
+        for eid, render_data in current_frame_data.items():
+            try:
+                sprite = sprite_cache[eid]
+            except LookupError:
+                image_path = render_data.image_path
+                try:
+                    image = _image_cache[image_path]
+                except LookupError:
+                    image = pyglet.image.load(image_path)
+                    image.anchor_x = image.width // 2
+                    image.anchor_y = image.height // 2
+                    _image_cache[image_path] = image
+                sprite = pyglet.sprite.Sprite(image, batch=entity_batch)
+                sprite.color = render_data.color
+                sprite_cache[eid] = sprite
 
-        for peo in _entity_object_map.values():
-            peo.update_sprite()
+            sprite.update(render_data.x * 40 + 20, render_data.y * 40 + 20)
+
+        for eid, sprite in [(eid, sprite) for eid, sprite in sprite_cache.items() if eid not in current_frame_data]:
+            # Delete all sprites that represent deleted entities
+            sprite.delete()
+            del sprite_cache[eid]
 
         self.clear()
-        _entity_batch.draw()
+        entity_batch.draw()
         fps_display.draw()
-
-        self.window_lock.release()
     
     def update_from_em(self):
-        self.window_lock.acquire()
-
         matching_eids = self.em.get_matching_entities(["GridWorld::Component::Position"])
+
+        frame_data = {}
         
         for eid in matching_eids:
             position = self.em.get_Position(eid)
 
             try:
-                entity_obj = _entity_object_map[eid]
-            except LookupError:
-                try:
-                    display_data = self.em.get_PyMeta(eid)["DisplayData"]
-                except (ValueError, LookupError):
-                    display_data = None
-                
-                entity_obj = PositionEntityObject(display_data)
-                _entity_object_map[eid] = entity_obj
-            
-            entity_obj.position = (position.x, position.y)
-        
-        # clear out expired sprites
-        for eid in list(_entity_object_map.keys()):
-            try:
-                if not self.em.has_Position(eid):
-                    # EID valid, but no longer has position
-                    del _entity_object_map[eid]
-            except KeyError:
-                # EID no longer valid
-                del _entity_object_map[eid]
+                display_data = self.em.get_PyMeta(eid)["DisplayData"]
+                image_path = display_data.image_path or 'assets/DefaultEntity.png'
 
-        self.window_lock.release()
+                color = display_data.blend
+            except (ValueError, LookupError):
+                image_path = None
+                color = (255, 255, 255)
+
+            frame_data[eid] = RenderData(position.x, position.y, image_path, color)
+
+        self._latest_frame_data = frame_data
+
 
 class _Plotter:
     def __init__(self, em):
@@ -271,19 +250,18 @@ if __name__ == '__main__':
 
     window = WorldWindow(test_em)
 
-    def blah(delta):
+    def update(dt):
         pass
 
     def on_loop_finished():
         window.update_from_em()
 
     def on_judgement_occurred(judgement):
-        global old_perf
         plotter.process_judgement(judgement)
         plotter.plot_all()
 
     try:
-        pyglet.clock.schedule_interval(blah, 1/30)
+        pyglet.clock.schedule_interval(update, 1/30)
         test_em_runner.judgement_occurred.connect(on_judgement_occurred)
         test_em_runner.loop_finished.connect(on_loop_finished)
         test_em_runner.start()
