@@ -116,11 +116,11 @@ class _Plotter:
         
         plt.show()
     
-    def process_judgement(self, judgement_stats):
-        entity_scores = judgement_stats['entity_scores']
-        entity_details_log = judgement_stats['entity_details_log']
-        winners = judgement_stats['winners']
-        losers = judgement_stats['losers']
+    def process_evolution_log(self, evo_log):
+        entity_scores = evo_log['entity_scores']
+        entity_details_log = evo_log['entity_details_log']
+        winners = evo_log['winners']
+        losers = evo_log['losers']
 
         maj_scores = {}
 
@@ -256,13 +256,13 @@ if __name__ == '__main__':
     def on_loop_finished():
         window.update_from_em()
 
-    def on_judgement_occurred(judgement):
-        plotter.process_judgement(judgement)
+    def on_evolution_occurred(evo_log):
+        plotter.process_evolution_log(evo_log)
         plotter.plot_all()
 
     try:
         pyglet.clock.schedule_interval(update, 1/30)
-        test_em_runner.judgement_occurred.connect(on_judgement_occurred)
+        test_em_runner.evolution_occurred.connect(on_evolution_occurred)
         test_em_runner.loop_finished.connect(on_loop_finished)
         test_em_runner.start()
         pyglet.app.run()

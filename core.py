@@ -64,9 +64,9 @@ class EntityManagerRunner:
         self.max_ticks_per_loop = 1000
         self.loop_finished = Signal()
 
-        self.ticks_between_judgements = 25000
-        self.judgements = []
-        self.judgement_occurred = Signal()
+        self.ticks_between_evolutions = 25000
+        self.evolution_logs = []
+        self.evolution_occurred = Signal()
 
         self._keep_running = False
 
@@ -87,17 +87,17 @@ class EntityManagerRunner:
         self._runner_thread = None
 
     def get_epoch(self):
-        return self.em.tick // self.ticks_between_judgements
+        return self.em.tick // self.ticks_between_evolutions
 
     def _thread_run(self):
         while self._keep_running:
-            ticks_to_do = self.ticks_between_judgements - self.em.tick % self.ticks_between_judgements
+            ticks_to_do = self.ticks_between_evolutions - self.em.tick % self.ticks_between_evolutions
             ticks_to_do = min(ticks_to_do, self.max_ticks_per_loop)
             gw.multiupdate(self.em, ticks_to_do)
-            if self.em.tick % self.ticks_between_judgements == 0:
-                judgement_info = judge_and_proliferate(self.em)
-                self.judgements.append(judgement_info)
-                self.judgement_occurred.emit(judgement_info)
+            if self.em.tick % self.ticks_between_evolutions == 0:
+                evolution_log = log_and_evolve(self.em)
+                self.evolution_logs.append(evolution_log)
+                self.evolution_occurred.emit(evolution_log)
             self.loop_finished.emit()
 
 
@@ -179,16 +179,15 @@ def mutate_brain(brain: gw.SimpleBrain, rng):
         np.clip(synapse_array, -1.0, 1.0, out=synapse_array)
 
 
-def judge_and_proliferate(em: gw.EntityManager):
+def log_and_evolve(em: gw.EntityManager):
     srng = em.get_singleton_RNG()
     world = em.get_singleton_SWorld()
 
-    # judge stats
     stat_entity_scores = {}
     log_entity_details = {}
     stat_winners = []
     stat_losers = []
-    judge_stats = {
+    log = {
         'entity_scores': stat_entity_scores,
         'entity_details_log': log_entity_details,
         'winners': stat_winners,
@@ -301,7 +300,7 @@ def judge_and_proliferate(em: gw.EntityManager):
         display_data.blend = (rng.randi() % 200 + 56, rng.randi() % 200 + 56, rng.randi() % 200 + 56)
         meta["DisplayData"] = display_data
 
-    return judge_stats
+    return log
 
 
 def setup_test_em():
@@ -335,6 +334,6 @@ def run_perf_test():
 def run_super_tick(em):
     gw.multiupdate(em, 500)
     if em.tick % 25000 == 0:
-        return judge_and_proliferate(em)
+        return log_and_evolve(em)
     else:
         return None
