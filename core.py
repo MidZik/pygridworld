@@ -38,6 +38,10 @@ class Signal:
             # Function/callable case
             self._slots.insert(0, (None, slot, binds))
 
+    def disconnect(self, slot):
+        i = self._find_slot(slot)
+        del self._slots[i]
+
     def emit(self, *args):
         for i in range(len(self._slots) - 1, -1, -1):
             slot = self._slots[i]
@@ -56,6 +60,29 @@ class Signal:
                 # Function case
                 func(*args, *binds)
 
+    def _find_slot(self, slot):
+        if inspect.ismethod(slot):
+            # Bound method case
+            expected_self = slot.__self__
+            expected_func = slot.__func__
+        else:
+            # Function/callable case
+            expected_self = None
+            expected_func = slot
+
+        for i, slot2 in enumerate(self._slots):
+            found_self = slot2[0]
+            if found_self:
+                # If not none, this is a weakref that needs dereferencing
+                found_self = found_self()
+
+            found_func = slot2[1]
+
+            if found_self is expected_self and found_func is expected_func:
+                return i
+
+        raise ValueError("Unable to find a connection with the given slot.")
+
 
 class EntityManagerRunner:
     def __init__(self, em):
@@ -73,7 +100,7 @@ class EntityManagerRunner:
         self._runner_thread = None
 
     def start(self):
-        if self._runner_thread is not None:
+        if self.is_running():
             raise RuntimeError("Runner is already running, unable to start again.")
 
         self._runner_thread = threading.Thread(target=self._thread_run)
@@ -81,13 +108,17 @@ class EntityManagerRunner:
         self._keep_running = True
         self._runner_thread.start()
 
-    def stop(self):
+    def stop(self, join):
         self._keep_running = False
-        self._runner_thread.join()
+        if join:
+            self._runner_thread.join()
         self._runner_thread = None
 
     def get_epoch(self):
         return self.em.tick // self.ticks_between_evolutions
+
+    def is_running(self):
+        return self._runner_thread is not None
 
     def _thread_run(self):
         while self._keep_running:
@@ -99,6 +130,41 @@ class EntityManagerRunner:
                 self.evolution_logs.append(evolution_log)
                 self.evolution_occurred.emit(evolution_log)
             self.loop_finished.emit()
+
+
+class RunnerCollection:
+    def __init__(self, em_list):
+        runners = []
+
+        for em in em_list:
+            runners.append(EntityManagerRunner(em))
+
+        self._runners = runners
+
+    def run_until_epoch(self, epochs):
+        wait_condition = threading.Condition()
+        wait_condition.acquire()
+
+        def on_evolution_occurred(_, runner):
+            if runner.get_epoch() >= epochs:
+                wait_condition.acquire()
+                runner.stop(False)
+                wait_condition.notify_all()
+                wait_condition.release()
+
+        for runner in self._runners:
+            runner.evolution_occurred.connect(on_evolution_occurred, runner)
+            runner.start()
+
+        def all_runners_stopped():
+            return all(not runner.is_running() for runner in self._runners)
+
+        wait_condition.wait_for(all_runners_stopped)
+
+        for runner in self._runners:
+            runner.evolution_occurred.disconnect(on_evolution_occurred)
+
+        wait_condition.release()
 
 
 def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
