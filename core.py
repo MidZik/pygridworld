@@ -166,8 +166,12 @@ class RunnerCollection:
 
         wait_condition.release()
 
+    def run_until_epoch_async(self, epochs):
+        thread = threading.Thread(target=self.run_until_epoch, args=(epochs,))
+        thread.start()
 
-def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
+
+def create_brain_entity(em: gw.EntityManager, x, y, seed, seq, **kwargs):
     eid = em.create()
 
     pos: gw.Position = em.assign_or_replace_Position(eid)
@@ -182,7 +186,9 @@ def create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
     name.major_name = f"I({x},{y})"
     name.minor_name = "Eve"
 
-    em.assign_or_replace_SimpleBrain(eid)
+    brain = em.assign_or_replace_SimpleBrain(eid)
+    brain.child_mutation_chance = kwargs.get('child_mutation_chance', 0.5)
+    brain.child_mutation_strength = kwargs.get('child_mutation_strength', 0.2)
 
     em.assign_or_replace_SimpleBrainSeer(eid)
 
@@ -369,17 +375,17 @@ def log_and_evolve(em: gw.EntityManager):
     return log
 
 
-def setup_test_em():
+def setup_test_em(root_seed=54321669, root_seq=12345667, **kwargs):
     em = gw.EntityManager()
 
     world = em.set_singleton_SWorld()
     world.reset_world(20, 20)
 
     rng = em.set_singleton_RNG()
-    rng.seed(54321669, 12345667)
+    rng.seed(root_seed, root_seq)
 
     for i in range(5):
-        create_brain_entity(em, i, i, rng.randi(), rng.randi())
+        create_brain_entity(em, i, i, rng.randi(), rng.randi(), **kwargs)
         create_predator(em, i + 2, i + 5, rng.randi(), rng.randi())
 
     for i in range(6):
