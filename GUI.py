@@ -113,8 +113,6 @@ class _Plotter:
         self.plot_pop_counts()
         
         self.plot_median_scores()
-        
-        plt.show()
     
     def process_evolution_log(self, evo_log):
         entity_scores = evo_log['entity_scores']
@@ -182,6 +180,7 @@ class _Plotter:
             y[-1] += 1
     
     def plot_pop_counts(self):
+        plt.figure(self.fig.number)
         plt.subplot(222, label="populations")
         for maj, (x, y) in self.majname_pop_data.items():
             # only plot populations that have lived a non-trivial amount of time
@@ -199,6 +198,7 @@ class _Plotter:
         ax.autoscale_view()
     
     def plot_aggregate_scores(self):
+        plt.figure(self.fig.number)
         plt.subplot(221, label="scores")
         
         try:
@@ -213,6 +213,7 @@ class _Plotter:
         ax.autoscale_view()
     
     def plot_median_scores(self):
+        plt.figure(self.fig.number)
         plt.subplot(224, label="median scores")
         
         for maj, (x, y) in self.majname_median_data.items():
@@ -242,29 +243,38 @@ class _Plotter:
 
 
 if __name__ == '__main__':
-    test_em = core.setup_test_em()
-    test_em_runner = core.EntityManagerRunner(test_em)
-    
-    # some debug plotting stuff
-    plotter = _Plotter(test_em)
-
-    window = WorldWindow(test_em)
+    ems = [core.setup_test_em(999, 999), core.setup_test_em(9999, 9999), core.setup_test_em(99999, 99999)]
+    collection = core.RunnerCollection(ems)
+    import threading
+    plot_lock = threading.Lock()
 
     def update(dt):
         pass
 
-    def on_loop_finished():
-        window.update_from_em()
+    for runner in collection._runners:
+        em = runner.em
+        plotter = _Plotter(em)
+        window = WorldWindow(em)
 
-    def on_evolution_occurred(evo_log):
-        plotter.process_evolution_log(evo_log)
-        plotter.plot_all()
+        def setup_signal_handlers(r, p, w):
+            def on_loop_finished():
+                w.update_from_em()
+
+            def on_evolution_occurred(evo_log):
+                p.process_evolution_log(evo_log)
+                plot_lock.acquire()
+                p.plot_all()
+                plot_lock.release()
+
+            r.evolution_occurred.connect(on_evolution_occurred)
+            r.loop_finished.connect(on_loop_finished)
+
+        setup_signal_handlers(runner, plotter, window)
 
     try:
-        pyglet.clock.schedule_interval(update, 1/30)
-        test_em_runner.evolution_occurred.connect(on_evolution_occurred)
-        test_em_runner.loop_finished.connect(on_loop_finished)
-        test_em_runner.start()
+        plt.show()
+        pyglet.clock.schedule_interval(update, 1 / 30)
+        collection.run_until_epoch_async(100)
         pyglet.app.run()
     finally:
         pyglet.app.exit()
