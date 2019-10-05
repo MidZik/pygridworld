@@ -84,328 +84,306 @@ class Signal:
         raise ValueError("Unable to find a connection with the given slot.")
 
 
-class EntityManagerRunner:
-    def __init__(self, em):
-        self.em = em
+class TestSimulation:
+    def __init__(self, init_state=123456789, init_seq=23456789):
+        self.em = None
+        self.seed = None
 
-        self.max_ticks_per_loop = 1000
-        self.loop_finished = Signal()
+        self.evolution_occurred = Signal()
+        self.update_done = Signal()
 
         self.ticks_between_evolutions = 25000
-        self.evolution_logs = []
-        self.evolution_occurred = Signal()
 
-        self._keep_running = False
+        self.reset_from_seed(init_state, init_seq)
 
-        self._runner_thread = None
+    def reset_from_seed(self, init_state, init_seq):
+        em = gw.EntityManager()
 
-    def start(self):
-        if self.is_running():
-            raise RuntimeError("Runner is already running, unable to start again.")
+        world = em.set_singleton_SWorld()
+        world.reset_world(20, 20)
 
-        self._runner_thread = threading.Thread(target=self._thread_run)
+        rng = em.set_singleton_RNG()
+        rng.seed(init_state, init_seq)
 
-        self._keep_running = True
-        self._runner_thread.start()
+        for i in range(5):
+            self._create_brain_entity(em, i, i, rng.randi(), rng.randi())
+            self._create_predator_entity(em, i + 2, i + 5, rng.randi(), rng.randi())
 
-    def stop(self, join):
-        self._keep_running = False
-        if join:
-            self._runner_thread.join()
-        self._runner_thread = None
+        for i in range(6):
+            self._create_predator_entity(em, i + 5, i + 9, rng.randi(), rng.randi())
 
-    def get_epoch(self):
-        return self.em.tick // self.ticks_between_evolutions
+        # After populating the world, need to refresh the world data
+        gw.rebuild_world(em)
 
-    def is_running(self):
-        return self._runner_thread is not None
+        self.em = em
+        self.seed = (init_state, init_seq)
 
-    def _thread_run(self):
-        while self._keep_running:
-            ticks_to_do = self.ticks_between_evolutions - self.em.tick % self.ticks_between_evolutions
-            ticks_to_do = min(ticks_to_do, self.max_ticks_per_loop)
-            gw.multiupdate(self.em, ticks_to_do)
-            if self.em.tick % self.ticks_between_evolutions == 0:
-                evolution_log = log_and_evolve(self.em)
-                self.evolution_logs.append(evolution_log)
+    def simulate(self, ticks, max_ticks_per_update=25000):
+        em = self.em
+        run_until_tick = em.tick + ticks
+        while em.tick < run_until_tick:
+            ticks_until_evolution = self.ticks_between_evolutions - em.tick % self.ticks_between_evolutions
+            ticks_to_do = min(run_until_tick - em.tick, ticks_until_evolution, max_ticks_per_update)
+            gw.multiupdate(em, ticks_to_do)
+            if em.tick % self.ticks_between_evolutions == 0:
+                evolution_log = self._log_and_evolve(em)
                 self.evolution_occurred.emit(evolution_log)
-            self.loop_finished.emit()
+            self.update_done.emit()
 
-
-class RunnerCollection:
-    def __init__(self, em_list):
-        runners = []
-
-        for em in em_list:
-            runners.append(EntityManagerRunner(em))
-
-        self._runners = runners
-
-    def run_until_epoch(self, epochs):
-        wait_condition = threading.Condition()
-        wait_condition.acquire()
-
-        def on_evolution_occurred(_, runner):
-            if runner.get_epoch() >= epochs:
-                wait_condition.acquire()
-                runner.stop(False)
-                wait_condition.notify_all()
-                wait_condition.release()
-
-        for runner in self._runners:
-            runner.evolution_occurred.connect(on_evolution_occurred, runner)
-            runner.start()
-
-        def all_runners_stopped():
-            return all(not runner.is_running() for runner in self._runners)
-
-        wait_condition.wait_for(all_runners_stopped)
-
-        for runner in self._runners:
-            runner.evolution_occurred.disconnect(on_evolution_occurred)
-
-        wait_condition.release()
-
-    def run_until_epoch_async(self, epochs):
-        thread = threading.Thread(target=self.run_until_epoch, args=(epochs,))
-        thread.start()
-
-
-def create_brain_entity(em: gw.EntityManager, x, y, seed, seq, **kwargs):
-    eid = em.create()
-
-    pos: gw.Position = em.assign_or_replace_Position(eid)
-    pos.x = x
-    pos.y = y
-
-    em.assign_or_replace_Moveable(eid)
-
-    em.assign_or_replace_Scorable(eid)
-
-    name = em.assign_or_replace_Name(eid)
-    name.major_name = f"I({x},{y})"
-    name.minor_name = "Eve"
-
-    brain = em.assign_or_replace_SimpleBrain(eid)
-    brain.child_mutation_chance = kwargs.get('child_mutation_chance', 0.5)
-    brain.child_mutation_strength = kwargs.get('child_mutation_strength', 0.2)
-
-    em.assign_or_replace_SimpleBrainSeer(eid)
-
-    em.assign_or_replace_SimpleBrainMover(eid)
-
-    rng = em.assign_or_replace_RNG(eid)
-    rng.seed(seed, seq)
-
-    meta = em.assign_or_replace_PyMeta(eid)
-    display_data = DisplayData()
-    display_data.image_path = None
-    display_data.blend = (0, 255, 0)
-    meta["DisplayData"] = display_data
-
-    return eid
-
-
-def create_predator(em: gw.EntityManager, x, y, seed, seq):
-    eid = em.create()
-
-    pos: gw.Position = em.assign_or_replace_Position(eid)
-    pos.x = x
-    pos.y = y
-
-    em.assign_or_replace_Moveable(eid)
-
-    name = em.assign_or_replace_Name(eid)
-    name.major_name = f"I({x},{y})"
-    name.minor_name = "PREDATOR"
-
-    em.assign_or_replace_RandomMover(eid)
-
-    em.assign_or_replace_Predation(eid)
-
-    rng = em.assign_or_replace_RNG(eid)
-    rng.seed(seed, seq)
-
-    meta = em.assign_or_replace_PyMeta(eid)
-    display_data = DisplayData()
-    display_data.image_path = 'assets/PredatorEntity.png'
-    display_data.blend = (255, 0, 0)
-    meta["DisplayData"] = display_data
-
-    return eid
-
-
-def mutate_brain(brain: gw.SimpleBrain, rng):
-    mutation_chance = brain.child_mutation_chance
-    mutation_strength = brain.child_mutation_strength
-
-    synapse_array: np.ndarray
-    for synapse_array in brain.synapses:
-        synapse_unraveled = np.reshape(synapse_array, -1, order='F')
-        for index in range(len(synapse_unraveled)):
-            mutation_occurs = rng.randd() <= mutation_chance
-            mutation_amount = (rng.randd() - 0.5) * mutation_strength
-            synapse_unraveled[index] += mutation_occurs * mutation_amount
-
-        # after all mutations, clamp synapses so they stay in [-1,1] range
-        np.clip(synapse_array, -1.0, 1.0, out=synapse_array)
-
-
-def log_and_evolve(em: gw.EntityManager):
-    srng = em.get_singleton_RNG()
-    world = em.get_singleton_SWorld()
-
-    stat_entity_scores = {}
-    log_entity_details = {}
-    stat_winners = []
-    stat_losers = []
-    log = {
-        'entity_scores': stat_entity_scores,
-        'entity_details_log': log_entity_details,
-        'winners': stat_winners,
-        'losers': stat_losers
-    }
-
-    scorables = []
-    for eid in em.get_matching_entities(["GridWorld::Component::Scorable"]):
-        scorables.append((eid, em.get_Scorable(eid)))
-
-    sorted_scorables = sorted(scorables, key=lambda x: x[1].score, reverse=True)
-
-    for index, (eid, scorable) in enumerate(sorted_scorables):
-        stat_entity_scores[eid] = scorable.score
-
-        try:
-            name: gw.Name = em.get_Name(eid)
-        except ValueError:
-            log_entity_details[eid] = {}
-        else:
-            log_entity_details[eid] = {
-                'maj_name': name.major_name,
-                'min_name': name.minor_name
-            }
-
-        if index < 6:
-            # top 6 scorables are the winners that live and reproduce
-            stat_winners.append(eid)
-
-            scorable.score = 0
-        else:
-            # the remaining entities are losers and will be removed
-            # (cannot remove entities here because we are iterating over the
-            # sorted scorables, not in storage order)
-            stat_losers.append(eid)
-
-    # After all entities are judged, remove the losers.
-    for loser_eid in stat_losers:
-        try:
-            position = em.get_Position(loser_eid)
-            world.set_map_data(position.x, position.y, gw.null)
-        except ValueError:
-            pass
-
-        em.destroy(loser_eid)
-
-    # Entity creation is next, create a list of available spaces to put entities into.
-    available_spaces = []
-    for x in range(world.width):
-        for y in range(world.height):
-            if world.get_map_data(x, y) == gw.null:
-                available_spaces.append((x, y))
-
-    # create duplicate entities from winners, modifying them slightly
-    for parent_eid in stat_winners:
-        child_eid = gw.duplicate_entity(em, parent_eid)
-
-        parent_rng = em.get_RNG(parent_eid)
-
-        child_rng = em.get_RNG(child_eid)
-        child_rng.seed(parent_rng.randi(), parent_rng.randi())
-
-        new_pos = available_spaces.pop(child_rng.randi() % len(available_spaces))
-        position = em.get_Position(child_eid)
-        position.x = new_pos[0]
-        position.y = new_pos[1]
-        world.set_map_data(position.x, position.y, child_eid)
-
-        brain = em.get_SimpleBrain(child_eid)
-        mutate_brain(brain, child_rng)
-
-        name = em.get_Name(child_eid)
-        name.minor_name = f'T{em.tick}-P{parent_eid}'
-
-    # finally, part of the judge's duty is to queue brand new entities for creation
-    for i in range(3):
+    @staticmethod
+    def _create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
         eid = em.create()
 
-        new_brain = em.assign_or_replace_SimpleBrain(eid)
-        synapse_array: np.ndarray
-        for synapse_array in new_brain.synapses:
-            synapse_unraveled = np.reshape(synapse_array, -1, order='F')
-            for index in range(len(synapse_unraveled)):
-                synapse_unraveled[index] = (srng.randd() < 0.5) * (srng.randd() - 0.5) * 2
+        pos: gw.Position = em.assign_or_replace_Position(eid)
+        pos.x = x
+        pos.y = y
+
+        em.assign_or_replace_Moveable(eid)
+
+        em.assign_or_replace_Scorable(eid)
+
+        name = em.assign_or_replace_Name(eid)
+        name.major_name = f"I({x},{y})"
+        name.minor_name = "Eve"
+
+        brain = em.assign_or_replace_SimpleBrain(eid)
+        brain.child_mutation_chance = 0.5
+        brain.child_mutation_strength = 0.2
 
         em.assign_or_replace_SimpleBrainSeer(eid)
 
         em.assign_or_replace_SimpleBrainMover(eid)
 
-        new_pos = available_spaces.pop(srng.randi() % len(available_spaces))
-        position = em.assign_or_replace_Position(eid)
-        position.x = new_pos[0]
-        position.y = new_pos[1]
-        world.set_map_data(position.x, position.y, eid)
-
-        em.assign_or_replace_Moveable(eid)
-
         rng = em.assign_or_replace_RNG(eid)
-        rng.seed(srng.randi(), srng.randi())
-
-        em.assign_or_replace_Scorable(eid)
-
-        name = em.assign_or_replace_Name(eid)
-        name.major_name = f"T{em.tick}-{i}"
-        name.minor_name = f"T{em.tick}-Eve"
+        rng.seed(seed, seq)
 
         meta = em.assign_or_replace_PyMeta(eid)
         display_data = DisplayData()
         display_data.image_path = None
-        display_data.blend = (rng.randi() % 200 + 56, rng.randi() % 200 + 56, rng.randi() % 200 + 56)
+        display_data.blend = (0, 255, 0)
         meta["DisplayData"] = display_data
 
-    return log
+        return eid
+
+    @staticmethod
+    def _create_predator_entity(em: gw.EntityManager, x, y, seed, seq):
+        eid = em.create()
+
+        pos: gw.Position = em.assign_or_replace_Position(eid)
+        pos.x = x
+        pos.y = y
+
+        em.assign_or_replace_Moveable(eid)
+
+        name = em.assign_or_replace_Name(eid)
+        name.major_name = f"I({x},{y})"
+        name.minor_name = "PREDATOR"
+
+        em.assign_or_replace_RandomMover(eid)
+
+        em.assign_or_replace_Predation(eid)
+
+        rng = em.assign_or_replace_RNG(eid)
+        rng.seed(seed, seq)
+
+        meta = em.assign_or_replace_PyMeta(eid)
+        display_data = DisplayData()
+        display_data.image_path = 'assets/PredatorEntity.png'
+        display_data.blend = (255, 0, 0)
+        meta["DisplayData"] = display_data
+
+        return eid
+
+    @staticmethod
+    def _mutate_brain(brain: gw.SimpleBrain, rng):
+        mutation_chance = brain.child_mutation_chance
+        mutation_strength = brain.child_mutation_strength
+
+        synapse_array: np.ndarray
+        for synapse_array in brain.synapses:
+            synapse_unraveled = np.reshape(synapse_array, -1, order='F')
+            for index in range(len(synapse_unraveled)):
+                mutation_occurs = rng.randd() <= mutation_chance
+                mutation_amount = (rng.randd() - 0.5) * mutation_strength
+                synapse_unraveled[index] += mutation_occurs * mutation_amount
+
+            # after all mutations, clamp synapses so they stay in [-1,1] range
+            np.clip(synapse_array, -1.0, 1.0, out=synapse_array)
+
+    @staticmethod
+    def _log_and_evolve(em: gw.EntityManager):
+        srng = em.get_singleton_RNG()
+        world = em.get_singleton_SWorld()
+
+        stat_entity_scores = {}
+        log_entity_details = {}
+        stat_winners = []
+        stat_losers = []
+        log = {
+            'entity_scores': stat_entity_scores,
+            'entity_details_log': log_entity_details,
+            'winners': stat_winners,
+            'losers': stat_losers
+        }
+
+        scorables = []
+        for eid in em.get_matching_entities(["GridWorld::Component::Scorable"]):
+            scorables.append((eid, em.get_Scorable(eid)))
+
+        sorted_scorables = sorted(scorables, key=lambda x: x[1].score, reverse=True)
+
+        for index, (eid, scorable) in enumerate(sorted_scorables):
+            stat_entity_scores[eid] = scorable.score
+
+            try:
+                name: gw.Name = em.get_Name(eid)
+            except ValueError:
+                log_entity_details[eid] = {}
+            else:
+                log_entity_details[eid] = {
+                    'maj_name': name.major_name,
+                    'min_name': name.minor_name
+                }
+
+            if index < 6:
+                # top 6 scorables are the winners that live and reproduce
+                stat_winners.append(eid)
+
+                scorable.score = 0
+            else:
+                # the remaining entities are losers and will be removed
+                # (cannot remove entities here because we are iterating over the
+                # sorted scorables, not in storage order)
+                stat_losers.append(eid)
+
+        # After all entities are judged, remove the losers.
+        for loser_eid in stat_losers:
+            try:
+                position = em.get_Position(loser_eid)
+                world.set_map_data(position.x, position.y, gw.null)
+            except ValueError:
+                pass
+
+            em.destroy(loser_eid)
+
+        # Entity creation is next, create a list of available spaces to put entities into.
+        available_spaces = []
+        for x in range(world.width):
+            for y in range(world.height):
+                if world.get_map_data(x, y) == gw.null:
+                    available_spaces.append((x, y))
+
+        # create duplicate entities from winners, modifying them slightly
+        for parent_eid in stat_winners:
+            child_eid = gw.duplicate_entity(em, parent_eid)
+
+            parent_rng = em.get_RNG(parent_eid)
+
+            child_rng = em.get_RNG(child_eid)
+            child_rng.seed(parent_rng.randi(), parent_rng.randi())
+
+            new_pos = available_spaces.pop(child_rng.randi() % len(available_spaces))
+            position = em.get_Position(child_eid)
+            position.x = new_pos[0]
+            position.y = new_pos[1]
+            world.set_map_data(position.x, position.y, child_eid)
+
+            brain = em.get_SimpleBrain(child_eid)
+            TestSimulation._mutate_brain(brain, child_rng)
+
+            name = em.get_Name(child_eid)
+            name.minor_name = f'T{em.tick}-P{parent_eid}'
+
+        # finally, part of the judge's duty is to queue brand new entities for creation
+        for i in range(3):
+            eid = em.create()
+
+            new_brain = em.assign_or_replace_SimpleBrain(eid)
+            synapse_array: np.ndarray
+            for synapse_array in new_brain.synapses:
+                synapse_unraveled = np.reshape(synapse_array, -1, order='F')
+                for index in range(len(synapse_unraveled)):
+                    synapse_unraveled[index] = (srng.randd() < 0.5) * (srng.randd() - 0.5) * 2
+
+            em.assign_or_replace_SimpleBrainSeer(eid)
+
+            em.assign_or_replace_SimpleBrainMover(eid)
+
+            new_pos = available_spaces.pop(srng.randi() % len(available_spaces))
+            position = em.assign_or_replace_Position(eid)
+            position.x = new_pos[0]
+            position.y = new_pos[1]
+            world.set_map_data(position.x, position.y, eid)
+
+            em.assign_or_replace_Moveable(eid)
+
+            rng = em.assign_or_replace_RNG(eid)
+            rng.seed(srng.randi(), srng.randi())
+
+            em.assign_or_replace_Scorable(eid)
+
+            name = em.assign_or_replace_Name(eid)
+            name.major_name = f"T{em.tick}-{i}"
+            name.minor_name = f"T{em.tick}-Eve"
+
+            meta = em.assign_or_replace_PyMeta(eid)
+            display_data = DisplayData()
+            display_data.image_path = None
+            display_data.blend = (rng.randi() % 200 + 56, rng.randi() % 200 + 56, rng.randi() % 200 + 56)
+            meta["DisplayData"] = display_data
+
+        return log
 
 
-def setup_test_em(root_seed=54321669, root_seq=12345667, **kwargs):
-    em = gw.EntityManager()
+class SimulationThread:
+    def __init__(self, simulation):
+        self.simulation = simulation
 
-    world = em.set_singleton_SWorld()
-    world.reset_world(20, 20)
+        self.ticks_per_loop = 1000
+        self.loop_finished = Signal()
 
-    rng = em.set_singleton_RNG()
-    rng.seed(root_seed, root_seq)
+        self._keep_running = False
 
-    for i in range(5):
-        create_brain_entity(em, i, i, rng.randi(), rng.randi(), **kwargs)
-        create_predator(em, i + 2, i + 5, rng.randi(), rng.randi())
+        self._thread = None
 
-    for i in range(6):
-        create_predator(em, i + 5, i + 9, rng.randi(), rng.randi())
+    def start(self):
+        if self.is_running():
+            raise RuntimeError("Runner is already running, unable to start again.")
 
-    # After populating the world, need to refresh the world data
-    gw.rebuild_world(em)
+        self._thread = threading.Thread(target=self._thread_run)
 
-    return em
+        self._keep_running = True
+        self._thread.start()
+
+    def stop(self, join):
+        self._keep_running = False
+        if join:
+            self._thread.join()
+        self._thread = None
+
+    def is_running(self):
+        return self._thread is not None
+
+    def _thread_run(self):
+        while self._keep_running:
+            self.simulation.simulate(self.ticks_per_loop)
+            self.loop_finished.emit()
 
 
-def run_perf_test():
-    em = setup_test_em()
+class SimulationLogStore:
+    def __init__(self, simulation):
+        self.simulation = simulation
 
-    em.multiupdate(10000)
+        self.logs = {}
+
+        simulation.evolution_occurred.connect(self._on_simulation_evolution_occurred)
+
+    def _on_simulation_evolution_occurred(self, log):
+        self.logs[self.simulation.em.tick] = log
 
 
-def run_super_tick(em):
-    gw.multiupdate(em, 500)
-    if em.tick % 25000 == 0:
-        return log_and_evolve(em)
-    else:
-        return None
+def run_perf_test(total_ticks):
+    simulation = TestSimulation(998899889, 665566555)
+
+    simulation.simulate(total_ticks)
+

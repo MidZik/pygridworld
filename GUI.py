@@ -27,9 +27,9 @@ class RenderData:
         
 
 class WorldWindow(pyglet.window.Window):
-    def __init__(self, em):
+    def __init__(self, simulation):
         super().__init__(resizable=True, width=800, height=800)
-        self.em = em
+        self.em = simulation.em
         self._latest_frame_data = {}
         self._sprite_cache = {}
         self._entity_batch = pyglet.graphics.Batch()
@@ -89,9 +89,9 @@ class WorldWindow(pyglet.window.Window):
 
 
 class _Plotter:
-    def __init__(self, em):
+    def __init__(self, simulation):
         plt.ion()
-        self.em = em
+        self.em = simulation.em
         self.fig = plt.figure()
         
         self.majname_pop_data = {}
@@ -109,7 +109,7 @@ class _Plotter:
         plt.ylabel('Score')
         plt.title('Judge Stats')
         
-        self.log_pop_counts(em)
+        self.log_pop_counts(self.em)
         self.plot_pop_counts()
         
         self.plot_median_scores()
@@ -242,40 +242,51 @@ class _Plotter:
         self.fig.canvas.flush_events()
 
 
-if __name__ == '__main__':
-    ems = [core.setup_test_em(999, 999), core.setup_test_em(9999, 9999), core.setup_test_em(99999, 99999)]
-    collection = core.RunnerCollection(ems)
+def main():
+    simulation_threads = [
+        core.SimulationThread(core.TestSimulation(999, 999)),
+        core.SimulationThread(core.TestSimulation(9999, 9999)),
+        core.SimulationThread(core.TestSimulation(99999, 99999))
+    ]
+
     import threading
     plot_lock = threading.Lock()
 
     def update(dt):
         pass
 
-    for runner in collection._runners:
-        em = runner.em
-        plotter = _Plotter(em)
-        window = WorldWindow(em)
+    for sim_thread in simulation_threads:
+        simulation = sim_thread.simulation
+        plotter = _Plotter(simulation)
+        window = WorldWindow(simulation)
 
-        def setup_signal_handlers(r, p, w):
-            def on_loop_finished():
-                w.update_from_em()
+        def setup_signal_handlers(_simulation, _plotter, _window):
+            def on_update_done():
+                _window.update_from_em()
 
             def on_evolution_occurred(evo_log):
-                p.process_evolution_log(evo_log)
+                _plotter.process_evolution_log(evo_log)
                 plot_lock.acquire()
-                p.plot_all()
+                _plotter.plot_all()
                 plot_lock.release()
 
-            r.evolution_occurred.connect(on_evolution_occurred)
-            r.loop_finished.connect(on_loop_finished)
+            _simulation.evolution_occurred.connect(on_evolution_occurred)
+            _simulation.update_done.connect(on_update_done)
 
-        setup_signal_handlers(runner, plotter, window)
+        setup_signal_handlers(simulation, plotter, window)
 
     try:
         plt.show()
         pyglet.clock.schedule_interval(update, 1 / 30)
-        collection.run_until_epoch_async(100)
+
+        for sim_thread in simulation_threads:
+            sim_thread.start()
+
         pyglet.app.run()
     finally:
         pyglet.app.exit()
         window.close()
+
+
+if __name__ == '__main__':
+    main()
