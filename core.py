@@ -85,7 +85,7 @@ class Signal:
 
 
 class TestSimulation:
-    def __init__(self, init_state=123456789, init_seq=23456789):
+    def __init__(self, init_state=123456789, init_seq=23456789, **kwargs):
         self.em = None
         self.seed = None
 
@@ -94,9 +94,9 @@ class TestSimulation:
 
         self.ticks_between_evolutions = 25000
 
-        self.reset_from_seed(init_state, init_seq)
+        self.reset_from_seed(init_state, init_seq, **kwargs)
 
-    def reset_from_seed(self, init_state, init_seq):
+    def reset_from_seed(self, init_state, init_seq, **kwargs):
         em = gw.EntityManager()
 
         world = em.set_singleton_SWorld()
@@ -106,7 +106,7 @@ class TestSimulation:
         rng.seed(init_state, init_seq)
 
         for i in range(5):
-            self._create_brain_entity(em, i, i, rng.randi(), rng.randi())
+            self._create_brain_entity(em, i, i, rng.randi(), rng.randi(), **kwargs)
             self._create_predator_entity(em, i + 2, i + 5, rng.randi(), rng.randi())
 
         for i in range(6):
@@ -131,7 +131,7 @@ class TestSimulation:
             self.iteration_finished.emit()
 
     @staticmethod
-    def _create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
+    def _create_brain_entity(em: gw.EntityManager, x, y, seed, seq, **kwargs):
         eid = em.create()
 
         pos: gw.Position = em.assign_or_replace_Position(eid)
@@ -147,8 +147,8 @@ class TestSimulation:
         name.minor_name = "Eve"
 
         brain = em.assign_or_replace_SimpleBrain(eid)
-        brain.child_mutation_chance = 0.5
-        brain.child_mutation_strength = 0.2
+        brain.child_mutation_chance = kwargs.get('child_mutation_chance', 0.5)
+        brain.child_mutation_strength = kwargs.get('child_mutation_strength', 0.2)
 
         em.assign_or_replace_SimpleBrainSeer(eid)
 
@@ -337,6 +337,8 @@ class TestSimulation:
 
 
 class SimulationThread:
+    thread_limit_semaphore = threading.Semaphore(6)
+
     def __init__(self, simulation):
         self.simulation = simulation
 
@@ -351,24 +353,129 @@ class SimulationThread:
         if self.is_running():
             raise RuntimeError("Runner is already running, unable to start again.")
 
+        self.thread_limit_semaphore.acquire()
+
         self._thread = threading.Thread(target=self._thread_run)
 
         self._keep_running = True
         self._thread.start()
 
-    def stop(self, join):
+    def stop(self):
         self._keep_running = False
-        if join:
-            self._thread.join()
-        self._thread = None
+
+    def join(self):
+        self._thread.join()
 
     def is_running(self):
-        return self._thread is not None
+        return self._thread is not None and self._thread.is_alive()
 
     def _thread_run(self):
         while self._keep_running:
             self.simulation.simulate(self.ticks_per_loop)
             self.iteration_finished.emit()
+        self.thread_limit_semaphore.release()
+
+
+class TestSimulationGroup:
+    def __init__(self, simulation_count, configuration):
+        simulations = []
+
+        rng = gw.RNG()
+        rng.seed(3541690311527, 2554723005947)
+
+        for i in range(simulation_count):
+            simulation = TestSimulation(rng.randi(), rng.randi(), **configuration)
+
+        self.simulations = simulations
+        self.configuration = dict(configuration)
+
+
+def create_simulations(count, configuration):
+    rng = gw.RNG()
+    rng.seed(3541690311527, 2554723005947)
+
+    for i in range(count):
+        yield TestSimulation(rng.randi(), rng.randi(), **configuration)
+
+
+class Tester:
+    def __init__(self, simulation):
+        from math import inf
+        self.no_improvement_streak_limit = 25
+        self.current_best = -inf
+        self.current_no_improvement_streak = 0
+
+        self.test_finished = Signal()
+
+        self.simulation = simulation
+        self._simulation_thread = SimulationThread(simulation)
+        self._simulation_thread.ticks_per_loop = 25000
+
+        simulation.evolution_occurred.connect(self._on_simulation_evolution_occurred)
+
+    def start_test(self):
+        self._simulation_thread.start()
+
+    def join(self):
+        self._simulation_thread.join()
+
+    def _on_simulation_evolution_occurred(self, log):
+        sorted_scores = sorted(log['entity_scores'].values(), reverse=True)
+
+        if len(sorted_scores) < 6:
+            return
+
+        simulation_score = sum(sorted_scores[:6]) / 6
+
+        if simulation_score > self.current_best:
+            self.current_best = simulation_score
+            self.current_no_improvement_streak = 0
+        else:
+            self.current_no_improvement_streak += 1
+            if self.current_no_improvement_streak >= self.no_improvement_streak_limit:
+                # We decide that we've tested the simulation enough, and will use its current best as its
+                # final score.
+                self._simulation_thread.stop()
+                self.test_finished.emit()
+
+
+def run_configuration_test():
+    from collections import defaultdict
+    configuration_results = defaultdict(lambda: [])
+
+    testers = []
+
+    for child_mutation_chance in (x/100 for x in range(10, 100, 10)):
+        for child_mutation_strength in (x/100 for x in range(10, 200, 20)):
+            configuration = {
+                'child_mutation_chance': child_mutation_chance,
+                'child_mutation_strength': child_mutation_strength
+            }
+            print(f"Beginning config test {configuration}")
+
+            simulations = create_simulations(3, configuration)
+
+            for simulation in simulations:
+                tester = Tester(simulation)
+                tester.test_finished.connect(
+                    _on_tester_test_finished,
+                    configuration_results,
+                    tester,
+                    (child_mutation_chance, child_mutation_strength)
+                )
+                tester.start_test()
+                testers.append(tester)
+
+    for tester in testers:
+        tester.join()
+
+    print("Testing complete.")
+    return configuration_results
+
+
+def _on_tester_test_finished(configuration_results, tester, configuration_repr):
+    configuration_results[configuration_repr].append(tester.current_best)
+    print(f"Intermediate result: {configuration_repr}, {tester.simulation.seed}. best: {tester.current_best}")
 
 
 def run_perf_test(total_ticks):
