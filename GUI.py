@@ -197,10 +197,15 @@ class SimulationFigure:
 
 
 def main():
+    config = {
+        'child_mutation_chance': 0.8,
+        'child_mutation_strength': 1.5
+    }
+
     simulation_threads = [
-        core.SimulationThread(core.TestSimulation(999, 999)),
-        core.SimulationThread(core.TestSimulation(9999, 9999)),
-        core.SimulationThread(core.TestSimulation(99999, 99999))
+        core.SimulationThread(core.TestSimulation(999, 999, **config)),
+        core.SimulationThread(core.TestSimulation(9999, 9999, **config)),
+        core.SimulationThread(core.TestSimulation(99999, 99999, **config))
     ]
 
     figures = []
