@@ -6,6 +6,11 @@ Created on Fri May  3 18:24:23 2019
 """
 
 import core
+from core import Signal
+
+from threading import Lock
+
+from collections import defaultdict
 
 from weakref import WeakValueDictionary
 import pyglet
@@ -88,158 +93,107 @@ class WorldWindow(pyglet.window.Window):
         self._latest_frame_data = frame_data
 
 
-class _Plotter:
+class PopulationLogger:
+    """
+    Logs the population counts of each species when evolution occurred.
+    """
     def __init__(self, simulation):
+        self.population_data = defaultdict(lambda: ([], []))
+
+        self.data_updated = Signal()
+
+        self.simulation = simulation
+        simulation.evolution_occurred.connect(self._on_simulation_evolution_occurred)
+
+    def _on_simulation_evolution_occurred(self, log):
+        tick = log['tick']
+        population_counts = defaultdict(lambda: 0)
+
+        for entity_log in log['entity_details_log'].values():
+            major_name = entity_log['maj_name']
+            population_counts[major_name] += 1
+
+        for major_name, population_count in population_counts.items():
+            data = self.population_data[major_name]
+            data[0].append(tick)
+            data[1].append(population_count)
+
+        self.data_updated.emit()
+
+
+class SimulationScoreLogger:
+    """
+    Logs the score of the simulation when evolution occurred.
+    Current score: Average of the top 6 scores.
+    """
+    def __init__(self, simulation):
+        self.simulation_ticks = []
+        self.simulation_scores = []
+
+        self.data_updated = Signal()
+
+        self.simulation = simulation
+        simulation.evolution_occurred.connect(self._on_simulation_evolution_occurred)
+
+    def _on_simulation_evolution_occurred(self, log):
+        tick = log['tick']
+        sorted_scores = sorted(log['entity_scores'].values(), reverse=True)
+
+        if len(sorted_scores) < 6:
+            return
+
+        simulation_score = sum(sorted_scores[:6]) / 6
+
+        self.simulation_ticks.append(tick)
+        self.simulation_scores.append(simulation_score)
+
+        self.data_updated.emit()
+
+
+global_plt_lock = Lock()
+
+
+class SimulationFigure:
+    def __init__(self, simulation):
+        global_plt_lock.acquire()
+        self.min_pop_length_to_plot = 10
+
+        self.population_logger = PopulationLogger(simulation)
+        self.simulation_score_logger = SimulationScoreLogger(simulation)
+
         plt.ion()
-        self.em = simulation.em
-        self.fig = plt.figure()
-        
-        self.majname_pop_data = {}
-        self.pop_plots = {}
-        
-        self.majname_median_data = {}
-        self.median_plots = {}
-        
-        self.tick_data = [0]
-        self.winner_mean_score_data = [0]
-        self.all_mean_score_data = [0]
-        
-        self.plot_aggregate_scores()
-        plt.xlabel('Tick')
-        plt.ylabel('Score')
-        plt.title('Judge Stats')
-        
-        self.log_pop_counts(self.em)
-        self.plot_pop_counts()
-        
-        self.plot_median_scores()
-    
-    def process_evolution_log(self, evo_log):
-        entity_scores = evo_log['entity_scores']
-        entity_details_log = evo_log['entity_details_log']
-        winners = evo_log['winners']
-        losers = evo_log['losers']
+        self.figure, (self.sim_score_axes, self.pop_axes) = plt.subplots(2, 1)
 
-        maj_scores = {}
+        self.pop_axes.set_title('Populations')
+        self.sim_score_axes.set_title('Simulation Score')
 
-        for eid, score in entity_scores.items():
-            maj_name = entity_details_log[eid]['maj_name']
-            try:
-                maj_score = maj_scores[maj_name]
-            except LookupError:
-                maj_score = []
-                maj_scores[maj_name] = maj_score
+        self.pop_plots = defaultdict(lambda: self.pop_axes.plot([], [])[0])
+        self.sim_score_plot = self.sim_score_axes.plot([], [])[0]
 
-            maj_score.append(score)
+        self.population_logger.data_updated.connect(self._on_population_logger_data_updated)
+        self.simulation_score_logger.data_updated.connect(self._on_simulation_score_logger_data_updated)
+        global_plt_lock.release()
 
-        for maj_name, maj_score in maj_scores.items():
-            maj_sorted_score = sorted(maj_score)
-            median = maj_sorted_score[len(maj_sorted_score)//2]
+    def _on_population_logger_data_updated(self):
+        global_plt_lock.acquire()
+        for major_name, (ticks, populations) in self.population_logger.population_data.items():
+            if len(ticks) > self.min_pop_length_to_plot:
+                self.pop_plots[major_name].set_data(ticks, populations)
 
-            try:
-                x, y = self.majname_median_data[maj_name]
-            except LookupError:
-                x = []
-                y = []
-                self.majname_median_data[maj_name] = (x, y)
+        self.pop_axes.relim()
+        self.pop_axes.autoscale_view()
+        global_plt_lock.release()
 
-            x.append(self.em.tick)
-            y.append(median)
+    def _on_simulation_score_logger_data_updated(self):
+        global_plt_lock.acquire()
+        self.sim_score_plot.set_data(
+            self.simulation_score_logger.simulation_ticks,
+            self.simulation_score_logger.simulation_scores
+        )
 
-        winner_total = sum(entity_scores[eid] for eid in winners)
-        loser_total = sum(entity_scores[eid] for eid in losers)
-        total = winner_total + loser_total
-
-        winner_mean = winner_total / len(winners)
-        total_mean = total / len(entity_scores)
-
-        self.tick_data.append(self.em.tick)
-        self.winner_mean_score_data.append(winner_mean)
-        self.all_mean_score_data.append(total_mean)
-
-        self.log_pop_counts(self.em)
-
-    def log_pop_counts(self, em):
-        named_scorables_eids = em.get_matching_entities(["GridWorld::Component::Name", "GridWorld::Component::Scorable"])
-
-        for eid in named_scorables_eids:
-            name = em.get_Name(eid)
-            maj = name.major_name
-            
-            try:
-                x,y = self.majname_pop_data[maj]
-            except LookupError:
-                x = []
-                y = []
-                self.majname_pop_data[maj] = (x, y)
-            
-            if not x or x[-1] != em.tick:
-                x.append(em.tick)
-                y.append(0)
-            
-            y[-1] += 1
-    
-    def plot_pop_counts(self):
-        plt.figure(self.fig.number)
-        plt.subplot(222, label="populations")
-        for maj, (x, y) in self.majname_pop_data.items():
-            # only plot populations that have lived a non-trivial amount of time
-            if len(x) >= 10:
-                try:
-                    plot = self.pop_plots[maj]
-                except LookupError:
-                    plot, = plt.plot(x, y)
-                    self.pop_plots[maj] = plot
-                else:
-                    plot.set_data(x, y)
-        
-        ax = plt.gca()
-        ax.relim()
-        ax.autoscale_view()
-    
-    def plot_aggregate_scores(self):
-        plt.figure(self.fig.number)
-        plt.subplot(221, label="scores")
-        
-        try:
-            self.winners_mean_score_plot.set_data(self.tick_data, self.winner_mean_score_data)
-            self.all_mean_score_plot.set_data(self.tick_data, self.all_mean_score_data)
-        except AttributeError:
-            self.winners_mean_score_plot, = plt.plot(self.tick_data, self.winner_mean_score_data, label='winners')
-            self.all_mean_score_plot, = plt.plot(self.tick_data, self.all_mean_score_data, label='all')
-        
-        ax = plt.gca()
-        ax.relim()
-        ax.autoscale_view()
-    
-    def plot_median_scores(self):
-        plt.figure(self.fig.number)
-        plt.subplot(224, label="median scores")
-        
-        for maj, (x, y) in self.majname_median_data.items():
-            # only plot medians that have lived a non-trivial amount of time
-            if len(x) >= 10:
-                try:
-                    plot = self.median_plots[maj]
-                except LookupError:
-                    plot, = plt.plot(x, y)
-                    self.median_plots[maj] = plot
-                else:
-                    plot.set_data(x, y)
-        
-        ax = plt.gca()
-        ax.relim()
-        ax.autoscale_view()
-
-    def plot_all(self):
-        self.plot_aggregate_scores()
-
-        self.plot_pop_counts()
-
-        self.plot_median_scores()
-
-        self.fig.canvas.draw()
-        self.fig.canvas.flush_events()
+        self.sim_score_axes.relim()
+        self.sim_score_axes.autoscale_view()
+        global_plt_lock.release()
 
 
 def main():
@@ -249,31 +203,23 @@ def main():
         core.SimulationThread(core.TestSimulation(99999, 99999))
     ]
 
-    import threading
-    plot_lock = threading.Lock()
+    figures = []
 
     def update(dt):
         pass
 
     for sim_thread in simulation_threads:
         simulation = sim_thread.simulation
-        plotter = _Plotter(simulation)
+        figures.append(SimulationFigure(simulation))
         window = WorldWindow(simulation)
 
-        def setup_signal_handlers(_simulation, _plotter, _window):
+        def setup_signal_handlers(_simulation, _window):
             def on_update_done():
                 _window.update_from_em()
 
-            def on_evolution_occurred(evo_log):
-                _plotter.process_evolution_log(evo_log)
-                plot_lock.acquire()
-                _plotter.plot_all()
-                plot_lock.release()
+            _simulation.iteration_finished.connect(on_update_done)
 
-            _simulation.evolution_occurred.connect(on_evolution_occurred)
-            _simulation.update_done.connect(on_update_done)
-
-        setup_signal_handlers(simulation, plotter, window)
+        setup_signal_handlers(simulation, window)
 
     try:
         plt.show()

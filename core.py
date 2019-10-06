@@ -90,7 +90,7 @@ class TestSimulation:
         self.seed = None
 
         self.evolution_occurred = Signal()
-        self.update_done = Signal()
+        self.iteration_finished = Signal()
 
         self.ticks_between_evolutions = 25000
 
@@ -128,7 +128,7 @@ class TestSimulation:
             if em.tick % self.ticks_between_evolutions == 0:
                 evolution_log = self._log_and_evolve(em)
                 self.evolution_occurred.emit(evolution_log)
-            self.update_done.emit()
+            self.iteration_finished.emit()
 
     @staticmethod
     def _create_brain_entity(em: gw.EntityManager, x, y, seed, seq):
@@ -220,6 +220,7 @@ class TestSimulation:
         stat_winners = []
         stat_losers = []
         log = {
+            'tick': em.tick,
             'entity_scores': stat_entity_scores,
             'entity_details_log': log_entity_details,
             'winners': stat_winners,
@@ -340,7 +341,7 @@ class SimulationThread:
         self.simulation = simulation
 
         self.ticks_per_loop = 1000
-        self.loop_finished = Signal()
+        self.iteration_finished = Signal()
 
         self._keep_running = False
 
@@ -367,19 +368,7 @@ class SimulationThread:
     def _thread_run(self):
         while self._keep_running:
             self.simulation.simulate(self.ticks_per_loop)
-            self.loop_finished.emit()
-
-
-class SimulationLogStore:
-    def __init__(self, simulation):
-        self.simulation = simulation
-
-        self.logs = {}
-
-        simulation.evolution_occurred.connect(self._on_simulation_evolution_occurred)
-
-    def _on_simulation_evolution_occurred(self, log):
-        self.logs[self.simulation.em.tick] = log
+            self.iteration_finished.emit()
 
 
 def run_perf_test(total_ticks):
