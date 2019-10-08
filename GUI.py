@@ -196,6 +196,13 @@ class SimulationFigure:
         global_plt_lock.release()
 
 
+def run_configuration_test_with_gui():
+    from mpl_toolkits.mplot3d import Axes3D
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter([], [], [])
+
+
 def main():
     config = {
         'child_mutation_chance': 0.8,
@@ -203,9 +210,9 @@ def main():
     }
 
     simulation_threads = [
-        core.SimulationThread(core.TestSimulation(999, 999, **config)),
-        core.SimulationThread(core.TestSimulation(9999, 9999, **config)),
-        core.SimulationThread(core.TestSimulation(99999, 99999, **config))
+        core.SimulationThread(core.TestSimulation(999, 999, config)),
+        core.SimulationThread(core.TestSimulation(9999, 9999, config)),
+        core.SimulationThread(core.TestSimulation(99999, 99999, config))
     ]
 
     figures = []

@@ -85,18 +85,19 @@ class Signal:
 
 
 class TestSimulation:
-    def __init__(self, init_state=123456789, init_seq=23456789, **kwargs):
+    def __init__(self, init_state=123456789, init_seq=23456789, config={}):
         self.em = None
         self.seed = None
+        self.config = dict(config)
 
         self.evolution_occurred = Signal()
         self.iteration_finished = Signal()
 
         self.ticks_between_evolutions = 25000
 
-        self.reset_from_seed(init_state, init_seq, **kwargs)
+        self.reset_from_seed(init_state, init_seq)
 
-    def reset_from_seed(self, init_state, init_seq, **kwargs):
+    def reset_from_seed(self, init_state, init_seq):
         em = gw.EntityManager()
 
         world = em.set_singleton_SWorld()
@@ -106,7 +107,7 @@ class TestSimulation:
         rng.seed(init_state, init_seq)
 
         for i in range(5):
-            self._create_brain_entity(em, i, i, rng.randi(), rng.randi(), **kwargs)
+            self._create_brain_entity(em, i, i, rng.randi(), rng.randi(), self.config)
             self._create_predator_entity(em, i + 2, i + 5, rng.randi(), rng.randi())
 
         for i in range(6):
@@ -126,12 +127,12 @@ class TestSimulation:
             ticks_to_do = min(run_until_tick - em.tick, ticks_until_evolution, max_ticks_per_update)
             gw.multiupdate(em, ticks_to_do)
             if em.tick % self.ticks_between_evolutions == 0:
-                evolution_log = self._log_and_evolve(em)
+                evolution_log = self._log_and_evolve(em, self.config)
                 self.evolution_occurred.emit(evolution_log)
             self.iteration_finished.emit()
 
     @staticmethod
-    def _create_brain_entity(em: gw.EntityManager, x, y, seed, seq, **kwargs):
+    def _create_brain_entity(em: gw.EntityManager, x, y, seed, seq, config):
         eid = em.create()
 
         pos: gw.Position = em.assign_or_replace_Position(eid)
@@ -147,8 +148,8 @@ class TestSimulation:
         name.minor_name = "Eve"
 
         brain = em.assign_or_replace_SimpleBrain(eid)
-        brain.child_mutation_chance = kwargs.get('child_mutation_chance', 0.5)
-        brain.child_mutation_strength = kwargs.get('child_mutation_strength', 0.2)
+        brain.child_mutation_chance = config.get('child_mutation_chance', 0.5)
+        brain.child_mutation_strength = config.get('child_mutation_strength', 0.2)
 
         em.assign_or_replace_SimpleBrainSeer(eid)
 
@@ -211,7 +212,7 @@ class TestSimulation:
             np.clip(synapse_array, -1.0, 1.0, out=synapse_array)
 
     @staticmethod
-    def _log_and_evolve(em: gw.EntityManager):
+    def _log_and_evolve(em: gw.EntityManager, config):
         srng = em.get_singleton_RNG()
         world = em.get_singleton_SWorld()
 
@@ -300,6 +301,8 @@ class TestSimulation:
             eid = em.create()
 
             new_brain = em.assign_or_replace_SimpleBrain(eid)
+            new_brain.child_mutation_chance = config.get('child_mutation_chance', 0.5)
+            new_brain.child_mutation_strength = config.get('child_mutation_strength', 0.2)
             synapse_array: np.ndarray
             for synapse_array in new_brain.synapses:
                 synapse_unraveled = np.reshape(synapse_array, -1, order='F')
@@ -395,15 +398,17 @@ def create_simulations(count, configuration):
     rng.seed(3541690311527, 2554723005947)
 
     for i in range(count):
-        yield TestSimulation(rng.randi(), rng.randi(), **configuration)
+        yield TestSimulation(rng.randi(), rng.randi(), configuration)
 
 
 class Tester:
     def __init__(self, simulation):
         from math import inf
-        self.no_improvement_streak_limit = 25
+        self.no_improvement_streak_limit = 100
         self.current_best = -inf
         self.current_no_improvement_streak = 0
+
+        self._past_10_evaluations = []
 
         self.test_finished = Signal()
 
@@ -420,12 +425,27 @@ class Tester:
         self._simulation_thread.join()
 
     def _on_simulation_evolution_occurred(self, log):
+        tick = log['tick']
+        if tick <= 300000:
+            # Simulations seem to be very volatile early,
+            # so ignore the first few evolutions.
+            return
+
         sorted_scores = sorted(log['entity_scores'].values(), reverse=True)
 
         if len(sorted_scores) < 6:
+            # Only evaluate states where there exist at least 6 scorables
             return
 
-        simulation_score = sum(sorted_scores[:6]) / 6
+        evaluation = sum(sorted_scores[:6]) / 6
+        self._past_10_evaluations = [evaluation] + self._past_10_evaluations[:9]
+
+        if len(self._past_10_evaluations) < 10:
+            # The simulation's score is determined by the average of its last 10 evaluations.
+            # So do not score it if there aren't 10 evaluations accumulated.
+            return
+
+        simulation_score = sum(self._past_10_evaluations) / len(self._past_10_evaluations)
 
         if simulation_score > self.current_best:
             self.current_best = simulation_score
@@ -440,20 +460,19 @@ class Tester:
 
 
 def run_configuration_test():
-    from collections import defaultdict
-    configuration_results = defaultdict(lambda: [])
+    configuration_results = {}
 
     testers = []
 
-    for child_mutation_chance in (x/100 for x in range(10, 100, 10)):
-        for child_mutation_strength in (x/100 for x in range(10, 200, 20)):
+    for child_mutation_chance in (x/100 for x in range(10, 110, 10)):
+        for child_mutation_strength in (x/100 for x in (10, 25, 50, 75, 100, 150, 200, 250, 300)):
             configuration = {
                 'child_mutation_chance': child_mutation_chance,
                 'child_mutation_strength': child_mutation_strength
             }
             print(f"Beginning config test {configuration}")
 
-            simulations = create_simulations(3, configuration)
+            simulations = create_simulations(5, configuration)
 
             for simulation in simulations:
                 tester = Tester(simulation)
@@ -474,8 +493,9 @@ def run_configuration_test():
 
 
 def _on_tester_test_finished(configuration_results, tester, configuration_repr):
-    configuration_results[configuration_repr].append(tester.current_best)
-    print(f"Intermediate result: {configuration_repr}, {tester.simulation.seed}. best: {tester.current_best}")
+    result_key = (configuration_repr, tester.simulation.seed)
+    configuration_results[result_key] = tester.current_best
+    print(f"Intermediate result: {result_key}. best: {tester.current_best}")
 
 
 def run_perf_test(total_ticks):
