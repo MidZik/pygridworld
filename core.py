@@ -2,7 +2,7 @@
 """
 Created on Thu May  2 03:03:18 2019
 
-@author: MidZik
+@author: Matt Idzik (MidZik)
 """
 
 import gridworld as gw

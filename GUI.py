@@ -2,7 +2,7 @@
 """
 Created on Fri May  3 18:24:23 2019
 
-@author: MidZik
+@author: Matt Idzik (MidZik)
 """
 
 import core
