@@ -27,39 +27,19 @@ class SimulationRunner:
     def set_state_json(self, state_json : str):
         self.simulation.set_state_json(state_json)
 
-    def test(self):
-        simulation = self.module.Simulation()
+    def create_entity(self):
+        return self.simulation.create_entity()
 
-        eid = simulation.create_entity()
-        print(f"Created entity: {eid}")
-
-        eid = simulation.create_entity()
-        print(f"Created entity: {eid}")
-
-        eid = simulation.create_entity()
-        eid_to_destroy = eid
-        print(f"Created entity: {eid}")
-
-        eid = simulation.create_entity()
-        print(f"Created entity: {eid}")
-
-        eid = simulation.create_entity()
-        print(f"Created entity: {eid}")
-
-        simulation.destroy_entity(eid_to_destroy)
-        print(f"Destroyed entity: {eid_to_destroy}")
-
-        print(f"All entities: {simulation.get_all_entities()}")
-
-        return simulation.get_state_json()
+    def destroy_entity(self, eid):
+        self.simulation.destroy_entity(eid)
 
 
-def simulation_runner_loop(con : Connection, simulation_folder_path):
+def simulation_runner_loop(con: Connection, simulation_folder_path):
     runner = SimulationRunner(simulation_folder_path)
 
     while True:
         try:
-            cmd,params = con.recv()
+            cmd, params = con.recv()
             if cmd == "stop_process":
                 con.send((True, None))
                 break
@@ -73,9 +53,18 @@ def simulation_runner_loop(con : Connection, simulation_folder_path):
                 state_json = runner.get_state_json()
                 con.send((True, state_json))
             elif cmd == "set_state_json":
-                runner.set_state_json(params)
+                state_json, = params
+                runner.set_state_json(state_json)
                 con.send((True, None))
-                pass
+            elif cmd == "create_entity":
+                eid = runner.create_entity()
+                con.send((True, eid))
+            elif cmd == "destroy_entity":
+                eid, = params
+                runner.destroy_entity(eid)
+                con.send((True, None))
+            else:
+                con.send((False, f"Unknown command '{cmd}'."))
         except EOFError:
             # connection closed, end the simulation
             break
@@ -105,9 +94,22 @@ class SimulationRunnerProcess:
     def set_state_json(self, state_json):
         self._send_command("set_state_json", state_json)
 
+    def create_entity(self):
+        return self._send_command("create_entity")
+
+    def destroy_entity(self, eid):
+        self._send_command("destroy_entity", eid)
+
     def _send_command(self, command_str, *command_params):
+        if not self._process.is_alive():
+            raise RuntimeError("Unable to send command: process not running.")
+
         self._conn.send((command_str, command_params))
-        return self._conn.recv()[1]
+        success, result = self._conn.recv()
+        if success:
+            return result
+        else:
+            raise Exception(result)
 
 
 class SimulationManager:
