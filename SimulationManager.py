@@ -73,7 +73,7 @@ def simulation_runner_loop(con: Connection, simulation_folder_path):
 class SimulationRunnerProcess:
     def __init__(self, simulation_folder_path):
         self._conn, child_conn = Pipe()
-        self._process = Process(target=simulation_runner_loop, args=(child_conn, simulation_folder_path))
+        self._process = Process(target=simulation_runner_loop, args=(child_conn, simulation_folder_path), daemon=True)
 
     def start_process(self):
         self._process.start()
