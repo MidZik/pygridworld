@@ -4,6 +4,7 @@
 from importlib import util
 from multiprocessing.connection import Connection
 from multiprocessing import Pipe, Process
+from threading import Lock
 
 
 class SimulationRunner:
@@ -32,6 +33,9 @@ class SimulationRunner:
 
     def destroy_entity(self, eid):
         self.simulation.destroy_entity(eid)
+
+    def assign_component(self, eid, com_name):
+        self.simulation.assign_component(eid, com_name)
 
 
 def simulation_runner_loop(con: Connection, simulation_folder_path):
@@ -63,6 +67,10 @@ def simulation_runner_loop(con: Connection, simulation_folder_path):
                 eid, = params
                 runner.destroy_entity(eid)
                 con.send((True, None))
+            elif cmd == "assign_component":
+                eid, com_name = params
+                runner.assign_component(eid, com_name)
+                con.send((True, None))
             else:
                 con.send((False, f"Unknown command '{cmd}'."))
         except EOFError:
@@ -74,6 +82,7 @@ class SimulationRunnerProcess:
     def __init__(self, simulation_folder_path):
         self._conn, child_conn = Pipe()
         self._process = Process(target=simulation_runner_loop, args=(child_conn, simulation_folder_path), daemon=True)
+        self._lock = Lock()
 
     def start_process(self):
         self._process.start()
@@ -100,12 +109,17 @@ class SimulationRunnerProcess:
     def destroy_entity(self, eid):
         self._send_command("destroy_entity", eid)
 
+    def assign_component(self, eid, com_name):
+        self._send_command("assign_component", eid, com_name)
+
     def _send_command(self, command_str, *command_params):
         if not self._process.is_alive():
             raise RuntimeError("Unable to send command: process not running.")
 
+        self._lock.acquire()
         self._conn.send((command_str, command_params))
         success, result = self._conn.recv()
+        self._lock.release()
         if success:
             return result
         else:
