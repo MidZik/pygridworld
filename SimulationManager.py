@@ -37,6 +37,9 @@ class SimulationRunner:
     def assign_component(self, eid, com_name):
         self.simulation.assign_component(eid, com_name)
 
+    def get_component_names(self):
+        return self.simulation.get_component_names()
+
 
 def simulation_runner_loop(con: Connection, simulation_folder_path):
     runner = SimulationRunner(simulation_folder_path)
@@ -71,6 +74,9 @@ def simulation_runner_loop(con: Connection, simulation_folder_path):
                 eid, com_name = params
                 runner.assign_component(eid, com_name)
                 con.send((True, None))
+            elif cmd == "get_component_names":
+                component_names = runner.get_component_names()
+                con.send((True, component_names))
             else:
                 con.send((False, f"Unknown command '{cmd}'."))
         except EOFError:
@@ -111,6 +117,9 @@ class SimulationRunnerProcess:
 
     def assign_component(self, eid, com_name):
         self._send_command("assign_component", eid, com_name)
+
+    def get_component_names(self):
+        return self._send_command("get_component_names")
 
     def _send_command(self, command_str, *command_params):
         if not self._process.is_alive():
