@@ -5,7 +5,7 @@ from importlib import util
 from multiprocessing.connection import Connection
 from multiprocessing import Pipe, Process
 from threading import Lock
-import time
+import json
 
 
 class SimulationRunner:
@@ -17,9 +17,6 @@ class SimulationRunner:
 
         self.simulation = self.module.Simulation()
         self.simulation.set_event_callback(self._on_simulation_event)
-
-        # PERF COUNTER (for debug)
-        self._last_time = time.perf_counter()
 
     def start_simulation(self):
         self.simulation.start_simulation()
@@ -45,10 +42,10 @@ class SimulationRunner:
     def get_component_names(self):
         return self.simulation.get_component_names()
 
-    def _on_simulation_event(self, event_name):
-        cur_time = time.perf_counter()
-        print(f"{event_name}. Time since last event: {cur_time - self._last_time}.", end='\r')
-        self._last_time = cur_time
+    def _on_simulation_event(self, events_json):
+        events_obj = json.loads(events_json)
+        state_json = self.get_state_json()
+        state_obj = json.loads(state_json)
 
 
 def simulation_runner_loop(con: Connection, simulation_folder_path):
