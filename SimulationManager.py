@@ -1,15 +1,18 @@
 """
 @author: Matt Idzik (MidZik)
 """
+from collections import defaultdict, deque
 from importlib import util
 from multiprocessing.connection import Connection
 from multiprocessing import Pipe, Process
 from threading import Lock, Thread
 from pathlib import Path
 import json
-import os
 from datetime import datetime
 from queue import Queue, Empty
+import re
+import shutil
+from typing import Optional
 
 
 class SimulationRunner:
@@ -45,6 +48,9 @@ class SimulationRunner:
 
     def stop_simulation(self):
         self.simulation.stop_simulation()
+
+    def get_tick(self):
+        return self.simulation.get_tick()
 
     def get_state_json(self):
         return self.simulation.get_state_json()
@@ -110,6 +116,9 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
             elif cmd == "stop_simulation":
                 runner.stop_simulation()
                 con.send((True, None))
+            elif cmd == "get_tick":
+                tick = runner.get_tick()
+                con.send((True, tick))
             elif cmd == "get_state_json":
                 state_json = runner.get_state_json()
                 con.send((True, state_json))
@@ -159,6 +168,9 @@ class SimulationRunnerProcess:
     def stop_simulation(self):
         self._send_command("stop_simulation")
 
+    def get_tick(self):
+        return self._send_command("get_tick")
+
     def get_state_json(self):
         return self._send_command("get_state_json")
 
@@ -191,6 +203,226 @@ class SimulationRunnerProcess:
             raise Exception(result)
 
 
-class SimulationManager:
-    def __init__(self):
-        pass
+class TimelinePoint:
+    def __init__(self, tick, timeline):
+        self.tick = tick
+
+        self.timeline: Timeline = timeline
+        self.derivative_timelines = []
+        self.next_point: Optional[TimelinePoint] = None
+        self.prev_point: Optional[TimelinePoint] = None
+
+
+class Timeline:
+    def __init__(self, timeline_id: int, parent_timeline_id: Optional[int]):
+        """
+        :param timeline_id: The ID of the timeline
+        :param parent_timeline_id: The ID of this timeline's parent timeline (if any).
+        """
+        self.timeline_id: int = timeline_id
+        self.parent_timeline_id: Optional[int] = parent_timeline_id
+        self.simulation_path: Optional[Path] = None
+        self.head_point: Optional[TimelinePoint] = None
+
+
+def _parse_point_file_name(file_name):
+    exp = re.compile(r'^tick-(?P<tick>\d+)\.point$')
+    result = exp.match(file_name)
+    if result:
+        return int(result.group('tick'))
+    else:
+        return None
+
+
+def _get_point_file_name(point: TimelinePoint):
+    return f'tick-{point.tick}.point'
+
+
+def _get_point_file_path(timelines_dir_path: Path, point: TimelinePoint):
+    return timelines_dir_path / _get_timeline_folder_name(point.timeline) / _get_point_file_name(point)
+
+
+def _parse_timeline_folder_name(folder_name):
+    exp = re.compile(r'^t(?P<timeline_id>\d+)(_p(?P<parent_timeline_id>\d+))?$')
+    result = exp.match(folder_name)
+    if result:
+        timeline_id = result.group('timeline_id')
+        parent_timeline_id = result.group('parent_timeline_id')
+        timeline_id = int(timeline_id)
+        parent_timeline_id = int(parent_timeline_id) if parent_timeline_id else None
+        return timeline_id, parent_timeline_id
+    else:
+        return None, None
+
+
+def _get_timeline_folder_name(timeline: Timeline):
+    if timeline.parent_timeline_id is not None:
+        return f't{timeline.timeline_id}_p{timeline.parent_timeline_id}'
+    else:
+        return f't{timeline.timeline_id}'
+
+
+def _get_timeline_file_path(timelines_dir_path: Path, timeline: Timeline):
+    return timelines_dir_path / _get_timeline_folder_name(timeline) / 'timeline.json'
+
+
+def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: TimelinePoint):
+    """
+    Create and return a new timeline at a given location.
+    :param timelines_dir_path: The folder that the timeline folder should be created in.
+    :param timeline_id: The ID of the timeline.
+    :param source_point: The point that the new timeline should derive from.
+        Source point data will be copied into the new timeline head point.
+    :return: The newly created timeline.
+    """
+    parent_timeline = source_point.timeline
+    parent_timeline_id = parent_timeline.timeline_id if parent_timeline else None
+    parent_simulation = parent_timeline.simulation_path if parent_timeline else None
+
+    timeline = Timeline(timeline_id, parent_timeline_id)
+    timeline.simulation_path = parent_simulation
+
+    (timelines_dir_path / _get_timeline_folder_name(timeline)).mkdir()
+
+    head_point = TimelinePoint(source_point.tick, timeline)
+    timeline.head_point = head_point
+
+    if source_point.timeline is not None:
+        source_point_file_path = _get_point_file_path(timelines_dir_path, source_point).resolve(True)
+        shutil.copyfile(str(source_point_file_path), _get_point_file_path(timelines_dir_path, head_point))
+    else:
+        head_point_path = _get_point_file_path(timelines_dir_path, head_point)
+        with head_point_path.open('w') as head_point_file:
+            json.dump({}, head_point_file)
+
+    _save_timeline_file(timelines_dir_path, timeline)
+
+    return timeline
+
+
+def _save_timeline_file(timelines_dir_path: Path, timeline: Timeline):
+    timeline_file_path = _get_timeline_file_path(timelines_dir_path, timeline)
+    with timeline_file_path.open('w') as timeline_file:
+        simulation_path = timeline.simulation_path if timeline.simulation_path else None
+        data = {
+            'simulation_path': simulation_path
+        }
+        json.dump(data, timeline_file)
+
+
+def _load_timeline_file(timelines_dir_path: Path, timeline: Timeline):
+    timeline_file_path = _get_timeline_file_path(timelines_dir_path, timeline)
+    with timeline_file_path.open('r') as timeline_file:
+        data = json.load(timeline_file)
+        timeline.simulation_path = data['simulation_path']
+
+
+def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
+    timelines = {}
+    timeline_children = defaultdict(list)
+    largest_id = 0
+
+    # pass 1: create all timelines and their points, and log parent timelines+ticks
+    for timeline_path in (p for p in timelines_dir_path.iterdir() if p.is_dir()):
+        timeline_id, parent_id = _parse_timeline_folder_name(timeline_path.name)
+        if timeline_id is None:
+            print(f"WARNING: Improperly formatted folder found in timelines dir '{timeline_path.name}'.")
+            continue
+
+        timeline = Timeline(timeline_id, parent_id)
+        ticks = []
+
+        for point_path in timeline_path.glob('*.point'):
+            tick = _parse_point_file_name(point_path.name)
+            if tick is not None:
+                ticks.append(tick)
+
+        if len(ticks) <= 0:
+            print(f"WARNING: Timeline {timeline_id} has no points. Skipped loading.")
+            continue
+
+        ticks = sorted(ticks)
+
+        timeline.head_point = TimelinePoint(ticks[0], timeline)
+        prev_point = timeline.head_point
+        cur_point = None
+
+        for tick in ticks[1:]:
+            cur_point = TimelinePoint(tick, timeline)
+            cur_point.prev_point = prev_point
+            prev_point.next_point = cur_point
+            prev_point = cur_point
+
+        timelines[timeline_id] = timeline
+        timeline_children[parent_id, timeline.head_point.tick].append(timeline)
+        largest_id = max(largest_id, timeline_id)
+
+    # pass 2: add derived timelines to the appropriate points in each timeline.
+    timeline_deque = deque()
+
+    # root point is a special case, as it has no timeline associated with it
+    for t in timeline_children[None, 0]:
+        root_point.derivative_timelines.append(t)
+        timeline_deque.append(t)
+
+    del timeline_children[None, 0]
+
+    while len(timeline_deque) > 0:
+        cur_timeline = timeline_deque.popleft()
+        cur_timeline_id = cur_timeline.timeline_id
+        cur_point = cur_timeline.head_point
+
+        while cur_point is not None:
+            tick = cur_point.tick
+            point_children_timelines = timeline_children.get((cur_timeline_id, tick), None)
+            if point_children_timelines is not None:
+                cur_point.derivative_timelines.extend(point_children_timelines)
+                timeline_deque.extend(point_children_timelines)
+                del timeline_children[(cur_timeline_id, tick)]
+            cur_point = cur_point.next_point
+
+    if len(timeline_children) > 0:
+        print(f"WARNING: Some timelines are not attached to the root point and have not been loaded.")
+        print(timeline_children)
+
+    return largest_id + 1
+
+
+class TimelinesProject:
+    @staticmethod
+    def create_new_project(project_root_dir):
+        project = TimelinesProject(project_root_dir)
+
+        project.root_dir_path.mkdir()
+        with project.project_file_path.open('x') as project_file:
+            json.dump({}, project_file)
+
+        project._project_file_handle = project.project_file_path.open('r+')
+
+        return project
+
+    @staticmethod
+    def load_project(project_root_dir):
+        project = TimelinesProject(project_root_dir)
+
+        project._project_file_handle = project.project_file_path.open('r+')
+        project._next_new_timeline_id = _load_all_timelines(project.timelines_dir_path, project.root_point)
+
+        return project
+
+    def __init__(self, project_root_dir):
+        self.root_dir_path = Path(project_root_dir).resolve()
+        self.timelines_dir_path = self.root_dir_path / 'timelines'
+        self.project_file_path = self.root_dir_path / 'timelines.project'
+        self.project_file_handle = None
+        self.root_point = TimelinePoint(0, None)
+        self._next_new_timeline_id = 1
+
+    def create_timeline(self, source_point: Optional[TimelinePoint] = None):
+        source_point = source_point if source_point is not None else self.root_point
+        timeline = _create_timeline(self.timelines_dir_path, self._next_new_timeline_id, source_point)
+        self._next_new_timeline_id += 1
+
+        self.root_point.derivative_timelines.append(timeline)
+
+        return timeline
