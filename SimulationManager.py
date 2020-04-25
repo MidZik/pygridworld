@@ -223,6 +223,7 @@ class Timeline:
         self.parent_timeline_id: Optional[int] = parent_timeline_id
         self.simulation_path: Optional[Path] = None
         self.head_point: Optional[TimelinePoint] = None
+        self.tail_point: Optional[TimelinePoint] = None
 
 
 def _parse_point_file_name(file_name):
@@ -286,6 +287,7 @@ def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: T
 
     head_point = TimelinePoint(source_point.tick, timeline)
     timeline.head_point = head_point
+    timeline.tail_point = head_point
 
     if source_point.timeline is not None:
         source_point_file_path = _get_point_file_path(timelines_dir_path, source_point).resolve(True)
@@ -345,13 +347,15 @@ def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
 
         timeline.head_point = TimelinePoint(ticks[0], timeline)
         prev_point = timeline.head_point
-        cur_point = None
+        tail_point = timeline.head_point
 
         for tick in ticks[1:]:
-            cur_point = TimelinePoint(tick, timeline)
-            cur_point.prev_point = prev_point
-            prev_point.next_point = cur_point
-            prev_point = cur_point
+            tail_point = TimelinePoint(tick, timeline)
+            tail_point.prev_point = prev_point
+            prev_point.next_point = tail_point
+            prev_point = tail_point
+
+        timeline.tail_point = tail_point
 
         timelines[timeline_id] = timeline
         timeline_children[parent_id, timeline.head_point.tick].append(timeline)
