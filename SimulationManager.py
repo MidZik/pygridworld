@@ -104,49 +104,50 @@ class SimulationRunner:
 def simulation_runner_loop(con: Connection, simulation_folder_path, runner_working_dir):
     runner = SimulationRunner(simulation_folder_path, runner_working_dir)
 
-    while True:
-        try:
-            cmd, params = con.recv()
-            if cmd == "stop_process":
-                con.send((True, None))
+    try:
+        while True:
+            try:
+                cmd, params = con.recv()
+                if cmd == "stop_process":
+                    con.send((True, None))
+                    break
+                elif cmd == "start_simulation":
+                    runner.start_simulation()
+                    con.send((True, None))
+                elif cmd == "stop_simulation":
+                    runner.stop_simulation()
+                    con.send((True, None))
+                elif cmd == "get_tick":
+                    tick = runner.get_tick()
+                    con.send((True, tick))
+                elif cmd == "get_state_json":
+                    state_json = runner.get_state_json()
+                    con.send((True, state_json))
+                elif cmd == "set_state_json":
+                    state_json, = params
+                    runner.set_state_json(state_json)
+                    con.send((True, None))
+                elif cmd == "create_entity":
+                    eid = runner.create_entity()
+                    con.send((True, eid))
+                elif cmd == "destroy_entity":
+                    eid, = params
+                    runner.destroy_entity(eid)
+                    con.send((True, None))
+                elif cmd == "assign_component":
+                    eid, com_name = params
+                    runner.assign_component(eid, com_name)
+                    con.send((True, None))
+                elif cmd == "get_component_names":
+                    component_names = runner.get_component_names()
+                    con.send((True, component_names))
+                else:
+                    con.send((False, f"Unknown command '{cmd}'."))
+            except EOFError:
+                # connection closed, end the simulation
                 break
-            elif cmd == "start_simulation":
-                runner.start_simulation()
-                con.send((True, None))
-            elif cmd == "stop_simulation":
-                runner.stop_simulation()
-                con.send((True, None))
-            elif cmd == "get_tick":
-                tick = runner.get_tick()
-                con.send((True, tick))
-            elif cmd == "get_state_json":
-                state_json = runner.get_state_json()
-                con.send((True, state_json))
-            elif cmd == "set_state_json":
-                state_json, = params
-                runner.set_state_json(state_json)
-                con.send((True, None))
-            elif cmd == "create_entity":
-                eid = runner.create_entity()
-                con.send((True, eid))
-            elif cmd == "destroy_entity":
-                eid, = params
-                runner.destroy_entity(eid)
-                con.send((True, None))
-            elif cmd == "assign_component":
-                eid, com_name = params
-                runner.assign_component(eid, com_name)
-                con.send((True, None))
-            elif cmd == "get_component_names":
-                component_names = runner.get_component_names()
-                con.send((True, component_names))
-            else:
-                con.send((False, f"Unknown command '{cmd}'."))
-        except EOFError:
-            # connection closed, end the simulation
-            break
-
-    runner.cleanup()
+    finally:
+        runner.cleanup()
 
 
 class SimulationRunnerProcess:
