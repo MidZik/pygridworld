@@ -5,18 +5,20 @@ from collections import defaultdict, deque
 from importlib import util
 from multiprocessing.connection import Connection
 from multiprocessing import Pipe, Process
+import multiprocessing
 from threading import Lock, Thread
 from pathlib import Path
 import json
 from datetime import datetime
-from queue import Queue, Empty
+import queue
 import re
 import shutil
 from typing import Optional
+import os
 
 
 class SimulationRunner:
-    def __init__(self, simulation_folder_path, runner_working_dir):
+    def __init__(self, simulation_folder_path, runner_working_dir, state_file_written_callback=None):
         simulation_module_path = (simulation_folder_path / "simulation.pyd").resolve(True)
         spec = util.spec_from_file_location("simulation", simulation_module_path)
         self.module = util.module_from_spec(spec)
@@ -32,7 +34,9 @@ class SimulationRunner:
         self._logs_dir.mkdir(exist_ok=True)
         self._cur_log_file = (self._logs_dir / f'log-{datetime.now():%Y-%m-%d}.txt').resolve()
 
-        self._state_jsons_to_save_queue = Queue(100)
+        self._state_file_written_callback = state_file_written_callback
+
+        self._state_jsons_to_save_queue = queue.Queue(100)
         self._state_writer_thread = Thread(target=self._queued_states_writer)
         self._state_writer_thread.start()
 
@@ -78,7 +82,7 @@ class SimulationRunner:
         while True:
             try:
                 state_json_to_write = self._state_jsons_to_save_queue.get(True, 1.0)
-            except Empty:
+            except queue.Empty:
                 continue
 
             try:
@@ -91,6 +95,8 @@ class SimulationRunner:
                         state_file_path = (self._saved_states_dir / f'{tick}.json').resolve()
                         with state_file_path.open('w') as state_file:
                             state_file.write(state_json_to_write)
+                        if self._state_file_written_callback is not None:
+                            self._state_file_written_callback(tick, str(state_file_path))
                     else:
                         with self._cur_log_file.open('a') as log:
                             log.write(f'[{datetime.now():%H:%M:%S}] Could not write state, bad tick format: {tick}\n')
@@ -101,8 +107,13 @@ class SimulationRunner:
                 self._state_jsons_to_save_queue.task_done()
 
 
-def simulation_runner_loop(con: Connection, simulation_folder_path, runner_working_dir):
-    runner = SimulationRunner(simulation_folder_path, runner_working_dir)
+def simulation_runner_loop(con: Connection, simulation_folder_path, runner_working_dir, state_file_queue):
+    def _on_state_file_written(tick, state_file_path):
+        state_file_queue.put((tick, state_file_path))
+
+    state_file_written_callback = _on_state_file_written if state_file_queue is not None else None
+
+    runner = SimulationRunner(simulation_folder_path, runner_working_dir, state_file_written_callback)
 
     try:
         while True:
@@ -151,9 +162,10 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
 
 
 class SimulationRunnerProcess:
-    def __init__(self, simulation_folder_path, runner_working_dir):
+    def __init__(self, simulation_folder_path, runner_working_dir, state_file_queue=None):
         self._conn, child_conn = Pipe()
-        self._process = Process(target=simulation_runner_loop, args=(child_conn, simulation_folder_path, runner_working_dir), daemon=True)
+        args = (child_conn, simulation_folder_path, runner_working_dir, state_file_queue)
+        self._process = Process(target=simulation_runner_loop, args=args, daemon=True)
         self._lock = Lock()
 
     def start_process(self):
@@ -264,8 +276,12 @@ def _get_timeline_folder_name(timeline: Timeline):
         return f't{timeline.timeline_id}'
 
 
+def _get_timeline_folder_path(timelines_dir_path: Path, timeline: Timeline):
+    return timelines_dir_path / _get_timeline_folder_name(timeline)
+
+
 def _get_timeline_file_path(timelines_dir_path: Path, timeline: Timeline):
-    return timelines_dir_path / _get_timeline_folder_name(timeline) / 'timeline.json'
+    return _get_timeline_folder_path(timelines_dir_path, timeline) / 'timeline.json'
 
 
 def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: TimelinePoint):
@@ -306,7 +322,7 @@ def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: T
 def _save_timeline_file(timelines_dir_path: Path, timeline: Timeline):
     timeline_file_path = _get_timeline_file_path(timelines_dir_path, timeline)
     with timeline_file_path.open('w') as timeline_file:
-        simulation_path = timeline.simulation_path if timeline.simulation_path else None
+        simulation_path = str(timeline.simulation_path) if timeline.simulation_path else None
         data = {
             'simulation_path': simulation_path
         }
@@ -317,7 +333,7 @@ def _load_timeline_file(timelines_dir_path: Path, timeline: Timeline):
     timeline_file_path = _get_timeline_file_path(timelines_dir_path, timeline)
     with timeline_file_path.open('r') as timeline_file:
         data = json.load(timeline_file)
-        timeline.simulation_path = data['simulation_path']
+        timeline.simulation_path = Path(data['simulation_path']).resolve(True)
 
 
 def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
@@ -333,6 +349,7 @@ def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
             continue
 
         timeline = Timeline(timeline_id, parent_id)
+        _load_timeline_file(timelines_dir_path, timeline)
         ticks = []
 
         for point_path in timeline_path.glob('*.point'):
@@ -393,6 +410,61 @@ def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
     return largest_id + 1
 
 
+class TimelineSimulation:
+    def __init__(self, timeline, timelines_dir_path, working_dir):
+        self.timeline: Timeline = timeline
+        self.timelines_dir_path = timelines_dir_path
+
+        self._simulation_state_queue = multiprocessing.Queue(1000)
+
+        self._process_working_dir = Path(working_dir).resolve()
+        self._process_working_dir.mkdir(exist_ok=True)
+
+        self.simulation_process: Optional[SimulationRunnerProcess] = None
+
+        self._handle_queue_thread = Thread(target=self._handle_queue, daemon=False)
+        self._handle_queue_thread.start()
+
+    def start_process(self):
+        self.simulation_process = SimulationRunnerProcess(
+            self.timeline.simulation_path,
+            self._process_working_dir,
+            self._simulation_state_queue)
+        self.simulation_process.start_process()
+
+    def stop_process(self):
+        self.simulation_process.stop_and_join_process()
+
+    def start_simulation(self):
+        self.simulation_process.start_simulation()
+
+    def stop_simulation(self):
+        self.simulation_process.stop_simulation()
+
+    def _handle_queue(self):
+        while True:
+            queue_item = self._simulation_state_queue.get()
+
+            if queue_item is None:
+                break
+
+            tick, state_file_path = queue_item
+            state_file_path = Path(state_file_path).resolve(True)
+
+            if tick <= self.timeline.tail_point.tick:
+                # discard already recorded states
+                state_file_path.unlink()
+            else:
+                # create new point and move in its state
+                prev_tail = self.timeline.tail_point
+                new_point = TimelinePoint(tick, self.timeline)
+                new_point.prev_point = prev_tail
+                prev_tail.next_point = new_point
+                self.timeline.tail_point = new_point
+                destination = _get_point_file_path(self.timelines_dir_path, new_point)
+                state_file_path.rename(destination)
+
+
 class TimelinesProject:
     @staticmethod
     def create_new_project(project_root_dir):
@@ -431,3 +503,7 @@ class TimelinesProject:
         self.root_point.derivative_timelines.append(timeline)
 
         return timeline
+
+    def create_timeline_simulation(self, timeline):
+        working_dir = _get_timeline_folder_path(self.timelines_dir_path, timeline) / 'working'
+        return TimelineSimulation(timeline, self.timelines_dir_path, working_dir)
