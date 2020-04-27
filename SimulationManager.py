@@ -227,16 +227,46 @@ class TimelinePoint:
 
 
 class Timeline:
-    def __init__(self, timeline_id: int, parent_timeline_id: Optional[int]):
+    @staticmethod
+    def create_folder_name(timeline_id, parent_timeline_id):
+        if parent_timeline_id is not None:
+            return f't{timeline_id}_p{parent_timeline_id}'
+        else:
+            return f't{timeline_id}'
+
+    @staticmethod
+    def parse_folder_name(folder_name):
+        exp = re.compile(r'^t(?P<timeline_id>\d+)(_p(?P<parent_timeline_id>\d+))?$')
+        result = exp.match(folder_name)
+        if result:
+            timeline_id = result.group('timeline_id')
+            parent_timeline_id = result.group('parent_timeline_id')
+            timeline_id = int(timeline_id)
+            parent_timeline_id = int(parent_timeline_id) if parent_timeline_id else None
+            return timeline_id, parent_timeline_id
+        else:
+            return None, None
+
+    def __init__(self, timeline_id: int, parent_timeline_id: Optional[int], timelines_root_dir: Path):
         """
         :param timeline_id: The ID of the timeline
         :param parent_timeline_id: The ID of this timeline's parent timeline (if any).
         """
         self.timeline_id: int = timeline_id
         self.parent_timeline_id: Optional[int] = parent_timeline_id
+        self._timelines_root_dir: Path = timelines_root_dir
         self.simulation_path: Optional[Path] = None
         self.head_point: Optional[TimelinePoint] = None
         self.tail_point: Optional[TimelinePoint] = None
+
+    def get_folder_name(self):
+        return Timeline.create_folder_name(self.timeline_id, self.parent_timeline_id)
+
+    def get_dir(self):
+        return self._timelines_root_dir / self.get_folder_name()
+
+    def get_file_path(self):
+        return self.get_dir() / 'timeline.json'
 
 
 def _parse_point_file_name(file_name):
@@ -252,36 +282,8 @@ def _get_point_file_name(point: TimelinePoint):
     return f'tick-{point.tick}.point'
 
 
-def _get_point_file_path(timelines_dir_path: Path, point: TimelinePoint):
-    return timelines_dir_path / _get_timeline_folder_name(point.timeline) / _get_point_file_name(point)
-
-
-def _parse_timeline_folder_name(folder_name):
-    exp = re.compile(r'^t(?P<timeline_id>\d+)(_p(?P<parent_timeline_id>\d+))?$')
-    result = exp.match(folder_name)
-    if result:
-        timeline_id = result.group('timeline_id')
-        parent_timeline_id = result.group('parent_timeline_id')
-        timeline_id = int(timeline_id)
-        parent_timeline_id = int(parent_timeline_id) if parent_timeline_id else None
-        return timeline_id, parent_timeline_id
-    else:
-        return None, None
-
-
-def _get_timeline_folder_name(timeline: Timeline):
-    if timeline.parent_timeline_id is not None:
-        return f't{timeline.timeline_id}_p{timeline.parent_timeline_id}'
-    else:
-        return f't{timeline.timeline_id}'
-
-
-def _get_timeline_folder_path(timelines_dir_path: Path, timeline: Timeline):
-    return timelines_dir_path / _get_timeline_folder_name(timeline)
-
-
-def _get_timeline_file_path(timelines_dir_path: Path, timeline: Timeline):
-    return _get_timeline_folder_path(timelines_dir_path, timeline) / 'timeline.json'
+def _get_point_file_path(point: TimelinePoint):
+    return point.timeline.get_dir() / _get_point_file_name(point)
 
 
 def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: TimelinePoint):
@@ -297,31 +299,30 @@ def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: T
     parent_timeline_id = parent_timeline.timeline_id if parent_timeline else None
     parent_simulation = parent_timeline.simulation_path if parent_timeline else None
 
-    timeline = Timeline(timeline_id, parent_timeline_id)
+    timeline = Timeline(timeline_id, parent_timeline_id, timelines_dir_path)
     timeline.simulation_path = parent_simulation
 
-    (timelines_dir_path / _get_timeline_folder_name(timeline)).mkdir()
+    timeline.get_dir().mkdir()
 
     head_point = TimelinePoint(source_point.tick, timeline)
     timeline.head_point = head_point
     timeline.tail_point = head_point
 
     if source_point.timeline is not None:
-        source_point_file_path = _get_point_file_path(timelines_dir_path, source_point).resolve(True)
-        shutil.copyfile(str(source_point_file_path), _get_point_file_path(timelines_dir_path, head_point))
+        source_point_file_path = _get_point_file_path(source_point).resolve(True)
+        shutil.copyfile(str(source_point_file_path), _get_point_file_path(head_point))
     else:
-        head_point_path = _get_point_file_path(timelines_dir_path, head_point)
+        head_point_path = _get_point_file_path(head_point)
         with head_point_path.open('w') as head_point_file:
             json.dump({}, head_point_file)
 
-    _save_timeline_file(timelines_dir_path, timeline)
+    _save_timeline_file(timeline)
 
     return timeline
 
 
-def _save_timeline_file(timelines_dir_path: Path, timeline: Timeline):
-    timeline_file_path = _get_timeline_file_path(timelines_dir_path, timeline)
-    with timeline_file_path.open('w') as timeline_file:
+def _save_timeline_file(timeline: Timeline):
+    with timeline.get_file_path().open('w') as timeline_file:
         simulation_path = str(timeline.simulation_path) if timeline.simulation_path else None
         data = {
             'simulation_path': simulation_path
@@ -329,9 +330,8 @@ def _save_timeline_file(timelines_dir_path: Path, timeline: Timeline):
         json.dump(data, timeline_file)
 
 
-def _load_timeline_file(timelines_dir_path: Path, timeline: Timeline):
-    timeline_file_path = _get_timeline_file_path(timelines_dir_path, timeline)
-    with timeline_file_path.open('r') as timeline_file:
+def _load_timeline_file(timeline: Timeline):
+    with timeline.get_file_path().open('r') as timeline_file:
         data = json.load(timeline_file)
         timeline.simulation_path = Path(data['simulation_path']).resolve(True)
 
@@ -343,13 +343,13 @@ def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
 
     # pass 1: create all timelines and their points, and log parent timelines+ticks
     for timeline_path in (p for p in timelines_dir_path.iterdir() if p.is_dir()):
-        timeline_id, parent_id = _parse_timeline_folder_name(timeline_path.name)
+        timeline_id, parent_id = Timeline.parse_folder_name(timeline_path.name)
         if timeline_id is None:
             print(f"WARNING: Improperly formatted folder found in timelines dir '{timeline_path.name}'.")
             continue
 
-        timeline = Timeline(timeline_id, parent_id)
-        _load_timeline_file(timelines_dir_path, timeline)
+        timeline = Timeline(timeline_id, parent_id, timelines_dir_path)
+        _load_timeline_file(timeline)
         ticks = []
 
         for point_path in timeline_path.glob('*.point'):
@@ -461,7 +461,7 @@ class TimelineSimulation:
                 new_point.prev_point = prev_tail
                 prev_tail.next_point = new_point
                 self.timeline.tail_point = new_point
-                destination = _get_point_file_path(self.timelines_dir_path, new_point)
+                destination = _get_point_file_path(new_point)
                 state_file_path.rename(destination)
 
 
@@ -505,5 +505,5 @@ class TimelinesProject:
         return timeline
 
     def create_timeline_simulation(self, timeline):
-        working_dir = _get_timeline_folder_path(self.timelines_dir_path, timeline) / 'working'
+        working_dir = timeline.get_dir() / 'working'
         return TimelineSimulation(timeline, self.timelines_dir_path, working_dir)
