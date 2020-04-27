@@ -217,6 +217,19 @@ class SimulationRunnerProcess:
 
 
 class TimelinePoint:
+    @staticmethod
+    def create_file_name(tick):
+        return f'tick-{tick}.point'
+
+    @staticmethod
+    def parse_file_name(file_name):
+        exp = re.compile(r'^tick-(?P<tick>\d+)\.point$')
+        result = exp.match(file_name)
+        if result:
+            return int(result.group('tick'))
+        else:
+            return None
+
     def __init__(self, tick, timeline):
         self.tick = tick
 
@@ -224,6 +237,12 @@ class TimelinePoint:
         self.derivative_timelines = []
         self.next_point: Optional[TimelinePoint] = None
         self.prev_point: Optional[TimelinePoint] = None
+
+    def get_file_name(self):
+        return TimelinePoint.create_file_name(self.tick)
+
+    def get_file_path(self):
+        return self.timeline.get_dir() / self.get_file_name()
 
 
 class Timeline:
@@ -269,23 +288,6 @@ class Timeline:
         return self.get_dir() / 'timeline.json'
 
 
-def _parse_point_file_name(file_name):
-    exp = re.compile(r'^tick-(?P<tick>\d+)\.point$')
-    result = exp.match(file_name)
-    if result:
-        return int(result.group('tick'))
-    else:
-        return None
-
-
-def _get_point_file_name(point: TimelinePoint):
-    return f'tick-{point.tick}.point'
-
-
-def _get_point_file_path(point: TimelinePoint):
-    return point.timeline.get_dir() / _get_point_file_name(point)
-
-
 def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: TimelinePoint):
     """
     Create and return a new timeline at a given location.
@@ -309,11 +311,9 @@ def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: T
     timeline.tail_point = head_point
 
     if source_point.timeline is not None:
-        source_point_file_path = _get_point_file_path(source_point).resolve(True)
-        shutil.copyfile(str(source_point_file_path), _get_point_file_path(head_point))
+        shutil.copyfile(str(source_point.get_file_path()), head_point.get_file_path())
     else:
-        head_point_path = _get_point_file_path(head_point)
-        with head_point_path.open('w') as head_point_file:
+        with head_point.get_file_path().open('w') as head_point_file:
             json.dump({}, head_point_file)
 
     _save_timeline_file(timeline)
@@ -353,7 +353,7 @@ def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
         ticks = []
 
         for point_path in timeline_path.glob('*.point'):
-            tick = _parse_point_file_name(point_path.name)
+            tick = TimelinePoint.parse_file_name(point_path.name)
             if tick is not None:
                 ticks.append(tick)
 
@@ -461,8 +461,7 @@ class TimelineSimulation:
                 new_point.prev_point = prev_tail
                 prev_tail.next_point = new_point
                 self.timeline.tail_point = new_point
-                destination = _get_point_file_path(new_point)
-                state_file_path.rename(destination)
+                state_file_path.rename(new_point.get_file_path())
 
 
 class TimelinesProject:
