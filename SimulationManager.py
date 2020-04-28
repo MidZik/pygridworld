@@ -503,3 +503,6 @@ class TimelinesProject:
             print(timeline_children)
 
         self._timelines = timelines
+
+    def get_timeline(self, timeline_id):
+        return self._timelines.get(timeline_id, None)
