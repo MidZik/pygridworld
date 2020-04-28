@@ -266,6 +266,39 @@ class Timeline:
         else:
             return None, None
 
+    @staticmethod
+    def create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: TimelinePoint):
+        """
+        Create and return a new timeline at a given location.
+        :param timelines_dir_path: The folder that the timeline folder should be created in.
+        :param timeline_id: The ID of the timeline.
+        :param source_point: The point that the new timeline should derive from.
+            Source point data will be copied into the new timeline head point.
+        :return: The newly created timeline.
+        """
+        parent_timeline = source_point.timeline
+        parent_timeline_id = parent_timeline.timeline_id if parent_timeline else None
+        parent_simulation = parent_timeline.simulation_path if parent_timeline else None
+
+        timeline = Timeline(timeline_id, parent_timeline_id, timelines_dir_path)
+        timeline.simulation_path = parent_simulation
+
+        timeline.get_dir().mkdir()
+
+        head_point = TimelinePoint(source_point.tick, timeline)
+        timeline.head_point = head_point
+        timeline.tail_point = head_point
+
+        if source_point.timeline is not None:
+            shutil.copyfile(str(source_point.get_file_path()), head_point.get_file_path())
+        else:
+            with head_point.get_file_path().open('w') as head_point_file:
+                json.dump({}, head_point_file)
+
+        timeline.save_file()
+
+        return timeline
+
     def __init__(self, timeline_id: int, parent_timeline_id: Optional[int], timelines_root_dir: Path):
         """
         :param timeline_id: The ID of the timeline
@@ -287,53 +320,18 @@ class Timeline:
     def get_file_path(self):
         return self.get_dir() / 'timeline.json'
 
+    def save_file(self):
+        with self.get_file_path().open('w') as timeline_file:
+            simulation_path = str(self.simulation_path) if self.simulation_path else None
+            data = {
+                'simulation_path': simulation_path
+            }
+            json.dump(data, timeline_file)
 
-def _create_timeline(timelines_dir_path: Path, timeline_id: int, source_point: TimelinePoint):
-    """
-    Create and return a new timeline at a given location.
-    :param timelines_dir_path: The folder that the timeline folder should be created in.
-    :param timeline_id: The ID of the timeline.
-    :param source_point: The point that the new timeline should derive from.
-        Source point data will be copied into the new timeline head point.
-    :return: The newly created timeline.
-    """
-    parent_timeline = source_point.timeline
-    parent_timeline_id = parent_timeline.timeline_id if parent_timeline else None
-    parent_simulation = parent_timeline.simulation_path if parent_timeline else None
-
-    timeline = Timeline(timeline_id, parent_timeline_id, timelines_dir_path)
-    timeline.simulation_path = parent_simulation
-
-    timeline.get_dir().mkdir()
-
-    head_point = TimelinePoint(source_point.tick, timeline)
-    timeline.head_point = head_point
-    timeline.tail_point = head_point
-
-    if source_point.timeline is not None:
-        shutil.copyfile(str(source_point.get_file_path()), head_point.get_file_path())
-    else:
-        with head_point.get_file_path().open('w') as head_point_file:
-            json.dump({}, head_point_file)
-
-    _save_timeline_file(timeline)
-
-    return timeline
-
-
-def _save_timeline_file(timeline: Timeline):
-    with timeline.get_file_path().open('w') as timeline_file:
-        simulation_path = str(timeline.simulation_path) if timeline.simulation_path else None
-        data = {
-            'simulation_path': simulation_path
-        }
-        json.dump(data, timeline_file)
-
-
-def _load_timeline_file(timeline: Timeline):
-    with timeline.get_file_path().open('r') as timeline_file:
-        data = json.load(timeline_file)
-        timeline.simulation_path = Path(data['simulation_path']).resolve(True)
+    def load_file(self):
+        with self.get_file_path().open('r') as timeline_file:
+            data = json.load(timeline_file)
+            self.simulation_path = Path(data['simulation_path']).resolve(True)
 
 
 def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
@@ -349,7 +347,7 @@ def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
             continue
 
         timeline = Timeline(timeline_id, parent_id, timelines_dir_path)
-        _load_timeline_file(timeline)
+        timeline.load_file()
         ticks = []
 
         for point_path in timeline_path.glob('*.point'):
@@ -496,7 +494,7 @@ class TimelinesProject:
 
     def create_timeline(self, source_point: Optional[TimelinePoint] = None):
         source_point = source_point if source_point is not None else self.root_point
-        timeline = _create_timeline(self.timelines_dir_path, self._next_new_timeline_id, source_point)
+        timeline = Timeline.create_timeline(self.timelines_dir_path, self._next_new_timeline_id, source_point)
         self._next_new_timeline_id += 1
 
         self.root_point.derivative_timelines.append(timeline)
