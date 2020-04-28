@@ -334,80 +334,6 @@ class Timeline:
             self.simulation_path = Path(data['simulation_path']).resolve(True)
 
 
-def _load_all_timelines(timelines_dir_path: Path, root_point: TimelinePoint):
-    timelines = {}
-    timeline_children = defaultdict(list)
-    largest_id = 0
-
-    # pass 1: create all timelines and their points, and log parent timelines+ticks
-    for timeline_path in (p for p in timelines_dir_path.iterdir() if p.is_dir()):
-        timeline_id, parent_id = Timeline.parse_folder_name(timeline_path.name)
-        if timeline_id is None:
-            print(f"WARNING: Improperly formatted folder found in timelines dir '{timeline_path.name}'.")
-            continue
-
-        timeline = Timeline(timeline_id, parent_id, timelines_dir_path)
-        timeline.load_file()
-        ticks = []
-
-        for point_path in timeline_path.glob('*.point'):
-            tick = TimelinePoint.parse_file_name(point_path.name)
-            if tick is not None:
-                ticks.append(tick)
-
-        if len(ticks) <= 0:
-            print(f"WARNING: Timeline {timeline_id} has no points. Skipped loading.")
-            continue
-
-        ticks = sorted(ticks)
-
-        timeline.head_point = TimelinePoint(ticks[0], timeline)
-        prev_point = timeline.head_point
-        tail_point = timeline.head_point
-
-        for tick in ticks[1:]:
-            tail_point = TimelinePoint(tick, timeline)
-            tail_point.prev_point = prev_point
-            prev_point.next_point = tail_point
-            prev_point = tail_point
-
-        timeline.tail_point = tail_point
-
-        timelines[timeline_id] = timeline
-        timeline_children[parent_id, timeline.head_point.tick].append(timeline)
-        largest_id = max(largest_id, timeline_id)
-
-    # pass 2: add derived timelines to the appropriate points in each timeline.
-    timeline_deque = deque()
-
-    # root point is a special case, as it has no timeline associated with it
-    for t in timeline_children[None, 0]:
-        root_point.derivative_timelines.append(t)
-        timeline_deque.append(t)
-
-    del timeline_children[None, 0]
-
-    while len(timeline_deque) > 0:
-        cur_timeline = timeline_deque.popleft()
-        cur_timeline_id = cur_timeline.timeline_id
-        cur_point = cur_timeline.head_point
-
-        while cur_point is not None:
-            tick = cur_point.tick
-            point_children_timelines = timeline_children.get((cur_timeline_id, tick), None)
-            if point_children_timelines is not None:
-                cur_point.derivative_timelines.extend(point_children_timelines)
-                timeline_deque.extend(point_children_timelines)
-                del timeline_children[(cur_timeline_id, tick)]
-            cur_point = cur_point.next_point
-
-    if len(timeline_children) > 0:
-        print(f"WARNING: Some timelines are not attached to the root point and have not been loaded.")
-        print(timeline_children)
-
-    return largest_id + 1
-
-
 class TimelineSimulation:
     def __init__(self, timeline, timelines_dir_path, working_dir):
         self.timeline: Timeline = timeline
@@ -479,8 +405,8 @@ class TimelinesProject:
     def load_project(project_root_dir):
         project = TimelinesProject(project_root_dir)
 
+        project.load_all_timelines()
         project._project_file_handle = project.project_file_path.open('r+')
-        project._next_new_timeline_id = _load_all_timelines(project.timelines_dir_path, project.root_point)
 
         return project
 
@@ -491,6 +417,7 @@ class TimelinesProject:
         self.project_file_handle = None
         self.root_point = TimelinePoint(0, None)
         self._next_new_timeline_id = 1
+        self._timelines = {}
 
     def create_timeline(self, source_point: Optional[TimelinePoint] = None):
         source_point = source_point if source_point is not None else self.root_point
@@ -504,3 +431,75 @@ class TimelinesProject:
     def create_timeline_simulation(self, timeline):
         working_dir = timeline.get_dir() / 'working'
         return TimelineSimulation(timeline, self.timelines_dir_path, working_dir)
+
+    def load_all_timelines(self):
+        timelines = {}
+        timeline_children = defaultdict(list)
+
+        # pass 1: create all timelines and their points, and log parent timelines+ticks
+        for timeline_path in (p for p in self.timelines_dir_path.iterdir() if p.is_dir()):
+            timeline_id, parent_id = Timeline.parse_folder_name(timeline_path.name)
+            if timeline_id is None:
+                print(f"WARNING: Improperly formatted folder found in timelines dir '{timeline_path.name}'.")
+                continue
+
+            timeline = Timeline(timeline_id, parent_id, self.timelines_dir_path)
+            timeline.load_file()
+            ticks = []
+
+            for point_path in timeline_path.glob('*.point'):
+                tick = TimelinePoint.parse_file_name(point_path.name)
+                if tick is not None:
+                    ticks.append(tick)
+
+            if len(ticks) <= 0:
+                print(f"WARNING: Timeline {timeline_id} has no points. Skipped loading.")
+                continue
+
+            ticks = sorted(ticks)
+
+            timeline.head_point = TimelinePoint(ticks[0], timeline)
+            prev_point = timeline.head_point
+            tail_point = timeline.head_point
+
+            for tick in ticks[1:]:
+                tail_point = TimelinePoint(tick, timeline)
+                tail_point.prev_point = prev_point
+                prev_point.next_point = tail_point
+                prev_point = tail_point
+
+            timeline.tail_point = tail_point
+
+            timelines[timeline_id] = timeline
+            timeline_children[parent_id, timeline.head_point.tick].append(timeline)
+            self._next_new_timeline_id = max(self._next_new_timeline_id, timeline_id)
+
+        # pass 2: add derived timelines to the appropriate points in each timeline.
+        timeline_deque = deque()
+
+        # root point is a special case, as it has no timeline associated with it
+        for t in timeline_children[None, 0]:
+            self.root_point.derivative_timelines.append(t)
+            timeline_deque.append(t)
+
+        del timeline_children[None, 0]
+
+        while len(timeline_deque) > 0:
+            cur_timeline = timeline_deque.popleft()
+            cur_timeline_id = cur_timeline.timeline_id
+            cur_point = cur_timeline.head_point
+
+            while cur_point is not None:
+                tick = cur_point.tick
+                point_children_timelines = timeline_children.get((cur_timeline_id, tick), None)
+                if point_children_timelines is not None:
+                    cur_point.derivative_timelines.extend(point_children_timelines)
+                    timeline_deque.extend(point_children_timelines)
+                    del timeline_children[(cur_timeline_id, tick)]
+                cur_point = cur_point.next_point
+
+        if len(timeline_children) > 0:
+            print(f"WARNING: Some timelines are not attached to the root point and have not been loaded.")
+            print(timeline_children)
+
+        self._timelines = timelines
