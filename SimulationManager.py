@@ -53,6 +53,12 @@ class SimulationRunner:
     def stop_simulation(self):
         self.simulation.stop_simulation()
 
+    def is_running(self):
+        """
+        :return: True if the simulation is running, false otherwise.
+        """
+        return self.simulation.is_running()
+
     def get_tick(self):
         return self.simulation.get_tick()
 
@@ -128,6 +134,9 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
                 elif cmd == "stop_simulation":
                     runner.stop_simulation()
                     con.send((True, None))
+                elif cmd == "is_running":
+                    running = runner.is_running()
+                    con.send((True, running))
                 elif cmd == "get_tick":
                     tick = runner.get_tick()
                     con.send((True, tick))
@@ -180,6 +189,9 @@ class SimulationRunnerProcess:
 
     def stop_simulation(self):
         self._send_command("stop_simulation")
+
+    def is_running(self):
+        return self._send_command("is_running")
 
     def get_tick(self):
         return self._send_command("get_tick")
