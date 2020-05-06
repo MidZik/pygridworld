@@ -5,6 +5,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class App:
+    _PointRole = QtCore.Qt.UserRole + 0
+    _TimelineRole = QtCore.Qt.UserRole + 1
+
     def __init__(self, argv):
         self._app = QtWidgets.QApplication(argv)
         self._main_window = QtWidgets.QMainWindow()
@@ -13,6 +16,8 @@ class App:
         self._ui = ui
 
         ui.actionOpen_Project.triggered.connect(self._open_project)
+
+        ui.timelinePointTree.currentItemChanged.connect(self._on_timeline_point_tree_current_item_changed)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._current_timeline: Optional[sm.Timeline] = None
@@ -23,6 +28,17 @@ class App:
 
         self._project = sm.TimelinesProject.load_project(project_dir)
         self.set_current_timeline(None)
+
+    def _on_timeline_point_tree_current_item_changed(self, current, previous):
+        point = current.data(0, App._PointRole)
+        timeline = current.data(0, App._TimelineRole)
+
+        if point is not None:
+            self._ui.stateJsonTextEdit.setPlainText(f"point {point}")
+        elif timeline is not None:
+            self._ui.stateJsonTextEdit.setPlainText(f"timeline {timeline}")
+        else:
+            raise RuntimeWarning("Selected timeline tree item with no attached data.")
 
     def set_current_timeline(self, timeline_id):
         self._current_timeline = self._project.get_timeline(timeline_id)
@@ -40,12 +56,14 @@ class App:
         while cur_point is not None:
             item = QtWidgets.QTreeWidgetItem(ui.timelinePointTree, item)
             item.setText(0, f"P {cur_point.tick}")
+            item.setData(0, App._PointRole, cur_point)
 
             child = None
             child_items_to_add = []
             for d in cur_point.derivative_timelines:
                 child = QtWidgets.QTreeWidgetItem(item, child)
                 child.setText(0, f"T {d.timeline_id}")
+                child.setData(0, App._TimelineRole, d)
                 child_items_to_add.append(child)
             item.addChildren(child_items_to_add)
 
