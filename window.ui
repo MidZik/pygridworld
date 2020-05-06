@@ -64,13 +64,15 @@
        </layout>
       </item>
       <item>
-       <widget class="QTreeView" name="timelinePointTree">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QTreeWidget" name="timelinePointTree">
+        <property name="headerHidden">
+         <bool>true</bool>
         </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>
