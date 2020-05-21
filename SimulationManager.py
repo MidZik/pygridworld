@@ -350,9 +350,9 @@ class Timeline:
 
 
 class TimelineSimulation:
-    def __init__(self, timeline, timelines_dir_path, working_dir):
+    def __init__(self, timeline, working_dir):
+
         self.timeline: Timeline = timeline
-        self.timelines_dir_path = timelines_dir_path
 
         self._simulation_state_queue = multiprocessing.Queue(1000)
 
@@ -445,7 +445,7 @@ class TimelinesProject:
 
     def create_timeline_simulation(self, timeline):
         working_dir = timeline.get_dir() / 'working'
-        return TimelineSimulation(timeline, self.timelines_dir_path, working_dir)
+        return TimelineSimulation(timeline, working_dir)
 
     def load_all_timelines(self):
         timelines = {}
