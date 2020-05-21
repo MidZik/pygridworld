@@ -254,7 +254,10 @@ class TimelinePoint:
         return TimelinePoint.create_file_name(self.tick)
 
     def get_file_path(self):
-        return self.timeline.get_dir() / self.get_file_name()
+        if self.timeline is not None:
+            return self.timeline.get_dir() / self.get_file_name()
+        else:
+            return None
 
 
 class Timeline:
