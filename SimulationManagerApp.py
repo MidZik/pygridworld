@@ -1,7 +1,7 @@
 import SimulationManager as sm
 import window
 from typing import Optional
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 from pathlib import Path
 
 
@@ -10,7 +10,7 @@ class _TaskRunner(QtCore.QRunnable):
         super().__init__()
         self._task = task
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def run(self) -> None:
         self._task.do_work()
 
@@ -24,7 +24,7 @@ class _Task(QtCore.QObject):
 
 
 class _ReadFileTask(_Task):
-    read_done = QtCore.pyqtSignal(str)
+    read_done = QtCore.Signal(str)
 
     def __init__(self, file_path):
         super().__init__()
@@ -42,6 +42,7 @@ class App:
 
     def __init__(self, argv):
         self._app = QtWidgets.QApplication(argv)
+        self._app.setQuitOnLastWindowClosed(True)
         self._main_window = QtWidgets.QMainWindow()
         ui = window.Ui_MainWindow()
         ui.setupUi(self._main_window)
@@ -51,14 +52,16 @@ class App:
 
         ui.timelinePointTree.currentItemChanged.connect(self._on_timeline_point_tree_current_item_changed)
         ui.timelinePointTree.itemActivated.connect(self._on_timeline_point_tree_item_activated)
+        ui.start_sim_process_button.pressed.connect(self._start_selected_sim_process)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._current_timeline: Optional[sm.Timeline] = None
+        self._simulations = {}
 
         self._thread_pool = QtCore.QThreadPool()
 
     def _open_project(self):
-        from PyQt5.QtWidgets import QFileDialog
+        from PySide2.QtWidgets import QFileDialog
         project_dir = QFileDialog.getExistingDirectory(self._main_window, options=QFileDialog.ShowDirsOnly)
 
         self._project = sm.TimelinesProject.load_project(project_dir)
@@ -73,7 +76,7 @@ class App:
         timeline = current.data(0, App._TimelineRole)
 
         def update_text(text):
-            if self._ui.timelinePointTree.currentItem() == current:
+            if id(self._ui.timelinePointTree.currentItem()) == id(current):
                 self._ui.stateJsonTextEdit.setPlainText(text)
 
         if point is not None:
@@ -94,6 +97,9 @@ class App:
         timeline = item.data(0, App._TimelineRole)
         if timeline is not None:
             self.set_current_timeline(timeline.timeline_id)
+
+    def _start_selected_sim_process(self):
+        pass
 
     def set_current_timeline(self, timeline_id):
         self._current_timeline = self._project.get_timeline(timeline_id)
@@ -129,7 +135,7 @@ class App:
 
     def run(self):
         self._main_window.show()
-        return self._app.exec()
+        return self._app.exec_()
 
 
 if __name__ == "__main__":
