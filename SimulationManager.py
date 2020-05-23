@@ -74,8 +74,17 @@ class SimulationRunner:
     def destroy_entity(self, eid):
         self.simulation.destroy_entity(eid)
 
+    def get_all_entities(self):
+        return self.simulation.get_all_entities()
+
     def assign_component(self, eid, com_name):
         self.simulation.assign_component(eid, com_name)
+
+    def remove_component(self, eid, com_name):
+        self.simulation.remove_component(eid, com_name)
+
+    def replace_component(self, eid, com_name, state_json):
+        self.simulation.replace_component(eid, com_name, state_json)
 
     def get_component_names(self):
         return self.simulation.get_component_names()
@@ -154,9 +163,20 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
                     eid, = params
                     runner.destroy_entity(eid)
                     con.send((True, None))
+                elif cmd == "get_all_entities":
+                    entities = runner.get_all_entities()
+                    con.send((True, entities))
                 elif cmd == "assign_component":
                     eid, com_name = params
                     runner.assign_component(eid, com_name)
+                    con.send((True, None))
+                elif cmd == "remove_component":
+                    eid, com_name = params
+                    runner.remove_component(eid, com_name)
+                    con.send((True, None))
+                elif cmd == "replace_component":
+                    eid, com_name, state_json = params
+                    runner.replace_component(eid, com_name, state_json)
                     con.send((True, None))
                 elif cmd == "get_component_names":
                     component_names = runner.get_component_names()
@@ -208,8 +228,17 @@ class SimulationRunnerProcess:
     def destroy_entity(self, eid):
         self._send_command("destroy_entity", eid)
 
+    def get_all_entities(self):
+        return self._send_command("get_all_entities")
+
     def assign_component(self, eid, com_name):
         self._send_command("assign_component", eid, com_name)
+
+    def remove_component(self, eid, com_name):
+        self._send_command("remove_component", eid, com_name)
+
+    def replace_component(self, eid, com_name, state_json):
+        self._send_command("replace_component", eid, com_name, state_json)
 
     def get_component_names(self):
         return self._send_command("get_component_names")
@@ -319,6 +348,7 @@ class Timeline:
         :param timeline_id: The ID of the timeline
         :param parent_timeline_id: The ID of this timeline's parent timeline (if any).
         """
+
         self.timeline_id: int = timeline_id
         self.parent_timeline_id: Optional[int] = parent_timeline_id
         self._timelines_root_dir: Path = timelines_root_dir
@@ -442,10 +472,6 @@ class TimelinesProject:
         self.root_point.derivative_timelines.append(timeline)
 
         return timeline
-
-    def create_timeline_simulation(self, timeline):
-        working_dir = timeline.get_dir() / 'working'
-        return TimelineSimulation(timeline, working_dir)
 
     def load_all_timelines(self):
         timelines = {}

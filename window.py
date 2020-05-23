@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Tue May 19 05:30:57 2020
+# Created: Fri May 22 03:34:07 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -236,7 +236,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuProject.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         self.tabWidget_2.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 

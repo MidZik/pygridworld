@@ -3,6 +3,7 @@ import window
 from typing import Optional
 from PySide2 import QtCore, QtGui, QtWidgets
 from pathlib import Path
+import json
 
 
 class _TaskRunner(QtCore.QRunnable):
@@ -53,12 +54,47 @@ class App:
         ui.timelinePointTree.currentItemChanged.connect(self._on_timeline_point_tree_current_item_changed)
         ui.timelinePointTree.itemActivated.connect(self._on_timeline_point_tree_item_activated)
         ui.start_sim_process_button.pressed.connect(self._start_selected_sim_process)
+        ui.createEntityButton.pressed.connect(self._create_entity_on_selected_sim)
+        ui.destroyEntityButton.pressed.connect(self._destroy_selected_entity)
+        ui.simulationList.itemSelectionChanged.connect(self._on_selected_simulation_changed)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._current_timeline: Optional[sm.Timeline] = None
+
         self._simulations = {}
 
         self._thread_pool = QtCore.QThreadPool()
+
+    def get_selected_simulation(self):
+        items = self._ui.simulationList.selectedItems()
+
+        if len(items) != 1:
+            return None
+        else:
+            item = items[0]
+
+        simulation_id = int(self._ui.simulationList.currentItem().text())
+        return self._simulations[simulation_id]
+
+    def get_selected_eid(self):
+        items = self._ui.entityList.selectedItems()
+
+        if len(items) != 1:
+            return None
+        else:
+            item = items[0]
+
+        return int(item.text())
+
+    def get_selected_component_name(self):
+        items = self._ui.entityComponentList.selectedItems()
+
+        if len(items) != 1:
+            return None
+        else:
+            item = items[0]
+
+        return item.text()
 
     def _open_project(self):
         from PySide2.QtWidgets import QFileDialog
@@ -99,7 +135,61 @@ class App:
             self.set_current_timeline(timeline.timeline_id)
 
     def _start_selected_sim_process(self):
-        pass
+        selected_item = self._ui.timelinePointTree.currentItem()
+        point = selected_item.data(0, App._PointRole)
+        timeline = selected_item.data(0, App._TimelineRole)
+        timeline = point.timeline if point is not None else timeline
+
+        self.start_simulation(timeline.timeline_id)
+
+    def _create_entity_on_selected_sim(self):
+        sim = self.get_selected_simulation()
+        if sim is not None:
+            sim.simulation_process.create_entity()
+
+        # TODO: temp
+        self._on_selected_simulation_changed()
+
+    def _destroy_selected_entity(self):
+        sim = self.get_selected_simulation()
+        eid = self.get_selected_eid()
+        if sim and eid is not None:
+            sim.simulation_process.destroy_entity(eid)
+
+        # TODO: temp
+        self._on_selected_simulation_changed()
+
+    def start_simulation(self, timeline_id):
+        if timeline_id in self._simulations:
+            return
+
+        timeline = self._project.get_timeline(timeline_id)
+
+        if timeline is None:
+            raise RuntimeError('No timeline found with given ID.')
+
+        working_dir = timeline.get_dir() / 'working'
+        new_sim = sm.TimelineSimulation(timeline, working_dir)
+        new_sim.start_process()
+
+        self._simulations[timeline_id] = new_sim
+        item = QtWidgets.QListWidgetItem(f"{timeline_id}")
+        self._ui.simulationList.addItem(item)
+
+    def _on_selected_simulation_changed(self):
+        ui = self._ui
+
+        ui.entityList.clear()
+
+        selected_sim = self.get_selected_simulation()
+
+        if selected_sim is not None:
+            sim_process: sm.SimulationRunnerProcess = selected_sim.simulation_process
+
+            entities = sim_process.get_all_entities()
+
+            for eid in entities:
+                ui.entityList.addItem(str(eid))
 
     def set_current_timeline(self, timeline_id):
         self._current_timeline = self._project.get_timeline(timeline_id)
