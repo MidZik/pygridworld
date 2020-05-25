@@ -89,6 +89,9 @@ class SimulationRunner:
     def get_component_names(self):
         return self.simulation.get_component_names()
 
+    def get_entity_component_names(self, eid):
+        return self.simulation.get_entity_component_names(eid)
+
     def _on_simulation_event(self, events_json):
         events_obj = json.loads(events_json)
         self._state_jsons_to_save_queue.put(self.get_state_json())
@@ -181,6 +184,10 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
                 elif cmd == "get_component_names":
                     component_names = runner.get_component_names()
                     con.send((True, component_names))
+                elif cmd == "get_entity_component_names":
+                    eid, = params
+                    entity_component_names = runner.get_entity_component_names(eid)
+                    con.send((True, entity_component_names))
                 else:
                     con.send((False, f"Unknown command '{cmd}'."))
             except EOFError:
@@ -242,6 +249,9 @@ class SimulationRunnerProcess:
 
     def get_component_names(self):
         return self._send_command("get_component_names")
+
+    def get_entity_component_names(self, eid):
+        return self._send_command("get_entity_component_names", eid)
 
     def _send_command(self, command_str, *command_params):
         if not self._process.is_alive():
