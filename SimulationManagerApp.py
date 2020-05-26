@@ -64,6 +64,7 @@ class App:
         assign_component_menu = QtWidgets.QMenu(ui.assignComponentButton)
         ui.assignComponentButton.setMenu(assign_component_menu)
         assign_component_menu.triggered.connect(self._on_assign_component_triggered)
+        ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._current_timeline: Optional[sm.Timeline] = None
@@ -227,6 +228,19 @@ class App:
 
             # TODO: temp
             self._on_selected_entity_changed()
+
+    def _on_selected_component_changed(self):
+        ui = self._ui
+        ui.comStateTextEdit.clear()
+
+        selected_sim = self.get_selected_simulation()
+        selected_eid = self.get_selected_eid()
+        selected_com = self.get_selected_component_name()
+
+        if selected_sim is not None and selected_eid is not None and selected_com is not None:
+            com_state_json = selected_sim.simulation_process.get_component_json(selected_eid, selected_com)
+            com_state_json = json.dumps(json.loads(com_state_json), indent=2)  # pretty print
+            ui.comStateTextEdit.setPlainText(com_state_json)
 
     def set_current_timeline(self, timeline_id):
         self._current_timeline = self._project.get_timeline(timeline_id)

@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Fri May 22 03:34:07 2020
+# Created: Tue May 26 03:19:20 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -206,9 +206,9 @@ class Ui_MainWindow(object):
         self.saveComStateButton.setObjectName("saveComStateButton")
         self.horizontalLayout_11.addWidget(self.saveComStateButton)
         self.verticalLayout_5.addLayout(self.horizontalLayout_11)
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.entitiesTab)
-        self.plainTextEdit.setObjectName("plainTextEdit")
-        self.verticalLayout_5.addWidget(self.plainTextEdit)
+        self.comStateTextEdit = QtWidgets.QPlainTextEdit(self.entitiesTab)
+        self.comStateTextEdit.setObjectName("comStateTextEdit")
+        self.verticalLayout_5.addWidget(self.comStateTextEdit)
         self.horizontalLayout_8.addLayout(self.verticalLayout_5)
         self.horizontalLayout_8.setStretch(2, 1)
         self.tabWidget_2.addTab(self.entitiesTab, "")
