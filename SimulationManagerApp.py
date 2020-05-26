@@ -64,6 +64,7 @@ class App:
         assign_component_menu = QtWidgets.QMenu(ui.assignComponentButton)
         ui.assignComponentButton.setMenu(assign_component_menu)
         assign_component_menu.triggered.connect(self._on_assign_component_triggered)
+        ui.removeComponentButton.pressed.connect(self._remove_selected_component)
         ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
 
         self._project: Optional[sm.TimelinesProject] = None
@@ -103,6 +104,12 @@ class App:
             item = items[0]
 
         return item.text()
+
+    def get_all_sim_tab_selections(self):
+        """
+        :return: (simulation, eid, component name)
+        """
+        return self.get_selected_simulation(), self.get_selected_eid(), self.get_selected_component_name()
 
     def _open_project(self):
         from PySide2.QtWidgets import QFileDialog
@@ -225,6 +232,16 @@ class App:
         if selected_eid is not None and selected_simulation is not None:
             sim_process: sm.SimulationRunnerProcess = selected_simulation.simulation_process
             sim_process.assign_component(selected_eid, action.text())
+
+            # TODO: temp
+            self._on_selected_entity_changed()
+
+    def _remove_selected_component(self):
+        selections = self.get_all_sim_tab_selections()
+        if all(s is not None for s in selections):
+            sim, eid, com = selections
+            sim_process: sm.SimulationRunnerProcess = sim.simulation_process
+            sim_process.remove_component(eid, com)
 
             # TODO: temp
             self._on_selected_entity_changed()
