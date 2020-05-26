@@ -51,12 +51,19 @@ class App:
 
         ui.actionOpen_Project.triggered.connect(self._open_project)
 
+        # Timelines tab
         ui.timelinePointTree.currentItemChanged.connect(self._on_timeline_point_tree_current_item_changed)
         ui.timelinePointTree.itemActivated.connect(self._on_timeline_point_tree_item_activated)
         ui.start_sim_process_button.pressed.connect(self._start_selected_sim_process)
+
+        # Simulations tab
+        ui.simulationList.itemSelectionChanged.connect(self._on_selected_simulation_changed)
         ui.createEntityButton.pressed.connect(self._create_entity_on_selected_sim)
         ui.destroyEntityButton.pressed.connect(self._destroy_selected_entity)
-        ui.simulationList.itemSelectionChanged.connect(self._on_selected_simulation_changed)
+        ui.entityList.itemSelectionChanged.connect(self._on_selected_entity_changed)
+        assign_component_menu = QtWidgets.QMenu(ui.assignComponentButton)
+        ui.assignComponentButton.setMenu(assign_component_menu)
+        assign_component_menu.triggered.connect(self._on_assign_component_triggered)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._current_timeline: Optional[sm.Timeline] = None
@@ -153,7 +160,7 @@ class App:
     def _destroy_selected_entity(self):
         sim = self.get_selected_simulation()
         eid = self.get_selected_eid()
-        if sim and eid is not None:
+        if sim is not None and eid is not None:
             sim.simulation_process.destroy_entity(eid)
 
         # TODO: temp
@@ -187,9 +194,39 @@ class App:
             sim_process: sm.SimulationRunnerProcess = selected_sim.simulation_process
 
             entities = sim_process.get_all_entities()
-
             for eid in entities:
                 ui.entityList.addItem(str(eid))
+
+    def _on_selected_entity_changed(self):
+        ui = self._ui
+
+        ui.entityComponentList.clear()
+        assign_components_button_menu = ui.assignComponentButton.menu()
+        assign_components_button_menu.clear()
+
+        selected_eid = self.get_selected_eid()
+
+        if selected_eid is not None:
+            sim_process: sm.SimulationRunnerProcess = self.get_selected_simulation().simulation_process
+
+            component_names = sim_process.get_component_names()
+            entity_component_names = sim_process.get_entity_component_names(selected_eid)
+            missing_component_names = [c for c in component_names if c not in entity_component_names]
+            for c in missing_component_names:
+                assign_components_button_menu.addAction(c)
+            for c in entity_component_names:
+                ui.entityComponentList.addItem(c)
+
+    def _on_assign_component_triggered(self, action):
+        ui = self._ui
+        selected_eid = self.get_selected_eid()
+        selected_simulation = self.get_selected_simulation()
+        if selected_eid is not None and selected_simulation is not None:
+            sim_process: sm.SimulationRunnerProcess = selected_simulation.simulation_process
+            sim_process.assign_component(selected_eid, action.text())
+
+            # TODO: temp
+            self._on_selected_entity_changed()
 
     def set_current_timeline(self, timeline_id):
         self._current_timeline = self._project.get_timeline(timeline_id)
