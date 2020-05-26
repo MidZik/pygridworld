@@ -80,6 +80,9 @@ class SimulationRunner:
     def assign_component(self, eid, com_name):
         self.simulation.assign_component(eid, com_name)
 
+    def get_component_json(self, eid, com_name):
+        return self.simulation.get_component_json(eid, com_name)
+
     def remove_component(self, eid, com_name):
         self.simulation.remove_component(eid, com_name)
 
@@ -173,6 +176,10 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
                     eid, com_name = params
                     runner.assign_component(eid, com_name)
                     con.send((True, None))
+                elif cmd == "get_component_json":
+                    eid, com_name = params
+                    com_data = runner.get_component_json(eid, com_name)
+                    con.send((True, com_data))
                 elif cmd == "remove_component":
                     eid, com_name = params
                     runner.remove_component(eid, com_name)
@@ -240,6 +247,9 @@ class SimulationRunnerProcess:
 
     def assign_component(self, eid, com_name):
         self._send_command("assign_component", eid, com_name)
+
+    def get_component_json(self, eid, com_name):
+        return self._send_command("get_component_json", eid, com_name)
 
     def remove_component(self, eid, com_name):
         self._send_command("remove_component", eid, com_name)
