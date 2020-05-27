@@ -74,6 +74,12 @@ class App:
 
         self._thread_pool = QtCore.QThreadPool()
 
+        # Refresh selection states
+        # TODO: A better way to ensure all ui elements are in the proper state?
+        ui.simulationList.itemSelectionChanged.emit()
+        ui.entityList.itemSelectionChanged.emit()
+        ui.entityComponentList.itemSelectionChanged.emit()
+
     def get_selected_simulation(self):
         items = self._ui.simulationList.selectedItems()
 
@@ -195,6 +201,7 @@ class App:
         ui = self._ui
 
         ui.entityList.clear()
+        ui.createEntityButton.setEnabled(False)
 
         selected_sim = self.get_selected_simulation()
 
@@ -205,12 +212,16 @@ class App:
             for eid in entities:
                 ui.entityList.addItem(str(eid))
 
+            ui.createEntityButton.setEnabled(True)
+
     def _on_selected_entity_changed(self):
         ui = self._ui
 
         ui.entityComponentList.clear()
         assign_components_button_menu = ui.assignComponentButton.menu()
         assign_components_button_menu.clear()
+        ui.destroyEntityButton.setEnabled(False)
+        ui.assignComponentButton.setEnabled(False)
 
         selected_eid = self.get_selected_eid()
 
@@ -224,6 +235,9 @@ class App:
                 assign_components_button_menu.addAction(c)
             for c in entity_component_names:
                 ui.entityComponentList.addItem(c)
+
+            ui.destroyEntityButton.setEnabled(True)
+            ui.assignComponentButton.setEnabled(True)
 
     def _on_assign_component_triggered(self, action):
         ui = self._ui
@@ -250,14 +264,25 @@ class App:
         ui = self._ui
         ui.comStateTextEdit.clear()
 
+        ui.removeComponentButton.setEnabled(False)
+        ui.revertComStateButton.setEnabled(False)
+        ui.saveComStateButton.setEnabled(False)
+
         selected_sim = self.get_selected_simulation()
         selected_eid = self.get_selected_eid()
         selected_com = self.get_selected_component_name()
 
         if selected_sim is not None and selected_eid is not None and selected_com is not None:
             com_state_json = selected_sim.simulation_process.get_component_json(selected_eid, selected_com)
-            com_state_json = json.dumps(json.loads(com_state_json), indent=2)  # pretty print
+            com_state = json.loads(com_state_json)
+            com_state_json = json.dumps(com_state, indent=2)  # pretty print
             ui.comStateTextEdit.setPlainText(com_state_json)
+
+            ui.removeComponentButton.setEnabled(True)
+
+            if com_state is not None:
+                ui.revertComStateButton.setEnabled(True)
+                ui.saveComStateButton.setEnabled(True)
 
     def set_current_timeline(self, timeline_id):
         self._current_timeline = self._project.get_timeline(timeline_id)
