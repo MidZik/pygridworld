@@ -67,6 +67,8 @@ class App:
         ui.removeComponentButton.pressed.connect(self._remove_selected_component)
         ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
 
+        ui.killSimButton.pressed.connect(self._kill_selected_simulation)
+
         self._project: Optional[sm.TimelinesProject] = None
         self._current_timeline: Optional[sm.Timeline] = None
 
@@ -88,7 +90,7 @@ class App:
         else:
             item = items[0]
 
-        simulation_id = int(self._ui.simulationList.currentItem().text())
+        simulation_id = int(item.text())
         return self._simulations[simulation_id]
 
     def get_selected_eid(self):
@@ -123,6 +125,13 @@ class App:
 
         self._project = sm.TimelinesProject.load_project(project_dir)
         self.set_current_timeline(None)
+
+    def _refresh_simulation_list(self):
+        ui = self._ui
+        ui.simulationList.clear()
+
+        for sim_id in self._simulations.keys():
+            ui.simulationList.addItem(f"{sim_id}")
 
     def _on_timeline_point_tree_current_item_changed(self, current, previous):
         if current is None:
@@ -194,8 +203,7 @@ class App:
         new_sim.start_process()
 
         self._simulations[timeline_id] = new_sim
-        item = QtWidgets.QListWidgetItem(f"{timeline_id}")
-        self._ui.simulationList.addItem(item)
+        self._refresh_simulation_list()
 
     def _on_selected_simulation_changed(self):
         ui = self._ui
@@ -283,6 +291,14 @@ class App:
             if com_state is not None:
                 ui.revertComStateButton.setEnabled(True)
                 ui.saveComStateButton.setEnabled(True)
+
+    def _kill_selected_simulation(self):
+        sim = self.get_selected_simulation()
+
+        if sim is not None:
+            sim.stop_process()
+            del self._simulations[sim.timeline.timeline_id]
+            self._refresh_simulation_list()
 
     def set_current_timeline(self, timeline_id):
         self._current_timeline = self._project.get_timeline(timeline_id)
