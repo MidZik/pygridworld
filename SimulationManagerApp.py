@@ -67,6 +67,8 @@ class App:
         ui.removeComponentButton.pressed.connect(self._remove_selected_component)
         ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
 
+        ui.startSimButton.pressed.connect(self._start_selected_simulation)
+        ui.stopSimButton.pressed.connect(self._stop_selected_simulation)
         ui.killSimButton.pressed.connect(self._kill_selected_simulation)
 
         self._project: Optional[sm.TimelinesProject] = None
@@ -210,6 +212,9 @@ class App:
 
         ui.entityList.clear()
         ui.createEntityButton.setEnabled(False)
+        ui.startSimButton.setEnabled(False)
+        ui.stopSimButton.setEnabled(False)
+        ui.killSimButton.setEnabled(False)
 
         selected_sim = self.get_selected_simulation()
 
@@ -221,6 +226,9 @@ class App:
                 ui.entityList.addItem(str(eid))
 
             ui.createEntityButton.setEnabled(True)
+            ui.startSimButton.setEnabled(True)
+            ui.stopSimButton.setEnabled(True)
+            ui.killSimButton.setEnabled(True)
 
     def _on_selected_entity_changed(self):
         ui = self._ui
@@ -291,6 +299,20 @@ class App:
             if com_state is not None:
                 ui.revertComStateButton.setEnabled(True)
                 ui.saveComStateButton.setEnabled(True)
+
+    def _start_selected_simulation(self):
+        selected_sim = self.get_selected_simulation()
+
+        if selected_sim is not None:
+            sim_process: sm.SimulationRunnerProcess = selected_sim.simulation_process
+            sim_process.start_simulation()
+
+    def _stop_selected_simulation(self):
+        selected_sim = self.get_selected_simulation()
+
+        if selected_sim is not None:
+            sim_process: sm.SimulationRunnerProcess = selected_sim.simulation_process
+            sim_process.stop_simulation()
 
     def _kill_selected_simulation(self):
         sim = self.get_selected_simulation()
