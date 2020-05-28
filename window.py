@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Tue May 26 03:19:20 2020
+# Created: Thu May 28 04:50:59 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -126,9 +126,15 @@ class Ui_MainWindow(object):
         self.stopSimButton = QtWidgets.QPushButton(self.simulationTab)
         self.stopSimButton.setObjectName("stopSimButton")
         self.horizontalLayout_7.addWidget(self.stopSimButton)
-        self.toggleSimEditButton = QtWidgets.QPushButton(self.simulationTab)
-        self.toggleSimEditButton.setObjectName("toggleSimEditButton")
-        self.horizontalLayout_7.addWidget(self.toggleSimEditButton)
+        self.startEditSimButton = QtWidgets.QPushButton(self.simulationTab)
+        self.startEditSimButton.setObjectName("startEditSimButton")
+        self.horizontalLayout_7.addWidget(self.startEditSimButton)
+        self.commitEditsSimButton = QtWidgets.QPushButton(self.simulationTab)
+        self.commitEditsSimButton.setObjectName("commitEditsSimButton")
+        self.horizontalLayout_7.addWidget(self.commitEditsSimButton)
+        self.discardEditsSimButton = QtWidgets.QPushButton(self.simulationTab)
+        self.discardEditsSimButton.setObjectName("discardEditsSimButton")
+        self.horizontalLayout_7.addWidget(self.discardEditsSimButton)
         self.killSimButton = QtWidgets.QPushButton(self.simulationTab)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(170, 0, 0))
@@ -252,7 +258,9 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.timelineTab), QtWidgets.QApplication.translate("MainWindow", "Timelines", None, -1))
         self.startSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Start", None, -1))
         self.stopSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Stop", None, -1))
-        self.toggleSimEditButton.setText(QtWidgets.QApplication.translate("MainWindow", "Toggle Edit", None, -1))
+        self.startEditSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Start Editing", None, -1))
+        self.commitEditsSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Commit Edits", None, -1))
+        self.discardEditsSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Discard Edits", None, -1))
         self.killSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Kill Simulation", None, -1))
         self.createEntityButton.setText(QtWidgets.QApplication.translate("MainWindow", "Create", None, -1))
         self.destroyEntityButton.setText(QtWidgets.QApplication.translate("MainWindow", "Destroy", None, -1))

@@ -423,6 +423,58 @@ class TimelineSimulation:
 
         self._handle_queue_thread: Optional[Thread] = None
 
+        self._is_editing = False
+
+    def is_editing(self):
+        return self._is_editing
+
+    def can_start_editing(self):
+        # Can only edit the simulation state if:
+        # 1. The simulation tick matches the head point tick.
+        # 2. The head point is the only point in the timeline.
+        # 3. Simulation is not currently running.
+        # 4. Not currently in edit mode.
+        timeline = self.timeline
+        sim = self._simulation_process
+        return (timeline.head_point == timeline.tail_point and
+                sim.get_tick() == timeline.head_point.tick and
+                not sim.is_running() and
+                not self._is_editing)
+
+    def start_editing(self):
+        if self._is_editing:
+            raise RuntimeError("Cannot start editing: already in edit mode.")
+
+        if not self.can_start_editing():
+            raise RuntimeError("Cannot start editing: not in an editable state.")
+
+        self._is_editing = True
+
+    def commit_edits(self):
+        """
+        Save the current simulation state as the new head point and exit edit mode.
+        """
+        if not self._is_editing:
+            raise RuntimeError("Cannot commit edits: not in edit mode.")
+
+        sim_state_json = self.get_state_json()
+        with self.timeline.head_point.get_file_path().open('w') as f:
+            f.write(sim_state_json)
+
+        self._is_editing = False
+
+    def discard_edits(self):
+        """
+        Revert the simulation state to the head point and exit edit mode.
+        """
+        if not self._is_editing:
+            raise RuntimeError("Cannot discard edits: not in edit mode.")
+
+        with self.timeline.head_point.get_file_path().open('r') as f:
+            self.set_state_json(f.read())
+
+        self._is_editing = False
+
     def start_process(self):
         self._simulation_process = SimulationRunnerProcess(
             self.timeline.simulation_path,
@@ -439,7 +491,8 @@ class TimelineSimulation:
         self._handle_queue_thread = None
 
     def start_simulation(self):
-        self._simulation_process.start_simulation()
+        if not self._is_editing:
+            self._simulation_process.start_simulation()
 
     def stop_simulation(self):
         self._simulation_process.stop_simulation()
@@ -454,28 +507,34 @@ class TimelineSimulation:
         return self._simulation_process.get_state_json()
 
     def set_state_json(self, state_json):
-        self._simulation_process.set_state_json(state_json)
+        if self._is_editing:
+            self._simulation_process.set_state_json(state_json)
 
     def create_entity(self):
-        return self._simulation_process.create_entity()
+        if self._is_editing:
+            return self._simulation_process.create_entity()
 
     def destroy_entity(self, eid):
-        self._simulation_process.destroy_entity(eid)
+        if self._is_editing:
+            self._simulation_process.destroy_entity(eid)
 
     def get_all_entities(self):
         return self._simulation_process.get_all_entities()
 
     def assign_component(self, eid, com_name):
-        self._simulation_process.assign_component(eid, com_name)
+        if self._is_editing:
+            self._simulation_process.assign_component(eid, com_name)
 
     def get_component_json(self, eid, com_name):
         return self._simulation_process.get_component_json(eid, com_name)
 
     def remove_component(self, eid, com_name):
-        self._simulation_process.remove_component(eid, com_name)
+        if self._is_editing:
+            self._simulation_process.remove_component(eid, com_name)
 
     def replace_component(self, eid, com_name, state_json):
-        self._simulation_process.replace_component(eid, com_name, state_json)
+        if self._is_editing:
+            self._simulation_process.replace_component(eid, com_name, state_json)
 
     def get_component_names(self):
         return self._simulation_process.get_component_names()

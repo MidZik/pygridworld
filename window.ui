@@ -217,9 +217,23 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="toggleSimEditButton">
+             <widget class="QPushButton" name="startEditSimButton">
               <property name="text">
-               <string>Toggle Edit</string>
+               <string>Start Editing</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="commitEditsSimButton">
+              <property name="text">
+               <string>Commit Edits</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="discardEditsSimButton">
+              <property name="text">
+               <string>Discard Edits</string>
               </property>
              </widget>
             </item>

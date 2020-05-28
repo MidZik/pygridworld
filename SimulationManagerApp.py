@@ -69,6 +69,9 @@ class App:
 
         ui.startSimButton.clicked.connect(self._start_selected_simulation)
         ui.stopSimButton.clicked.connect(self._stop_selected_simulation)
+        ui.startEditSimButton.clicked.connect(self._start_editing_selected_sim)
+        ui.commitEditsSimButton.clicked.connect(self._commit_edits_to_selected_sim)
+        ui.discardEditsSimButton.clicked.connect(self._discard_edits_to_selected_sim)
         ui.killSimButton.clicked.connect(self._kill_selected_simulation)
 
         self._project: Optional[sm.TimelinesProject] = None
@@ -84,7 +87,7 @@ class App:
         ui.entityList.itemSelectionChanged.emit()
         ui.entityComponentList.itemSelectionChanged.emit()
 
-    def get_selected_simulation(self):
+    def get_selected_simulation(self) -> Optional[sm.TimelineSimulation]:
         items = self._ui.simulationList.selectedItems()
 
         if len(items) != 1:
@@ -210,6 +213,8 @@ class App:
     def _on_selected_simulation_changed(self):
         ui = self._ui
 
+        self._refresh_edit_button_states()
+
         ui.entityList.clear()
         ui.createEntityButton.setEnabled(False)
         ui.startSimButton.setEnabled(False)
@@ -227,6 +232,19 @@ class App:
             ui.startSimButton.setEnabled(True)
             ui.stopSimButton.setEnabled(True)
             ui.killSimButton.setEnabled(True)
+
+    def _refresh_edit_button_states(self):
+        sim, eid, com = self.get_all_sim_tab_selections()
+        ui = self._ui
+
+        if sim is None:
+            ui.startEditSimButton.setEnabled(False)
+            ui.commitEditsSimButton.setEnabled(False)
+            ui.discardEditsSimButton.setEnabled(False)
+        else:
+            ui.startEditSimButton.setEnabled(sim.can_start_editing())
+            ui.commitEditsSimButton.setEnabled(sim.is_editing())
+            ui.discardEditsSimButton.setEnabled(sim.is_editing())
 
     def _on_selected_entity_changed(self):
         ui = self._ui
@@ -306,6 +324,30 @@ class App:
 
         if selected_sim is not None:
             selected_sim.stop_simulation()
+
+    def _start_editing_selected_sim(self):
+        selected_sim = self.get_selected_simulation()
+
+        if selected_sim is not None and selected_sim.can_start_editing():
+            selected_sim.start_editing()
+
+        self._refresh_edit_button_states()
+
+    def _commit_edits_to_selected_sim(self):
+        selected_sim = self.get_selected_simulation()
+
+        if selected_sim is not None and selected_sim.is_editing():
+            selected_sim.commit_edits()
+
+        self._refresh_edit_button_states()
+
+    def _discard_edits_to_selected_sim(self):
+        selected_sim = self.get_selected_simulation()
+
+        if selected_sim is not None and selected_sim.is_editing():
+            selected_sim.discard_edits()
+
+        self._refresh_edit_button_states()
 
     def _kill_selected_simulation(self):
         sim = self.get_selected_simulation()
