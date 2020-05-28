@@ -54,22 +54,22 @@ class App:
         # Timelines tab
         ui.timelinePointTree.currentItemChanged.connect(self._on_timeline_point_tree_current_item_changed)
         ui.timelinePointTree.itemActivated.connect(self._on_timeline_point_tree_item_activated)
-        ui.start_sim_process_button.pressed.connect(self._start_selected_sim_process)
+        ui.start_sim_process_button.clicked.connect(self._start_selected_sim_process)
 
         # Simulations tab
         ui.simulationList.itemSelectionChanged.connect(self._on_selected_simulation_changed)
-        ui.createEntityButton.pressed.connect(self._create_entity_on_selected_sim)
-        ui.destroyEntityButton.pressed.connect(self._destroy_selected_entity)
+        ui.createEntityButton.clicked.connect(self._create_entity_on_selected_sim)
+        ui.destroyEntityButton.clicked.connect(self._destroy_selected_entity)
         ui.entityList.itemSelectionChanged.connect(self._on_selected_entity_changed)
         assign_component_menu = QtWidgets.QMenu(ui.assignComponentButton)
         ui.assignComponentButton.setMenu(assign_component_menu)
         assign_component_menu.triggered.connect(self._on_assign_component_triggered)
-        ui.removeComponentButton.pressed.connect(self._remove_selected_component)
+        ui.removeComponentButton.clicked.connect(self._remove_selected_component)
         ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
 
-        ui.startSimButton.pressed.connect(self._start_selected_simulation)
-        ui.stopSimButton.pressed.connect(self._stop_selected_simulation)
-        ui.killSimButton.pressed.connect(self._kill_selected_simulation)
+        ui.startSimButton.clicked.connect(self._start_selected_simulation)
+        ui.stopSimButton.clicked.connect(self._stop_selected_simulation)
+        ui.killSimButton.clicked.connect(self._kill_selected_simulation)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._current_timeline: Optional[sm.Timeline] = None
