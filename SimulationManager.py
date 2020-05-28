@@ -18,6 +18,9 @@ import os
 
 
 class SimulationRunner:
+    """
+    Loads and wraps the simulation module.
+    """
     def __init__(self, simulation_folder_path, runner_working_dir, state_file_written_callback=None):
         simulation_module_path = (simulation_folder_path / "simulation.pyd").resolve(True)
         spec = util.spec_from_file_location("simulation", simulation_module_path)
@@ -205,6 +208,10 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
 
 
 class SimulationRunnerProcess:
+    """
+    Creates a SimulationRunner in a new process using multiprocessing.
+    Responsible for communicating with the other process.
+    """
     def __init__(self, simulation_folder_path, runner_working_dir, state_file_queue=None):
         self._conn, child_conn = Pipe()
         args = (child_conn, simulation_folder_path, runner_working_dir, state_file_queue)
@@ -400,6 +407,9 @@ class Timeline:
 
 
 class TimelineSimulation:
+    """
+    Manages a SimulationRunnerProcess associated with a timeline.
+    """
     def __init__(self, timeline, working_dir):
 
         self.timeline: Timeline = timeline
@@ -409,26 +419,69 @@ class TimelineSimulation:
         self._process_working_dir = Path(working_dir).resolve()
         self._process_working_dir.mkdir(exist_ok=True)
 
-        self.simulation_process: Optional[SimulationRunnerProcess] = None
+        self._simulation_process: Optional[SimulationRunnerProcess] = None
 
-        self._handle_queue_thread = Thread(target=self._handle_queue, daemon=False)
-        self._handle_queue_thread.start()
+        self._handle_queue_thread: Optional[Thread] = None
 
     def start_process(self):
-        self.simulation_process = SimulationRunnerProcess(
+        self._simulation_process = SimulationRunnerProcess(
             self.timeline.simulation_path,
             self._process_working_dir,
             self._simulation_state_queue)
-        self.simulation_process.start_process()
+        self._simulation_process.start_process()
+        self._handle_queue_thread = Thread(target=self._handle_queue, daemon=False)
+        self._handle_queue_thread.start()
 
     def stop_process(self):
-        self.simulation_process.stop_and_join_process()
+        self._simulation_process.stop_and_join_process()
+        self._simulation_state_queue.put(None)
+        self._handle_queue_thread.join()
+        self._handle_queue_thread = None
 
     def start_simulation(self):
-        self.simulation_process.start_simulation()
+        self._simulation_process.start_simulation()
 
     def stop_simulation(self):
-        self.simulation_process.stop_simulation()
+        self._simulation_process.stop_simulation()
+
+    def is_running(self):
+        return self._simulation_process.is_running()
+
+    def get_tick(self):
+        return self._simulation_process.get_tick()
+
+    def get_state_json(self):
+        return self._simulation_process.get_state_json()
+
+    def set_state_json(self, state_json):
+        self._simulation_process.set_state_json(state_json)
+
+    def create_entity(self):
+        return self._simulation_process.create_entity()
+
+    def destroy_entity(self, eid):
+        self._simulation_process.destroy_entity(eid)
+
+    def get_all_entities(self):
+        return self._simulation_process.get_all_entities()
+
+    def assign_component(self, eid, com_name):
+        self._simulation_process.assign_component(eid, com_name)
+
+    def get_component_json(self, eid, com_name):
+        return self._simulation_process.get_component_json(eid, com_name)
+
+    def remove_component(self, eid, com_name):
+        self._simulation_process.remove_component(eid, com_name)
+
+    def replace_component(self, eid, com_name, state_json):
+        self._simulation_process.replace_component(eid, com_name, state_json)
+
+    def get_component_names(self):
+        return self._simulation_process.get_component_names()
+
+    def get_entity_component_names(self, eid):
+        return self._simulation_process.get_entity_component_names(eid)
 
     def _handle_queue(self):
         while True:

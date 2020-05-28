@@ -177,7 +177,7 @@ class App:
     def _create_entity_on_selected_sim(self):
         sim = self.get_selected_simulation()
         if sim is not None:
-            sim.simulation_process.create_entity()
+            sim.create_entity()
 
         # TODO: temp
         self._on_selected_simulation_changed()
@@ -186,7 +186,7 @@ class App:
         sim = self.get_selected_simulation()
         eid = self.get_selected_eid()
         if sim is not None and eid is not None:
-            sim.simulation_process.destroy_entity(eid)
+            sim.destroy_entity(eid)
 
         # TODO: temp
         self._on_selected_simulation_changed()
@@ -219,9 +219,7 @@ class App:
         selected_sim = self.get_selected_simulation()
 
         if selected_sim is not None:
-            sim_process: sm.SimulationRunnerProcess = selected_sim.simulation_process
-
-            entities = sim_process.get_all_entities()
+            entities = selected_sim.get_all_entities()
             for eid in entities:
                 ui.entityList.addItem(str(eid))
 
@@ -239,13 +237,12 @@ class App:
         ui.destroyEntityButton.setEnabled(False)
         ui.assignComponentButton.setEnabled(False)
 
+        selected_sim = self.get_selected_simulation()
         selected_eid = self.get_selected_eid()
 
-        if selected_eid is not None:
-            sim_process: sm.SimulationRunnerProcess = self.get_selected_simulation().simulation_process
-
-            component_names = sim_process.get_component_names()
-            entity_component_names = sim_process.get_entity_component_names(selected_eid)
+        if selected_sim is not None and selected_eid is not None:
+            component_names = selected_sim.get_component_names()
+            entity_component_names = selected_sim.get_entity_component_names(selected_eid)
             missing_component_names = [c for c in component_names if c not in entity_component_names]
             for c in missing_component_names:
                 assign_components_button_menu.addAction(c)
@@ -260,8 +257,7 @@ class App:
         selected_eid = self.get_selected_eid()
         selected_simulation = self.get_selected_simulation()
         if selected_eid is not None and selected_simulation is not None:
-            sim_process: sm.SimulationRunnerProcess = selected_simulation.simulation_process
-            sim_process.assign_component(selected_eid, action.text())
+            selected_simulation.assign_component(selected_eid, action.text())
 
             # TODO: temp
             self._on_selected_entity_changed()
@@ -270,8 +266,7 @@ class App:
         selections = self.get_all_sim_tab_selections()
         if all(s is not None for s in selections):
             sim, eid, com = selections
-            sim_process: sm.SimulationRunnerProcess = sim.simulation_process
-            sim_process.remove_component(eid, com)
+            sim.remove_component(eid, com)
 
             # TODO: temp
             self._on_selected_entity_changed()
@@ -289,7 +284,7 @@ class App:
         selected_com = self.get_selected_component_name()
 
         if selected_sim is not None and selected_eid is not None and selected_com is not None:
-            com_state_json = selected_sim.simulation_process.get_component_json(selected_eid, selected_com)
+            com_state_json = selected_sim.get_component_json(selected_eid, selected_com)
             com_state = json.loads(com_state_json)
             com_state_json = json.dumps(com_state, indent=2)  # pretty print
             ui.comStateTextEdit.setPlainText(com_state_json)
@@ -304,15 +299,13 @@ class App:
         selected_sim = self.get_selected_simulation()
 
         if selected_sim is not None:
-            sim_process: sm.SimulationRunnerProcess = selected_sim.simulation_process
-            sim_process.start_simulation()
+            selected_sim.start_simulation()
 
     def _stop_selected_simulation(self):
         selected_sim = self.get_selected_simulation()
 
         if selected_sim is not None:
-            sim_process: sm.SimulationRunnerProcess = selected_sim.simulation_process
-            sim_process.stop_simulation()
+            selected_sim.stop_simulation()
 
     def _kill_selected_simulation(self):
         sim = self.get_selected_simulation()
