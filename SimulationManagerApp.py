@@ -49,6 +49,8 @@ class App:
         ui.setupUi(self._main_window)
         self._ui = ui
 
+        self._app.aboutToQuit.connect(self._on_application_quitting)
+
         ui.actionOpen_Project.triggered.connect(self._open_project)
 
         # Navigation
@@ -136,6 +138,10 @@ class App:
         :return: (simulation, eid, component name)
         """
         return self.get_selected_timeline_simulation(), self.get_selected_eid(), self.get_selected_component_name()
+
+    def _on_application_quitting(self):
+        for sim in self._simulations.values():
+            sim.stop_process()
 
     def _open_project(self):
         from PySide2.QtWidgets import QFileDialog
