@@ -475,6 +475,19 @@ class TimelineSimulation:
 
         self._is_editing = False
 
+    def move_to_point(self, point: TimelinePoint):
+        if point.timeline is not self.timeline:
+            raise ValueError('Point is not part of simulation timeline.')
+
+        if self._is_editing:
+            raise RuntimeError('Cannot move to point while simulation is being edited.')
+
+        if self.is_running():
+            raise RuntimeError('Cannot move to point while simulation is running.')
+
+        with point.get_file_path().open('r') as f:
+            self._simulation_process.set_state_json(f.read())
+
     def start_process(self):
         self._simulation_process = SimulationRunnerProcess(
             self.timeline.simulation_path,

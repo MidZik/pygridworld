@@ -324,7 +324,8 @@ class App:
 
     def _start_sim_process_for_current_timeline(self):
         timeline = self.get_selected_timeline()
-        self.start_simulation_process(timeline.timeline_id)
+        point = self.get_selected_point()
+        self.start_simulation_process(timeline.timeline_id, point)
 
     def _kill_sim_process_for_current_timeline(self):
         sim = self.get_selected_timeline_simulation()
@@ -351,18 +352,23 @@ class App:
         # TODO: temp
         self._refresh_simulation_entity_list()
 
-    def start_simulation_process(self, timeline_id):
+    def start_simulation_process(self, timeline_id, point=None):
         if timeline_id in self._simulations:
             return
 
         timeline = self._project.get_timeline(timeline_id)
-
         if timeline is None:
             raise RuntimeError('No timeline found with given ID.')
+
+        if point is not None and point.timeline is not timeline:
+            raise RuntimeError('Starting simulation process at invalid point.')
 
         working_dir = timeline.get_dir() / 'working'
         new_sim = sm.TimelineSimulation(timeline, working_dir)
         new_sim.start_process()
+
+        if point is not None:
+            new_sim.move_to_point(point)
 
         self._simulations[timeline_id] = new_sim
         self._refresh_simulation_tab()
