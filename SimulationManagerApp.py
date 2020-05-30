@@ -51,13 +51,20 @@ class App:
 
         ui.actionOpen_Project.triggered.connect(self._open_project)
 
-        # Timelines tab
-        ui.timelinePointTree.currentItemChanged.connect(self._on_timeline_point_tree_current_item_changed)
-        ui.timelinePointTree.itemActivated.connect(self._on_timeline_point_tree_item_activated)
-        ui.start_sim_process_button.clicked.connect(self._start_selected_sim_process)
+        # Navigation
+        ui.timelineTree.itemSelectionChanged.connect(self._on_timeline_tree_selected_item_changed)
+        ui.timelinePointList.itemSelectionChanged.connect(self._on_timeline_point_list_selected_item_changed)
 
-        # Simulations tab
-        ui.simulationList.itemSelectionChanged.connect(self._on_selected_simulation_changed)
+        # Simulation Tab
+        ui.startSimProcessButton.clicked.connect(self._start_sim_process_for_current_timeline)
+        ui.killSimProcessButton.clicked.connect(self._kill_sim_process_for_current_timeline)
+
+        ui.startSimButton.clicked.connect(self._start_selected_simulation)
+        ui.stopSimButton.clicked.connect(self._stop_selected_simulation)
+        ui.startEditSimButton.clicked.connect(self._start_editing_selected_sim)
+        ui.commitEditsSimButton.clicked.connect(self._commit_edits_to_selected_sim)
+        ui.discardEditsSimButton.clicked.connect(self._discard_edits_to_selected_sim)
+
         ui.createEntityButton.clicked.connect(self._create_entity_on_selected_sim)
         ui.destroyEntityButton.clicked.connect(self._destroy_selected_entity)
         ui.entityList.itemSelectionChanged.connect(self._on_selected_entity_changed)
@@ -67,15 +74,7 @@ class App:
         ui.removeComponentButton.clicked.connect(self._remove_selected_component)
         ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
 
-        ui.startSimButton.clicked.connect(self._start_selected_simulation)
-        ui.stopSimButton.clicked.connect(self._stop_selected_simulation)
-        ui.startEditSimButton.clicked.connect(self._start_editing_selected_sim)
-        ui.commitEditsSimButton.clicked.connect(self._commit_edits_to_selected_sim)
-        ui.discardEditsSimButton.clicked.connect(self._discard_edits_to_selected_sim)
-        ui.killSimButton.clicked.connect(self._kill_selected_simulation)
-
         self._project: Optional[sm.TimelinesProject] = None
-        self._current_timeline: Optional[sm.Timeline] = None
 
         self._simulations = {}
 
@@ -83,20 +82,34 @@ class App:
 
         # Refresh selection states
         # TODO: A better way to ensure all ui elements are in the proper state?
-        ui.simulationList.itemSelectionChanged.emit()
-        ui.entityList.itemSelectionChanged.emit()
-        ui.entityComponentList.itemSelectionChanged.emit()
+        self._on_timeline_tree_selected_item_changed()
 
-    def get_selected_simulation(self) -> Optional[sm.TimelineSimulation]:
-        items = self._ui.simulationList.selectedItems()
+    def get_selected_timeline(self) -> Optional[sm.Timeline]:
+        items = self._ui.timelineTree.selectedItems()
 
-        if len(items) != 1:
+        if items:
+            item = items[0]
+        else:
+            item = None
+
+        return None if item is None else item.data(0, App._TimelineRole)
+
+    def get_selected_timeline_simulation(self) -> Optional[sm.TimelineSimulation]:
+        timeline = self.get_selected_timeline()
+        if timeline is None:
             return None
         else:
-            item = items[0]
+            return self._simulations.get(timeline.timeline_id, None)
 
-        simulation_id = int(item.text())
-        return self._simulations[simulation_id]
+    def get_selected_point(self) -> Optional[sm.TimelinePoint]:
+        items = self._ui.timelinePointList.selectedItems()
+
+        if items:
+            item = items[0]
+        else:
+            item = None
+
+        return None if item is None else item.data(App._PointRole)
 
     def get_selected_eid(self):
         items = self._ui.entityList.selectedItems()
@@ -122,32 +135,179 @@ class App:
         """
         :return: (simulation, eid, component name)
         """
-        return self.get_selected_simulation(), self.get_selected_eid(), self.get_selected_component_name()
+        return self.get_selected_timeline_simulation(), self.get_selected_eid(), self.get_selected_component_name()
 
     def _open_project(self):
         from PySide2.QtWidgets import QFileDialog
         project_dir = QFileDialog.getExistingDirectory(self._main_window, options=QFileDialog.ShowDirsOnly)
 
         self._project = sm.TimelinesProject.load_project(project_dir)
-        self.set_current_timeline(None)
 
-    def _refresh_simulation_list(self):
         ui = self._ui
-        ui.simulationList.clear()
 
-        for sim_id in self._simulations.keys():
-            ui.simulationList.addItem(f"{sim_id}")
+        ui.timelineTree.clear()
 
-    def _on_timeline_point_tree_current_item_changed(self, current, previous):
-        if current is None:
+        def make_timeline_item(timeline, derived_from_point, parent_item, preceding_item):
+            result_item = QtWidgets.QTreeWidgetItem(parent_item, preceding_item)
+            result_item.setText(0, f"[{derived_from_point.tick}] {timeline.timeline_id}")
+            result_item.setData(0, App._TimelineRole, timeline)
+            return result_item
+
+        class ProcessingFrame:
+            def __init__(self, parent_ui_item, cur_point, next_derived_timeline_index):
+                self.parent_ui_item = parent_ui_item
+                self.cur_point: sm.TimelinePoint = cur_point
+                self.next_derived_timeline_index = next_derived_timeline_index
+
+        # Stack that tracks tree traversal.
+        processing_stack = [ProcessingFrame(ui.timelineTree, self._project.root_point, 0)]
+
+        last_added_item = None
+        while len(processing_stack) > 0:
+            cur_frame = processing_stack[-1]
+
+            if cur_frame.next_derived_timeline_index < len(cur_frame.cur_point.derivative_timelines):
+                # make the UI item for this derived timeline index
+                timeline = cur_frame.cur_point.derivative_timelines[cur_frame.next_derived_timeline_index]
+                last_added_item = make_timeline_item(timeline, cur_frame.cur_point, cur_frame.parent_ui_item, last_added_item)
+                cur_frame.next_derived_timeline_index += 1
+
+                # process this timeline next, starting at the head point
+                processing_stack.append(ProcessingFrame(last_added_item, timeline.head_point, 0))
+            else:
+                # All timelines at this point have been processed, fast forward to the next point with timelines
+                cur_frame.next_derived_timeline_index = 0
+                cur_frame.cur_point = cur_frame.cur_point.next_point
+                while cur_frame.cur_point is not None:
+                    if cur_frame.cur_point.derivative_timelines:
+                        break
+                    cur_frame.cur_point = cur_frame.cur_point.next_point
+
+                if cur_frame.cur_point is None:
+                    # No more points with derivative timelines have been found on this timeline,
+                    # so we can stop processing it.
+                    # Restore last added item to the previous frame as we exit
+                    processing_stack.pop()
+                    last_added_item = cur_frame.parent_ui_item
+
+        # TODO: Temp?
+        self._on_timeline_tree_selected_item_changed()
+
+    def _on_timeline_tree_selected_item_changed(self):
+        ui = self._ui
+
+        ui.timelinePointList.clear()
+
+        timeline = self.get_selected_timeline()
+
+        if timeline is not None:
+            cur_point = timeline.head_point
+            while cur_point is not None:
+                item = QtWidgets.QListWidgetItem(f"{cur_point.tick}")
+                item.setData(App._PointRole, cur_point)
+                ui.timelinePointList.addItem(item)
+                cur_point = cur_point.next_point
+
+        self._refresh_simulation_tab()
+
+    def _refresh_simulation_tab(self):
+        self._refresh_simulation_process_buttons()
+        self._refresh_simulation_start_stop_buttons()
+        self._refresh_simulation_edit_mode_buttons()
+        self._refresh_simulation_edit_buttons()
+        self._refresh_simulation_entity_list()
+
+    def _refresh_simulation_process_buttons(self):
+        ui = self._ui
+
+        timeline = self.get_selected_timeline()
+        simulation = self.get_selected_timeline_simulation()
+
+        ui.startSimProcessButton.setEnabled(False)
+        ui.killSimProcessButton.setEnabled(False)
+
+        if timeline is not None:
+            ui.startSimProcessButton.setEnabled(simulation is None)
+            ui.killSimProcessButton.setEnabled(simulation is not None)
+
+    def _refresh_simulation_start_stop_buttons(self):
+        ui = self._ui
+
+        simulation = self.get_selected_timeline_simulation()
+
+        ui.startSimButton.setEnabled(False)
+        ui.stopSimButton.setEnabled(False)
+
+        if simulation is not None and not simulation.is_editing():
+            is_running = simulation.is_running()
+            ui.startSimButton.setEnabled(not is_running)
+            ui.stopSimButton.setEnabled(is_running)
+
+    def _refresh_simulation_edit_mode_buttons(self):
+        ui = self._ui
+
+        simulation = self.get_selected_timeline_simulation()
+
+        ui.startEditSimButton.setEnabled(False)
+        ui.commitEditsSimButton.setEnabled(False)
+        ui.discardEditsSimButton.setEnabled(False)
+
+        if simulation is not None:
+            is_editing = simulation.is_editing()
+            ui.startEditSimButton.setEnabled(simulation.can_start_editing())
+            ui.commitEditsSimButton.setEnabled(is_editing)
+            ui.discardEditsSimButton.setEnabled(is_editing)
+
+    def _refresh_simulation_edit_buttons(self):
+        ui = self._ui
+
+        sim, eid, com = self.get_all_sim_tab_selections()
+
+        ui.createEntityButton.setEnabled(False)
+        ui.destroyEntityButton.setEnabled(False)
+        ui.assignComponentButton.setEnabled(False)
+        ui.removeComponentButton.setEnabled(False)
+        ui.revertComStateButton.setEnabled(False)
+        ui.saveComStateButton.setEnabled(False)
+
+        if sim is not None and sim.is_editing():
+            ui.createEntityButton.setEnabled(True)
+
+            if eid is not None:
+                ui.destroyEntityButton.setEnabled(True)
+                ui.assignComponentButton.setEnabled(True)
+
+                if com is not None:
+                    ui.removeComponentButton.setEnabled(True)
+
+                    com_state_json = sim.get_component_json(eid, com)
+                    com_state = json.loads(com_state_json)
+
+                    if com_state is not None:
+                        ui.revertComStateButton.setEnabled(True)
+                        ui.saveComStateButton.setEnabled(True)
+
+    def _refresh_simulation_entity_list(self):
+        ui = self._ui
+
+        sim = self.get_selected_timeline_simulation()
+
+        ui.entityList.clear()
+
+        if sim is not None:
+            entities = sim.get_all_entities()
+            for eid in entities:
+                ui.entityList.addItem(str(eid))
+
+    def _on_timeline_point_list_selected_item_changed(self):
+        point = self.get_selected_point()
+
+        if point is None:
             self._ui.stateJsonTextEdit.setPlainText("")
             return
 
-        point = current.data(0, App._PointRole)
-        timeline = current.data(0, App._TimelineRole)
-
         def update_text(text):
-            if id(self._ui.timelinePointTree.currentItem()) == id(current):
+            if id(self.get_selected_point()) == id(point):
                 self._ui.stateJsonTextEdit.setPlainText(text)
 
         if point is not None:
@@ -159,42 +319,39 @@ class App:
                 self._thread_pool.start(task.runner())
             else:
                 self._ui.stateJsonTextEdit.setPlainText(f"Selected point has no data.")
-        elif timeline is not None:
-            self._ui.stateJsonTextEdit.setPlainText(f"timeline {timeline}")
         else:
-            raise RuntimeWarning("Selected timeline tree item with no attached data.")
+            raise RuntimeWarning("Selected point item with no attached data.")
 
-    def _on_timeline_point_tree_item_activated(self, item, column):
-        timeline = item.data(0, App._TimelineRole)
-        if timeline is not None:
-            self.set_current_timeline(timeline.timeline_id)
+    def _start_sim_process_for_current_timeline(self):
+        timeline = self.get_selected_timeline()
+        self.start_simulation_process(timeline.timeline_id)
 
-    def _start_selected_sim_process(self):
-        selected_item = self._ui.timelinePointTree.currentItem()
-        point = selected_item.data(0, App._PointRole)
-        timeline = selected_item.data(0, App._TimelineRole)
-        timeline = point.timeline if point is not None else timeline
+    def _kill_sim_process_for_current_timeline(self):
+        sim = self.get_selected_timeline_simulation()
 
-        self.start_simulation(timeline.timeline_id)
+        if sim is not None:
+            sim.stop_process()
+            del self._simulations[sim.timeline.timeline_id]
+            self._refresh_simulation_tab()
 
     def _create_entity_on_selected_sim(self):
-        sim = self.get_selected_simulation()
+        sim = self.get_selected_timeline_simulation()
         if sim is not None:
             sim.create_entity()
 
         # TODO: temp
-        self._on_selected_simulation_changed()
+        self._refresh_simulation_entity_list()
 
     def _destroy_selected_entity(self):
-        sim = self.get_selected_simulation()
+        sim = self.get_selected_timeline_simulation()
         eid = self.get_selected_eid()
         if sim is not None and eid is not None:
             sim.destroy_entity(eid)
 
         # TODO: temp
-        self._on_selected_simulation_changed()
+        self._refresh_simulation_entity_list()
 
-    def start_simulation(self, timeline_id):
+    def start_simulation_process(self, timeline_id):
         if timeline_id in self._simulations:
             return
 
@@ -208,43 +365,7 @@ class App:
         new_sim.start_process()
 
         self._simulations[timeline_id] = new_sim
-        self._refresh_simulation_list()
-
-    def _on_selected_simulation_changed(self):
-        ui = self._ui
-
-        self._refresh_edit_button_states()
-
-        ui.entityList.clear()
-        ui.createEntityButton.setEnabled(False)
-        ui.startSimButton.setEnabled(False)
-        ui.stopSimButton.setEnabled(False)
-        ui.killSimButton.setEnabled(False)
-
-        selected_sim = self.get_selected_simulation()
-
-        if selected_sim is not None:
-            entities = selected_sim.get_all_entities()
-            for eid in entities:
-                ui.entityList.addItem(str(eid))
-
-            ui.createEntityButton.setEnabled(True)
-            ui.startSimButton.setEnabled(True)
-            ui.stopSimButton.setEnabled(True)
-            ui.killSimButton.setEnabled(True)
-
-    def _refresh_edit_button_states(self):
-        sim, eid, com = self.get_all_sim_tab_selections()
-        ui = self._ui
-
-        if sim is None:
-            ui.startEditSimButton.setEnabled(False)
-            ui.commitEditsSimButton.setEnabled(False)
-            ui.discardEditsSimButton.setEnabled(False)
-        else:
-            ui.startEditSimButton.setEnabled(sim.can_start_editing())
-            ui.commitEditsSimButton.setEnabled(sim.is_editing())
-            ui.discardEditsSimButton.setEnabled(sim.is_editing())
+        self._refresh_simulation_tab()
 
     def _on_selected_entity_changed(self):
         ui = self._ui
@@ -255,7 +376,7 @@ class App:
         ui.destroyEntityButton.setEnabled(False)
         ui.assignComponentButton.setEnabled(False)
 
-        selected_sim = self.get_selected_simulation()
+        selected_sim = self.get_selected_timeline_simulation()
         selected_eid = self.get_selected_eid()
 
         if selected_sim is not None and selected_eid is not None:
@@ -272,9 +393,9 @@ class App:
 
     def _on_assign_component_triggered(self, action):
         ui = self._ui
+        selected_simulation = self.get_selected_timeline_simulation()
         selected_eid = self.get_selected_eid()
-        selected_simulation = self.get_selected_simulation()
-        if selected_eid is not None and selected_simulation is not None:
+        if selected_simulation is not None and selected_eid is not None:
             selected_simulation.assign_component(selected_eid, action.text())
 
             # TODO: temp
@@ -297,7 +418,7 @@ class App:
         ui.revertComStateButton.setEnabled(False)
         ui.saveComStateButton.setEnabled(False)
 
-        selected_sim = self.get_selected_simulation()
+        selected_sim = self.get_selected_timeline_simulation()
         selected_eid = self.get_selected_eid()
         selected_com = self.get_selected_component_name()
 
@@ -314,80 +435,40 @@ class App:
                 ui.saveComStateButton.setEnabled(True)
 
     def _start_selected_simulation(self):
-        selected_sim = self.get_selected_simulation()
+        selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None:
             selected_sim.start_simulation()
 
     def _stop_selected_simulation(self):
-        selected_sim = self.get_selected_simulation()
+        selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None:
             selected_sim.stop_simulation()
 
     def _start_editing_selected_sim(self):
-        selected_sim = self.get_selected_simulation()
+        selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None and selected_sim.can_start_editing():
             selected_sim.start_editing()
 
-        self._refresh_edit_button_states()
+        self._refresh_simulation_tab()
 
     def _commit_edits_to_selected_sim(self):
-        selected_sim = self.get_selected_simulation()
+        selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None and selected_sim.is_editing():
             selected_sim.commit_edits()
 
-        self._refresh_edit_button_states()
+        self._refresh_simulation_tab()
 
     def _discard_edits_to_selected_sim(self):
-        selected_sim = self.get_selected_simulation()
+        selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None and selected_sim.is_editing():
             selected_sim.discard_edits()
 
-        self._refresh_edit_button_states()
-
-    def _kill_selected_simulation(self):
-        sim = self.get_selected_simulation()
-
-        if sim is not None:
-            sim.stop_process()
-            del self._simulations[sim.timeline.timeline_id]
-            self._refresh_simulation_list()
-
-    def set_current_timeline(self, timeline_id):
-        self._current_timeline = self._project.get_timeline(timeline_id)
-        ui = self._ui
-
-        ui.timelinePointTree.clear()
-        items_to_add = []
-
-        if self._current_timeline is not None:
-            cur_point = self._current_timeline.head_point
-        else:
-            cur_point = self._project.root_point
-
-        item = None
-        while cur_point is not None:
-            item = QtWidgets.QTreeWidgetItem(ui.timelinePointTree, item)
-            item.setText(0, f"P {cur_point.tick}")
-            item.setData(0, App._PointRole, cur_point)
-
-            child = None
-            child_items_to_add = []
-            for d in cur_point.derivative_timelines:
-                child = QtWidgets.QTreeWidgetItem(item, child)
-                child.setText(0, f"T {d.timeline_id}")
-                child.setData(0, App._TimelineRole, d)
-                child_items_to_add.append(child)
-            item.addChildren(child_items_to_add)
-
-            items_to_add.append(item)
-            cur_point = cur_point.next_point
-
-        ui.timelinePointTree.addTopLevelItems(items_to_add)
+        self._refresh_simulation_tab()
 
     def run(self):
         self._main_window.show()
