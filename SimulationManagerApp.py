@@ -70,11 +70,15 @@ class App:
         ui.createEntityButton.clicked.connect(self._create_entity_on_selected_sim)
         ui.destroyEntityButton.clicked.connect(self._destroy_selected_entity)
         ui.entityList.itemSelectionChanged.connect(self._on_selected_entity_changed)
+
         assign_component_menu = QtWidgets.QMenu(ui.assignComponentButton)
         ui.assignComponentButton.setMenu(assign_component_menu)
         assign_component_menu.triggered.connect(self._on_assign_component_triggered)
         ui.removeComponentButton.clicked.connect(self._remove_selected_component)
         ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
+
+        ui.revertComStateButton.clicked.connect(self._revert_selected_com_state)
+        ui.saveComStateButton.clicked.connect(self._save_selected_com_state)
 
         self._project: Optional[sm.TimelinesProject] = None
 
@@ -123,7 +127,7 @@ class App:
 
         return int(item.text())
 
-    def get_selected_component_name(self):
+    def get_selected_component_name(self) -> Optional[str]:
         items = self._ui.entityComponentList.selectedItems()
 
         if len(items) != 1:
@@ -481,6 +485,17 @@ class App:
             selected_sim.discard_edits()
 
         self._refresh_simulation_tab()
+
+    def _revert_selected_com_state(self):
+        # act as if the selected com was just re-selected
+        self._on_selected_component_changed()
+
+    def _save_selected_com_state(self):
+        sim, eid, com = self.get_all_sim_tab_selections()
+
+        if sim is not None and eid is not None and com is not None:
+            com_state_json = self._ui.comStateTextEdit.toPlainText()
+            sim.replace_component(eid, com, com_state_json)
 
     def run(self):
         self._main_window.show()
