@@ -14,7 +14,8 @@ import queue
 import re
 import shutil
 from typing import Optional
-import os
+import logging
+import traceback
 
 
 class SimulationRunner:
@@ -203,6 +204,12 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
             except EOFError:
                 # connection closed, end the simulation
                 break
+            except Exception as e:
+                # for any non-exiting exception, write to stderr and continue listening for commands
+                # (this simulation may no longer function as expected, but that is up to the
+                # creator of this process to decide, not this function)
+                logging.error('SimulationRunner encountered a non-exiting exception.', exc_info=e)
+                con.send((False, traceback.format_exc()))
     finally:
         runner.cleanup()
 
