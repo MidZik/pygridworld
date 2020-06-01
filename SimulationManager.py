@@ -495,12 +495,21 @@ class TimelineSimulation:
         with point.get_file_path().open('r') as f:
             self._simulation_process.set_state_json(f.read())
 
-    def start_process(self):
+    def start_process(self, initial_point=None):
+        if initial_point is None:
+            initial_point = self.timeline.head_point
+
+        if initial_point.timeline is not self.timeline:
+            raise ValueError('Attempted to start timeline simulation at an invalid point.')
+
         self._simulation_process = SimulationRunnerProcess(
             self.timeline.simulation_path,
             self._process_working_dir,
             self._simulation_state_queue)
         self._simulation_process.start_process()
+
+        self.move_to_point(initial_point)
+
         self._handle_queue_thread = Thread(target=self._handle_queue, daemon=False)
         self._handle_queue_thread.start()
 

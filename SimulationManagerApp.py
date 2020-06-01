@@ -375,10 +375,7 @@ class App:
 
         working_dir = timeline.get_dir() / 'working'
         new_sim = sm.TimelineSimulation(timeline, working_dir)
-        new_sim.start_process()
-
-        if point is not None:
-            new_sim.move_to_point(point)
+        new_sim.start_process(point)
 
         self._simulations[timeline_id] = new_sim
         self._refresh_simulation_tab()
