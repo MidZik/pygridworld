@@ -386,11 +386,11 @@ class App:
     def _on_selected_entity_changed(self):
         ui = self._ui
 
+        self._refresh_simulation_edit_buttons()
+
         ui.entityComponentList.clear()
         assign_components_button_menu = ui.assignComponentButton.menu()
         assign_components_button_menu.clear()
-        ui.destroyEntityButton.setEnabled(False)
-        ui.assignComponentButton.setEnabled(False)
 
         selected_sim = self.get_selected_timeline_simulation()
         selected_eid = self.get_selected_eid()
@@ -404,11 +404,9 @@ class App:
             for c in entity_component_names:
                 ui.entityComponentList.addItem(c)
 
-            ui.destroyEntityButton.setEnabled(True)
-            ui.assignComponentButton.setEnabled(True)
-
     def _on_assign_component_triggered(self, action):
         ui = self._ui
+
         selected_simulation = self.get_selected_timeline_simulation()
         selected_eid = self.get_selected_eid()
         if selected_simulation is not None and selected_eid is not None:
@@ -428,11 +426,10 @@ class App:
 
     def _on_selected_component_changed(self):
         ui = self._ui
-        ui.comStateTextEdit.clear()
 
-        ui.removeComponentButton.setEnabled(False)
-        ui.revertComStateButton.setEnabled(False)
-        ui.saveComStateButton.setEnabled(False)
+        self._refresh_simulation_edit_buttons()
+
+        ui.comStateTextEdit.clear()
 
         selected_sim = self.get_selected_timeline_simulation()
         selected_eid = self.get_selected_eid()
@@ -443,12 +440,6 @@ class App:
             com_state = json.loads(com_state_json)
             com_state_json = json.dumps(com_state, indent=2)  # pretty print
             ui.comStateTextEdit.setPlainText(com_state_json)
-
-            ui.removeComponentButton.setEnabled(True)
-
-            if com_state is not None:
-                ui.revertComStateButton.setEnabled(True)
-                ui.saveComStateButton.setEnabled(True)
 
     def _start_selected_simulation(self):
         selected_sim = self.get_selected_timeline_simulation()
