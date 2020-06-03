@@ -674,7 +674,7 @@ class TimelinesProject:
 
             timelines[timeline_id] = timeline
             timeline_children[parent_id, timeline.head_point.tick].append(timeline)
-            self._next_new_timeline_id = max(self._next_new_timeline_id, timeline_id)
+            self._next_new_timeline_id = max(self._next_new_timeline_id, timeline_id + 1)
 
         # pass 2: add derived timelines to the appropriate points in each timeline.
         timeline_deque = deque()
