@@ -1,6 +1,6 @@
 import SimulationManager as sm
 import window
-from typing import Optional
+from typing import Optional, Dict
 from PySide2 import QtCore, QtGui, QtWidgets
 from pathlib import Path
 import json
@@ -80,9 +80,15 @@ class App:
         ui.revertComStateButton.clicked.connect(self._revert_selected_com_state)
         ui.saveComStateButton.clicked.connect(self._save_selected_com_state)
 
+        # Timeline Tab
+        ui.createTimelineAtSelectionButton.clicked.connect(self._create_timeline_at_selection)
+        ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
+
         self._project: Optional[sm.TimelinesProject] = None
 
         self._simulations = {}
+
+        self._timeline_tree_widget_map: Dict[Optional[sm.Timeline]] = {None: self._ui.timelineTree}
 
         self._thread_pool = QtCore.QThreadPool()
 
@@ -147,6 +153,13 @@ class App:
         for sim in self._simulations.values():
             sim.stop_process()
 
+    def _make_timeline_item(self, timeline, derived_from_point, parent_item, preceding_item):
+        result_item = QtWidgets.QTreeWidgetItem(parent_item, preceding_item)
+        result_item.setText(0, f"[{derived_from_point.tick}] {timeline.timeline_id}")
+        result_item.setData(0, App._TimelineRole, timeline)
+        self._timeline_tree_widget_map[timeline] = result_item
+        return result_item
+
     def _open_project(self):
         from PySide2.QtWidgets import QFileDialog
         project_dir = QFileDialog.getExistingDirectory(self._main_window, options=QFileDialog.ShowDirsOnly)
@@ -156,12 +169,6 @@ class App:
         ui = self._ui
 
         ui.timelineTree.clear()
-
-        def make_timeline_item(timeline, derived_from_point, parent_item, preceding_item):
-            result_item = QtWidgets.QTreeWidgetItem(parent_item, preceding_item)
-            result_item.setText(0, f"[{derived_from_point.tick}] {timeline.timeline_id}")
-            result_item.setData(0, App._TimelineRole, timeline)
-            return result_item
 
         class ProcessingFrame:
             def __init__(self, parent_ui_item, cur_point, next_derived_timeline_index):
@@ -179,7 +186,7 @@ class App:
             if cur_frame.next_derived_timeline_index < len(cur_frame.cur_point.derivative_timelines):
                 # make the UI item for this derived timeline index
                 timeline = cur_frame.cur_point.derivative_timelines[cur_frame.next_derived_timeline_index]
-                last_added_item = make_timeline_item(timeline, cur_frame.cur_point, cur_frame.parent_ui_item, last_added_item)
+                last_added_item = self._make_timeline_item(timeline, cur_frame.cur_point, cur_frame.parent_ui_item, last_added_item)
                 cur_frame.next_derived_timeline_index += 1
 
                 # process this timeline next, starting at the head point
@@ -313,22 +320,22 @@ class App:
         point = self.get_selected_point()
 
         if point is None:
-            self._ui.stateJsonTextEdit.setPlainText("")
+            self._ui.pointStateJsonTextEdit.setPlainText("")
             return
 
         def update_text(text):
             if id(self.get_selected_point()) == id(point):
-                self._ui.stateJsonTextEdit.setPlainText(text)
+                self._ui.pointStateJsonTextEdit.setPlainText(text)
 
         if point is not None:
             point_file_path = point.get_file_path()
             if point_file_path is not None:
                 task = _ReadFileTask(point_file_path)
-                self._ui.stateJsonTextEdit.setPlainText(f"loading point {point}")
+                self._ui.pointStateJsonTextEdit.setPlainText(f"loading point {point}")
                 task.read_done.connect(update_text)
                 self._thread_pool.start(task.runner())
             else:
-                self._ui.stateJsonTextEdit.setPlainText(f"Selected point has no data.")
+                self._ui.pointStateJsonTextEdit.setPlainText(f"Selected point has no data.")
         else:
             raise RuntimeWarning("Selected point item with no attached data.")
 
@@ -402,8 +409,6 @@ class App:
                 ui.entityComponentList.addItem(c)
 
     def _on_assign_component_triggered(self, action):
-        ui = self._ui
-
         selected_simulation = self.get_selected_timeline_simulation()
         selected_eid = self.get_selected_eid()
         if selected_simulation is not None and selected_eid is not None:
@@ -484,6 +489,23 @@ class App:
         if sim is not None and eid is not None and com is not None:
             com_state_json = self._ui.comStateTextEdit.toPlainText()
             sim.replace_component(eid, com, com_state_json)
+
+    def _create_timeline_at_selection(self):
+        point = self.get_selected_point()
+
+        if point is None:
+            timeline = self.get_selected_timeline()
+            if timeline is not None:
+                point = timeline.head_point
+
+        new_timeline = self._project.create_timeline(point)
+
+        parent_item = self._timeline_tree_widget_map[self._project.get_parent_timeline(new_timeline)]
+
+        self._make_timeline_item(new_timeline, point, parent_item, None)
+
+    def _delete_selected_timeline(self):
+        pass
 
     def run(self):
         self._main_window.show()

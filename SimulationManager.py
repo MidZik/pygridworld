@@ -710,3 +710,6 @@ class TimelinesProject:
 
     def get_timeline(self, timeline_id):
         return self._timelines.get(timeline_id, None)
+
+    def get_parent_timeline(self, timeline):
+        return self.get_timeline(timeline.parent_timeline_id)

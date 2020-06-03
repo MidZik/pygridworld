@@ -326,38 +326,75 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLabel" name="label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+           <widget class="QPushButton" name="createTimelineAtSelectionButton">
             <property name="text">
-             <string>State JSON</string>
+             <string>Create Timeline at Selection</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="reloadStateButton">
-            <property name="text">
-             <string>Reload State</string>
+           <widget class="QPushButton" name="deleteSelectedTimelineButton">
+            <property name="palette">
+             <palette>
+              <active>
+               <colorrole role="ButtonText">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>170</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="ButtonText">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>170</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="ButtonText">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>120</red>
+                  <green>120</green>
+                  <blue>120</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="saveStateButton">
             <property name="text">
-             <string>Save State</string>
+             <string>Delete Selected Timeline</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QPlainTextEdit" name="stateJsonTextEdit">
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Point State JSON</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="pointStateJsonTextEdit">
           <property name="readOnly">
            <bool>true</bool>
           </property>
