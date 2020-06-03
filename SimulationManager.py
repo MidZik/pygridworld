@@ -410,7 +410,9 @@ class Timeline:
     def load_file(self):
         with self.get_file_path().open('r') as timeline_file:
             data = json.load(timeline_file)
-            self.simulation_path = Path(data['simulation_path']).resolve(True)
+            simulation_path = data['simulation_path']
+            if simulation_path is not None:
+                self.simulation_path = Path(simulation_path).resolve(True)
 
 
 class TimelineSimulation:
