@@ -4,6 +4,7 @@ from typing import Optional, Dict
 from PySide2 import QtCore, QtGui, QtWidgets
 from pathlib import Path
 import json
+from collections import deque
 
 
 class _TaskRunner(QtCore.QRunnable):
@@ -38,8 +39,8 @@ class _ReadFileTask(_Task):
 
 
 class App:
-    _PointRole = QtCore.Qt.UserRole + 0
-    _TimelineRole = QtCore.Qt.UserRole + 1
+    _TickRole = QtCore.Qt.UserRole + 0
+    _TimelineTreeNodeRole = QtCore.Qt.UserRole + 1
 
     def __init__(self, argv):
         self._app = QtWidgets.QApplication(argv)
@@ -88,7 +89,7 @@ class App:
 
         self._simulations = {}
 
-        self._timeline_tree_widget_map: Dict[Optional[sm.Timeline]] = {None: self._ui.timelineTree}
+        self._timeline_tree_widget_map: Dict[sm.TimelineTreeNode] = {}
 
         self._thread_pool = QtCore.QThreadPool()
 
@@ -96,32 +97,39 @@ class App:
         # TODO: A better way to ensure all ui elements are in the proper state?
         self._on_timeline_tree_selected_item_changed()
 
-    def get_selected_timeline(self) -> Optional[sm.Timeline]:
+    def get_selected_timeline_node(self) -> Optional[sm.TimelineTreeNode]:
         items = self._ui.timelineTree.selectedItems()
 
         if items:
-            item = items[0]
+            return items[0].data(0, App._TimelineTreeNodeRole)
         else:
-            item = None
+            return None
 
-        return None if item is None else item.data(0, App._TimelineRole)
+    def get_selected_timeline(self) -> Optional[sm.Timeline]:
+        timeline_node = self.get_selected_timeline_node()
+        if timeline_node is not None:
+            return timeline_node.timeline
+        else:
+            return None
 
     def get_selected_timeline_simulation(self) -> Optional[sm.TimelineSimulation]:
-        timeline = self.get_selected_timeline()
-        if timeline is None:
+        timeline_node = self.get_selected_timeline_node()
+
+        if timeline_node is None:
             return None
         else:
-            return self._simulations.get(timeline.timeline_id, None)
+            return self._simulations.get(timeline_node.timeline_id, None)
 
-    def get_selected_point(self) -> Optional[sm.TimelinePoint]:
+    def get_selected_tick(self) -> Optional[int]:
         items = self._ui.timelinePointList.selectedItems()
 
         if items:
-            item = items[0]
+            return items[0].data(App._TickRole)
         else:
-            item = None
+            return None
 
-        return None if item is None else item.data(App._PointRole)
+    def get_selected_point(self):
+        return self.get_selected_timeline(), self.get_selected_tick()
 
     def get_selected_eid(self):
         items = self._ui.entityList.selectedItems()
@@ -129,9 +137,7 @@ class App:
         if len(items) != 1:
             return None
         else:
-            item = items[0]
-
-        return int(item.text())
+            return int(items[0].text())
 
     def get_selected_component_name(self) -> Optional[str]:
         items = self._ui.entityComponentList.selectedItems()
@@ -139,9 +145,7 @@ class App:
         if len(items) != 1:
             return None
         else:
-            item = items[0]
-
-        return item.text()
+            return items[0].text()
 
     def get_all_sim_tab_selections(self):
         """
@@ -153,11 +157,15 @@ class App:
         for sim in self._simulations.values():
             sim.stop_process()
 
-    def _make_timeline_item(self, timeline, derived_from_point, parent_item, preceding_item):
+    def _make_timeline_item(self, timeline_node: sm.TimelineTreeNode, preceding_item):
+        if timeline_node in self._timeline_tree_widget_map:
+            raise ValueError('Timeline node already has an item associated with it.')
+
+        parent_item = self._timeline_tree_widget_map[timeline_node.parent_node]
         result_item = QtWidgets.QTreeWidgetItem(parent_item, preceding_item)
-        result_item.setText(0, f"[{derived_from_point.tick}] {timeline.timeline_id}")
-        result_item.setData(0, App._TimelineRole, timeline)
-        self._timeline_tree_widget_map[timeline] = result_item
+        result_item.setText(0, f"[{timeline_node.timeline.head()}] {timeline_node.timeline_id}")
+        result_item.setData(0, App._TimelineTreeNodeRole, timeline_node)
+        self._timeline_tree_widget_map[timeline_node] = result_item
         return result_item
 
     def _open_project(self):
@@ -166,46 +174,23 @@ class App:
 
         self._project = sm.TimelinesProject.load_project(project_dir)
 
+        self._timeline_tree_widget_map = {self._project.root_node: self._ui.timelineTree}
+
         ui = self._ui
 
         ui.timelineTree.clear()
 
-        class ProcessingFrame:
-            def __init__(self, parent_ui_item, cur_point, next_derived_timeline_index):
-                self.parent_ui_item = parent_ui_item
-                self.cur_point: sm.TimelinePoint = cur_point
-                self.next_derived_timeline_index = next_derived_timeline_index
+        # node_deque contains (node, node_ui) pairs that have a ui element already created,
+        # and their children need ui nodes still created
+        node_deque = deque()
+        node_deque.append((self._project.root_node, ui.timelineTree))
 
-        # Stack that tracks tree traversal.
-        processing_stack = [ProcessingFrame(ui.timelineTree, self._project.root_point, 0)]
-
-        last_added_item = None
-        while len(processing_stack) > 0:
-            cur_frame = processing_stack[-1]
-
-            if cur_frame.next_derived_timeline_index < len(cur_frame.cur_point.derivative_timelines):
-                # make the UI item for this derived timeline index
-                timeline = cur_frame.cur_point.derivative_timelines[cur_frame.next_derived_timeline_index]
-                last_added_item = self._make_timeline_item(timeline, cur_frame.cur_point, cur_frame.parent_ui_item, last_added_item)
-                cur_frame.next_derived_timeline_index += 1
-
-                # process this timeline next, starting at the head point
-                processing_stack.append(ProcessingFrame(last_added_item, timeline.head_point, 0))
-            else:
-                # All timelines at this point have been processed, fast forward to the next point with timelines
-                cur_frame.next_derived_timeline_index = 0
-                cur_frame.cur_point = cur_frame.cur_point.next_point
-                while cur_frame.cur_point is not None:
-                    if cur_frame.cur_point.derivative_timelines:
-                        break
-                    cur_frame.cur_point = cur_frame.cur_point.next_point
-
-                if cur_frame.cur_point is None:
-                    # No more points with derivative timelines have been found on this timeline,
-                    # so we can stop processing it.
-                    # Restore last added item to the previous frame as we exit
-                    processing_stack.pop()
-                    last_added_item = cur_frame.parent_ui_item
+        while node_deque:
+            cur_node, cur_ui_item = node_deque.pop()
+            child_item = None
+            for child_node in cur_node.child_nodes:
+                child_item = self._make_timeline_item(child_node, child_item)
+                node_deque.append((child_node, child_item))
 
         # TODO: Temp?
         self._on_timeline_tree_selected_item_changed()
@@ -218,12 +203,10 @@ class App:
         timeline = self.get_selected_timeline()
 
         if timeline is not None:
-            cur_point = timeline.head_point
-            while cur_point is not None:
-                item = QtWidgets.QListWidgetItem(f"{cur_point.tick}")
-                item.setData(App._PointRole, cur_point)
+            for tick in timeline.tick_list:
+                item = QtWidgets.QListWidgetItem(f"{tick}")
+                item.setData(App._TickRole, tick)
                 ui.timelinePointList.addItem(item)
-                cur_point = cur_point.next_point
 
         self._refresh_simulation_tab()
 
@@ -318,38 +301,37 @@ class App:
 
     def _on_timeline_point_list_selected_item_changed(self):
         point = self.get_selected_point()
+        timeline, tick = point
 
-        if point is None:
+        if tick is None:
             self._ui.pointStateJsonTextEdit.setPlainText("")
             return
 
         def update_text(text):
-            if id(self.get_selected_point()) == id(point):
+            if self.get_selected_point() == point:
                 self._ui.pointStateJsonTextEdit.setPlainText(text)
 
-        if point is not None:
-            point_file_path = point.get_file_path()
-            if point_file_path is not None:
-                task = _ReadFileTask(point_file_path)
-                self._ui.pointStateJsonTextEdit.setPlainText(f"loading point {point}")
-                task.read_done.connect(update_text)
-                self._thread_pool.start(task.runner())
-            else:
-                self._ui.pointStateJsonTextEdit.setPlainText(f"Selected point has no data.")
+        point_file_path = timeline.get_point_file_path(tick)
+        if point_file_path is not None:
+            task = _ReadFileTask(point_file_path)
+            self._ui.pointStateJsonTextEdit.setPlainText(f"loading point {point}")
+            task.read_done.connect(update_text)
+            self._thread_pool.start(task.runner())
         else:
-            raise RuntimeWarning("Selected point item with no attached data.")
+            self._ui.pointStateJsonTextEdit.setPlainText(f"Selected point has no data.")
 
     def _start_sim_process_for_current_timeline(self):
-        timeline = self.get_selected_timeline()
-        point = self.get_selected_point()
-        self.start_simulation_process(timeline.timeline_id, point)
+        timeline_node = self.get_selected_timeline_node()
+        tick = self.get_selected_tick()
+        self.start_simulation_process(timeline_node.timeline_id, tick)
 
     def _kill_sim_process_for_current_timeline(self):
+        timeline_node = self.get_selected_timeline_node()
         sim = self.get_selected_timeline_simulation()
 
         if sim is not None:
             sim.stop_process()
-            del self._simulations[sim.timeline.timeline_id]
+            del self._simulations[timeline_node.timeline_id]
             self._refresh_simulation_tab()
 
     def _create_entity_on_selected_sim(self):
@@ -369,20 +351,22 @@ class App:
         # TODO: temp
         self._refresh_simulation_entity_list()
 
-    def start_simulation_process(self, timeline_id, point=None):
+    def start_simulation_process(self, timeline_id, tick=None):
         if timeline_id in self._simulations:
             return
 
-        timeline = self._project.get_timeline(timeline_id)
-        if timeline is None:
+        timeline_node = self._project.get_timeline_node(timeline_id)
+        if timeline_node is None:
             raise RuntimeError('No timeline found with given ID.')
 
-        if point is not None and point.timeline is not timeline:
-            raise RuntimeError('Starting simulation process at invalid point.')
+        timeline = timeline_node.timeline
 
-        working_dir = timeline.get_dir() / 'working'
+        if tick is not None and tick not in timeline.tick_list:
+            raise RuntimeError('Starting simulation process at invalid tick.')
+
+        working_dir = timeline.path / 'working'
         new_sim = sm.TimelineSimulation(timeline, working_dir)
-        new_sim.start_process(point)
+        new_sim.start_process(tick)
 
         self._simulations[timeline_id] = new_sim
         self._refresh_simulation_tab()
@@ -491,18 +475,14 @@ class App:
             sim.replace_component(eid, com, com_state_json)
 
     def _create_timeline_at_selection(self):
-        point = self.get_selected_point()
+        timeline_node = self.get_selected_timeline_node()
+        tick = self.get_selected_tick()
 
-        if point is None:
-            timeline = self.get_selected_timeline()
-            if timeline is not None:
-                point = timeline.head_point
+        new_timeline_node = self._project.create_timeline(timeline_node, tick)
 
-        new_timeline = self._project.create_timeline(point)
+        parent_item = self._timeline_tree_widget_map[new_timeline_node.parent_node]
 
-        parent_item = self._timeline_tree_widget_map[self._project.get_parent_timeline(new_timeline)]
-
-        self._make_timeline_item(new_timeline, point, parent_item, None)
+        self._make_timeline_item(new_timeline_node, None)
 
     def _delete_selected_timeline(self):
         pass
