@@ -191,9 +191,9 @@ class TimelineSimulation:
                 self.timeline.tick_list.append(tick)
 
 
-class TimelineTreeNode:
+class TimelineNode:
     def __init__(self,
-                 parent_node: Optional['TimelineTreeNode'] = None,
+                 parent_node: Optional['TimelineNode'] = None,
                  timeline_id: Optional[int] = None,
                  timeline: Optional[Timeline] = None):
         self.parent_node = parent_node
@@ -204,7 +204,7 @@ class TimelineTreeNode:
         if parent_node is not None:
             parent_node.insert_child(self)
 
-    def insert_child(self, child: 'TimelineTreeNode'):
+    def insert_child(self, child: 'TimelineNode'):
         insort(self.child_nodes, child)
 
     def __lt__(self, other):
@@ -279,11 +279,11 @@ class TimelinesProject:
         self.timelines_dir_path = self.root_dir_path / 'timelines'
         self.project_file_path = self.root_dir_path / 'timelines.project'
         self.project_file_handle = None
-        self.root_node = TimelineTreeNode()
+        self.root_node = TimelineNode()
         self._next_new_timeline_id = 1
         self._timeline_nodes = {}
 
-    def create_timeline(self, parent_node: Optional[TimelineTreeNode] = None, parent_tick: Optional[int] = None):
+    def create_timeline(self, parent_node: Optional[TimelineNode] = None, parent_tick: Optional[int] = None):
         new_timeline_id = self._next_new_timeline_id
 
         parent_node = parent_node if parent_node is not None else self.root_node
@@ -292,7 +292,7 @@ class TimelinesProject:
         timeline_folder_path = self.timelines_dir_path / timeline_folder_name
 
         new_timeline = Timeline.create_timeline(timeline_folder_path, parent_node.timeline, parent_tick)
-        new_timeline_node = TimelineTreeNode(parent_node, new_timeline_id, new_timeline)
+        new_timeline_node = TimelineNode(parent_node, new_timeline_id, new_timeline)
         self._next_new_timeline_id += 1
         return new_timeline_node
 
@@ -314,14 +314,14 @@ class TimelinesProject:
             largest_loaded_timeline_id = max(largest_loaded_timeline_id, timeline_id)
 
         # pass 2: Starting at the root, populate tree with nodes
-        root_node = TimelineTreeNode()
+        root_node = TimelineNode()
         node_deque = deque([root_node])
 
         while node_deque:
             cur_node = node_deque.popleft()
             timeline_nodes[cur_node.timeline_id] = cur_node
             for timeline_id, timeline in timeline_children[cur_node.timeline_id]:
-                child_node = TimelineTreeNode(cur_node, timeline_id, timeline)
+                child_node = TimelineNode(cur_node, timeline_id, timeline)
                 node_deque.append(child_node)
             del timeline_children[cur_node.timeline_id]
 

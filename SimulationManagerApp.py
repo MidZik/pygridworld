@@ -89,7 +89,7 @@ class App:
 
         self._simulations = {}
 
-        self._timeline_tree_widget_map: Dict[sm.TimelineTreeNode] = {}
+        self._timeline_tree_widget_map: Dict[sm.TimelineNode] = {}
 
         self._thread_pool = QtCore.QThreadPool()
 
@@ -97,7 +97,7 @@ class App:
         # TODO: A better way to ensure all ui elements are in the proper state?
         self._on_timeline_tree_selected_item_changed()
 
-    def get_selected_timeline_node(self) -> Optional[sm.TimelineTreeNode]:
+    def get_selected_timeline_node(self) -> Optional[sm.TimelineNode]:
         items = self._ui.timelineTree.selectedItems()
 
         if items:
@@ -157,7 +157,7 @@ class App:
         for sim in self._simulations.values():
             sim.stop_process()
 
-    def _make_timeline_item(self, timeline_node: sm.TimelineTreeNode, preceding_item):
+    def _make_timeline_item(self, timeline_node: sm.TimelineNode, preceding_item):
         if timeline_node in self._timeline_tree_widget_map:
             raise ValueError('Timeline node already has an item associated with it.')
 
