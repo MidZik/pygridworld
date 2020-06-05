@@ -66,7 +66,7 @@ class Timeline:
 
         if derive_from is not None:
             derive_from.config.save_to(path / 'timeline.json')
-            derive_from_tick = derive_from_tick if derive_from_tick is not None else derive_from.point_tick_list[0]
+            derive_from_tick = derive_from_tick if derive_from_tick is not None else derive_from.tick_list[0]
             derive_from_point_path = derive_from.get_point_file_path(derive_from_tick)
             new_point_path = path / Timeline.point_file_name(derive_from_tick)
             shutil.copyfile(str(derive_from_point_path), new_point_path)
