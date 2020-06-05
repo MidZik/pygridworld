@@ -39,7 +39,7 @@ class _ReadFileTask(_Task):
 
 
 class App:
-    _TickRole = QtCore.Qt.UserRole + 0
+    _PointRole = QtCore.Qt.UserRole + 0
     _TimelineTreeNodeRole = QtCore.Qt.UserRole + 1
 
     def __init__(self, argv):
@@ -120,16 +120,13 @@ class App:
         else:
             return self._simulations.get(timeline_node.timeline_id, None)
 
-    def get_selected_tick(self) -> Optional[int]:
+    def get_selected_point(self) -> Optional[sm.TimelinePoint]:
         items = self._ui.timelinePointList.selectedItems()
 
         if items:
-            return items[0].data(App._TickRole)
+            return items[0].data(App._PointRole)
         else:
             return None
-
-    def get_selected_point(self):
-        return self.get_selected_timeline(), self.get_selected_tick()
 
     def get_selected_eid(self):
         items = self._ui.entityList.selectedItems()
@@ -200,12 +197,12 @@ class App:
 
         ui.timelinePointList.clear()
 
-        timeline = self.get_selected_timeline()
+        timeline_node = self.get_selected_timeline_node()
 
-        if timeline is not None:
-            for tick in timeline.tick_list:
-                item = QtWidgets.QListWidgetItem(f"{tick}")
-                item.setData(App._TickRole, tick)
+        if timeline_node is not None:
+            for point in timeline_node.points():
+                item = QtWidgets.QListWidgetItem(f"{point.tick}")
+                item.setData(App._PointRole, point)
                 ui.timelinePointList.addItem(item)
 
         self._refresh_simulation_tab()
@@ -301,9 +298,8 @@ class App:
 
     def _on_timeline_point_list_selected_item_changed(self):
         point = self.get_selected_point()
-        timeline, tick = point
 
-        if tick is None:
+        if point is None:
             self._ui.pointStateJsonTextEdit.setPlainText("")
             return
 
@@ -311,7 +307,7 @@ class App:
             if self.get_selected_point() == point:
                 self._ui.pointStateJsonTextEdit.setPlainText(text)
 
-        point_file_path = timeline.get_point_file_path(tick)
+        point_file_path = point.point_file_path()
         if point_file_path is not None:
             task = _ReadFileTask(point_file_path)
             self._ui.pointStateJsonTextEdit.setPlainText(f"loading point {point}")
@@ -321,9 +317,13 @@ class App:
             self._ui.pointStateJsonTextEdit.setPlainText(f"Selected point has no data.")
 
     def _start_sim_process_for_current_timeline(self):
-        timeline_node = self.get_selected_timeline_node()
-        tick = self.get_selected_tick()
-        self.start_simulation_process(timeline_node.timeline_id, tick)
+        point = self.get_selected_point()
+        if point is not None:
+            self.start_simulation_process(point)
+        else:
+            timeline_node = self.get_selected_timeline_node()
+            if timeline_node is not None:
+                self.start_simulation_process(timeline_node.head_point())
 
     def _kill_sim_process_for_current_timeline(self):
         timeline_node = self.get_selected_timeline_node()
@@ -351,24 +351,16 @@ class App:
         # TODO: temp
         self._refresh_simulation_entity_list()
 
-    def start_simulation_process(self, timeline_id, tick=None):
-        if timeline_id in self._simulations:
+    def start_simulation_process(self, point):
+        if point.timeline_id() in self._simulations:
             return
 
-        timeline_node = self._project.get_timeline_node(timeline_id)
-        if timeline_node is None:
-            raise RuntimeError('No timeline found with given ID.')
-
-        timeline = timeline_node.timeline
-
-        if tick is not None and tick not in timeline.tick_list:
-            raise RuntimeError('Starting simulation process at invalid tick.')
-
+        timeline = point.timeline()
         working_dir = timeline.path / 'working'
         new_sim = sm.TimelineSimulation(timeline, working_dir)
-        new_sim.start_process(tick)
+        new_sim.start_process(point.tick)
 
-        self._simulations[timeline_id] = new_sim
+        self._simulations[point.timeline_id()] = new_sim
         self._refresh_simulation_tab()
 
     def _on_selected_entity_changed(self):
@@ -476,7 +468,9 @@ class App:
 
     def _create_timeline_at_selection(self):
         timeline_node = self.get_selected_timeline_node()
-        tick = self.get_selected_tick()
+        point = self.get_selected_point()
+
+        tick = None if point is None else point.tick
 
         new_timeline_node = self._project.create_timeline(timeline_node, tick)
 

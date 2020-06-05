@@ -11,6 +11,7 @@ from typing import Optional
 from bisect import insort
 from simrunner import SimulationRunnerProcess
 from timeline import Timeline
+from dataclasses import dataclass
 
 
 class TimelineSimulation:
@@ -207,6 +208,19 @@ class TimelineNode:
     def insert_child(self, child: 'TimelineNode'):
         insort(self.child_nodes, child)
 
+    def point(self, tick):
+        if tick in self.timeline.tick_list:
+            return TimelinePoint(self, tick)
+        else:
+            raise ValueError('Cannot create point: tick not in timeline tick list')
+
+    def head_point(self):
+        return TimelinePoint(self, self.timeline.head())
+
+    def points(self):
+        for tick in self.timeline.tick_list:
+            yield TimelinePoint(self, tick)
+
     def __lt__(self, other):
         self_head = self.timeline.head()
         other_head = other.timeline.head()
@@ -230,6 +244,21 @@ class TimelineNode:
                         and self_id > other_id
                 ))
     __ge__ = __gt__
+
+
+@dataclass(frozen=True)
+class TimelinePoint:
+    timeline_node: TimelineNode
+    tick: int
+
+    def point_file_path(self):
+        return self.timeline_node.timeline.get_point_file_path(self.tick)
+
+    def timeline_id(self):
+        return self.timeline_node.timeline_id
+
+    def timeline(self):
+        return self.timeline_node.timeline
 
 
 class TimelinesProject:
