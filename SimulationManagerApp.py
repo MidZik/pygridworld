@@ -470,11 +470,10 @@ class App:
         timeline_node = self.get_selected_timeline_node()
         point = self.get_selected_point()
 
-        tick = None if point is None else point.tick
+        if point is None and timeline_node is not None:
+            point = timeline_node.head_point()
 
-        new_timeline_node = self._project.create_timeline(timeline_node, tick)
-
-        parent_item = self._timeline_tree_widget_map[new_timeline_node.parent_node]
+        new_timeline_node = self._project.create_timeline(point)
 
         self._make_timeline_item(new_timeline_node, None)
 

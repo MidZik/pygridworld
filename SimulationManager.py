@@ -284,7 +284,7 @@ class TimelinesProject:
         return project
 
     @staticmethod
-    def timeline_folder_name(timeline_id, parent_timeline_id):
+    def timeline_folder_name(timeline_id: int, parent_timeline_id: Optional[int]):
         if parent_timeline_id is not None:
             return f't{timeline_id}_p{parent_timeline_id}'
         else:
@@ -312,16 +312,17 @@ class TimelinesProject:
         self._next_new_timeline_id = 1
         self._timeline_nodes = {}
 
-    def create_timeline(self, parent_node: Optional[TimelineNode] = None, parent_tick: Optional[int] = None):
+    def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
         new_timeline_id = self._next_new_timeline_id
 
-        parent_node = parent_node if parent_node is not None else self.root_node
+        if derive_from is None:
+            derive_from = self.root_node
 
-        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, parent_node.timeline_id)
+        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, derive_from.timeline_id())
         timeline_folder_path = self.timelines_dir_path / timeline_folder_name
 
-        new_timeline = Timeline.create_timeline(timeline_folder_path, parent_node.timeline, parent_tick)
-        new_timeline_node = TimelineNode(parent_node, new_timeline_id, new_timeline)
+        new_timeline = Timeline.create_timeline(timeline_folder_path, derive_from.timeline(), derive_from.tick)
+        new_timeline_node = TimelineNode(derive_from.timeline_node, new_timeline_id, new_timeline)
         self._next_new_timeline_id += 1
         return new_timeline_node
 
