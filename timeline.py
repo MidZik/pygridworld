@@ -27,7 +27,7 @@ class TimelineConfig:
                 self.simulation_path = Path(simulation_path)
 
     def save_to(self, path):
-        path = Path(path).resolve(True)
+        path = Path(path).resolve()
         with path.open('w') as f:
             simulation_path = str(self.simulation_path) if self.simulation_path else None
             data = {
