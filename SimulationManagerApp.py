@@ -475,7 +475,13 @@ class App:
 
         new_timeline_node = self._project.create_timeline(point)
 
-        self._make_timeline_item(new_timeline_node, None)
+        previous_sibling = new_timeline_node.previous_sibling()
+        if previous_sibling is not None:
+            preceding_item = self._timeline_tree_widget_map[previous_sibling]
+        else:
+            preceding_item = None
+
+        self._make_timeline_item(new_timeline_node, preceding_item)
 
     def _delete_selected_timeline(self):
         pass

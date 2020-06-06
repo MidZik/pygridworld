@@ -208,6 +208,13 @@ class TimelineNode:
     def insert_child(self, child: 'TimelineNode'):
         insort(self.child_nodes, child)
 
+    def previous_sibling(self):
+        try:
+            my_index = self.parent_node.child_nodes.index(self, 1)
+            return self.parent_node.child_nodes[my_index - 1]
+        except ValueError:
+            return None
+
     def point(self, tick):
         if tick in self.timeline.tick_list:
             return TimelinePoint(self, tick)
