@@ -248,6 +248,7 @@ class TimelineNode:
 
 @dataclass(frozen=True)
 class TimelinePoint:
+    __slots__ = ('timeline_node', 'tick')
     timeline_node: TimelineNode
     tick: int
 
