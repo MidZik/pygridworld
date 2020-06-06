@@ -68,6 +68,7 @@ class App:
         ui.commitEditsSimButton.clicked.connect(self._commit_edits_to_selected_sim)
         ui.discardEditsSimButton.clicked.connect(self._discard_edits_to_selected_sim)
 
+        # Entities Subtab
         ui.createEntityButton.clicked.connect(self._create_entity_on_selected_sim)
         ui.destroyEntityButton.clicked.connect(self._destroy_selected_entity)
         ui.entityList.itemSelectionChanged.connect(self._on_selected_entity_changed)
@@ -80,6 +81,12 @@ class App:
 
         ui.revertComStateButton.clicked.connect(self._revert_selected_com_state)
         ui.saveComStateButton.clicked.connect(self._save_selected_com_state)
+
+        # Singletons Subtab
+        ui.singletonList.itemSelectionChanged.connect(self._on_selected_singleton_changed)
+
+        ui.revertSingletonStateButton.clicked.connect(self._revert_selected_singleton_state)
+        ui.saveSingletonStateButton.clicked.connect(self._save_selected_singleton_state)
 
         # Timeline Tab
         ui.createTimelineAtSelectionButton.clicked.connect(self._create_timeline_at_selection)
@@ -150,6 +157,14 @@ class App:
         """
         return self.get_selected_timeline_simulation(), self.get_selected_eid(), self.get_selected_component_name()
 
+    def get_selected_singleton_name(self) -> Optional[str]:
+        items = self._ui.singletonList.selectedItems()
+
+        if items:
+            return items[0].text()
+        else:
+            return None
+
     def _on_application_quitting(self):
         for sim in self._simulations.values():
             sim.stop_process()
@@ -213,6 +228,7 @@ class App:
         self._refresh_simulation_edit_mode_buttons()
         self._refresh_simulation_edit_buttons()
         self._refresh_simulation_entity_list()
+        self._refresh_simulation_singletons_list()
 
     def _refresh_simulation_process_buttons(self):
         ui = self._ui
@@ -259,6 +275,7 @@ class App:
         ui = self._ui
 
         sim, eid, com = self.get_all_sim_tab_selections()
+        singleton = self.get_selected_singleton_name()
 
         ui.createEntityButton.setEnabled(False)
         ui.destroyEntityButton.setEnabled(False)
@@ -266,6 +283,8 @@ class App:
         ui.removeComponentButton.setEnabled(False)
         ui.revertComStateButton.setEnabled(False)
         ui.saveComStateButton.setEnabled(False)
+        ui.revertSingletonStateButton.setEnabled(False)
+        ui.saveSingletonStateButton.setEnabled(False)
 
         if sim is not None and sim.is_editing():
             ui.createEntityButton.setEnabled(True)
@@ -284,6 +303,10 @@ class App:
                         ui.revertComStateButton.setEnabled(True)
                         ui.saveComStateButton.setEnabled(True)
 
+            if singleton is not None:
+                ui.revertSingletonStateButton.setEnabled(True)
+                ui.saveSingletonStateButton.setEnabled(True)
+
     def _refresh_simulation_entity_list(self):
         ui = self._ui
 
@@ -295,6 +318,18 @@ class App:
             entities = sim.get_all_entities()
             for eid in entities:
                 ui.entityList.addItem(str(eid))
+
+    def _refresh_simulation_singletons_list(self):
+        ui = self._ui
+
+        sim = self.get_selected_timeline_simulation()
+
+        ui.singletonList.clear()
+
+        if sim is not None:
+            singletons = sim.get_singleton_names()
+            for singleton in singletons:
+                ui.singletonList.addItem(singleton)
 
     def _on_timeline_point_list_selected_item_changed(self):
         point = self.get_selected_point()
@@ -456,7 +491,6 @@ class App:
         self._refresh_simulation_tab()
 
     def _revert_selected_com_state(self):
-        # act as if the selected com was just re-selected
         self._on_selected_component_changed()
 
     def _save_selected_com_state(self):
@@ -485,6 +519,33 @@ class App:
 
     def _delete_selected_timeline(self):
         pass
+
+    def _on_selected_singleton_changed(self):
+        ui = self._ui
+
+        self._refresh_simulation_edit_buttons()
+
+        ui.singletonStateTextEdit.clear()
+
+        singleton = self.get_selected_singleton_name()
+        sim = self.get_selected_timeline_simulation()
+
+        if sim is not None and singleton is not None:
+            singleton_state_json = sim.get_singleton_json(singleton)
+            singleton_state = json.loads(singleton_state_json)
+            singleton_state_json = json.dumps(singleton_state, indent=2)  # pretty print
+            ui.singletonStateTextEdit.setPlainText(singleton_state_json)
+
+    def _revert_selected_singleton_state(self):
+        self._on_selected_singleton_changed()
+
+    def _save_selected_singleton_state(self):
+        sim = self.get_selected_timeline_simulation()
+        singleton = self.get_selected_singleton_name()
+
+        if sim is not None and singleton is not None:
+            singleton_state_json = self._ui.singletonStateTextEdit.toPlainText()
+            sim.set_singleton_json(singleton, singleton_state_json)
 
     def run(self):
         self._main_window.show()

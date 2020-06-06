@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Tue Jun  2 04:57:08 2020
+# Created: Sat Jun  6 04:27:44 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -159,6 +159,29 @@ class Ui_MainWindow(object):
         self.tabWidget_2.addTab(self.entitiesTab, "")
         self.singletonsTab = QtWidgets.QWidget()
         self.singletonsTab.setObjectName("singletonsTab")
+        self.horizontalLayout_12 = QtWidgets.QHBoxLayout(self.singletonsTab)
+        self.horizontalLayout_12.setObjectName("horizontalLayout_12")
+        self.singletonList = QtWidgets.QListWidget(self.singletonsTab)
+        self.singletonList.setObjectName("singletonList")
+        self.horizontalLayout_12.addWidget(self.singletonList)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem2)
+        self.revertSingletonStateButton = QtWidgets.QPushButton(self.singletonsTab)
+        self.revertSingletonStateButton.setObjectName("revertSingletonStateButton")
+        self.horizontalLayout_5.addWidget(self.revertSingletonStateButton)
+        self.saveSingletonStateButton = QtWidgets.QPushButton(self.singletonsTab)
+        self.saveSingletonStateButton.setObjectName("saveSingletonStateButton")
+        self.horizontalLayout_5.addWidget(self.saveSingletonStateButton)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
+        self.singletonStateTextEdit = QtWidgets.QPlainTextEdit(self.singletonsTab)
+        self.singletonStateTextEdit.setObjectName("singletonStateTextEdit")
+        self.verticalLayout_2.addWidget(self.singletonStateTextEdit)
+        self.horizontalLayout_12.addLayout(self.verticalLayout_2)
+        self.horizontalLayout_12.setStretch(1, 1)
         self.tabWidget_2.addTab(self.singletonsTab, "")
         self.verticalLayout_4.addWidget(self.tabWidget_2)
         self.horizontalLayout_6.addLayout(self.verticalLayout_4)
@@ -238,6 +261,8 @@ class Ui_MainWindow(object):
         self.revertComStateButton.setText(QtWidgets.QApplication.translate("MainWindow", "Revert", None, -1))
         self.saveComStateButton.setText(QtWidgets.QApplication.translate("MainWindow", "Save", None, -1))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.entitiesTab), QtWidgets.QApplication.translate("MainWindow", "Entities", None, -1))
+        self.revertSingletonStateButton.setText(QtWidgets.QApplication.translate("MainWindow", "Revert", None, -1))
+        self.saveSingletonStateButton.setText(QtWidgets.QApplication.translate("MainWindow", "Save", None, -1))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.singletonsTab), QtWidgets.QApplication.translate("MainWindow", "Singletons", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.simulationTab), QtWidgets.QApplication.translate("MainWindow", "Simulation", None, -1))
         self.createTimelineAtSelectionButton.setText(QtWidgets.QApplication.translate("MainWindow", "Create Timeline at Selection", None, -1))
