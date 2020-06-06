@@ -173,6 +173,16 @@ class TimelineSimulation:
     def get_entity_component_names(self, eid):
         return self._simulation_process.get_entity_component_names(eid)
 
+    def get_singleton_json(self, singleton_name):
+        return self._simulation_process.get_singleton_json(singleton_name)
+
+    def set_singleton_json(self, singleton_name, singleton_json):
+        if self._is_editing:
+            self._simulation_process.set_singleton_json(singleton_name, singleton_json)
+
+    def get_singleton_names(self):
+        return self._simulation_process.get_singleton_names()
+
     def _handle_queue(self):
         while True:
             queue_item = self._simulation_state_queue.get()

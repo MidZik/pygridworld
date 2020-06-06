@@ -94,6 +94,15 @@ class SimulationRunner:
     def get_entity_component_names(self, eid):
         return self.simulation.get_entity_component_names(eid)
 
+    def get_singleton_json(self, singleton_name):
+        return self.simulation.get_singleton_json(singleton_name)
+
+    def set_singleton_json(self, singleton_name, singleton_json):
+        self.simulation.set_singleton_json(singleton_name, singleton_json)
+
+    def get_singleton_names(self):
+        return self.simulation.get_singleton_names()
+
     def _on_simulation_event(self, events_json):
         events_obj = json.loads(events_json)
         self._state_jsons_to_save_queue.put(self.get_state_json())
@@ -194,6 +203,17 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
                     eid, = params
                     entity_component_names = runner.get_entity_component_names(eid)
                     con.send((True, entity_component_names))
+                elif cmd == "get_singleton_json":
+                    singleton_name, = params
+                    singleton_json = runner.get_singleton_json(singleton_name)
+                    con.send((True, singleton_json))
+                elif cmd == "set_singleton_json":
+                    singleton_name, singleton_json = params
+                    runner.set_singleton_json(singleton_name, singleton_json)
+                    con.send((True, None))
+                elif cmd == "get_singleton_names":
+                    singleton_names = runner.get_singleton_names()
+                    con.send((True, singleton_names))
                 else:
                     con.send((False, f"Unknown command '{cmd}'."))
             except EOFError:
@@ -271,6 +291,15 @@ class SimulationRunnerProcess:
 
     def get_entity_component_names(self, eid):
         return self._send_command("get_entity_component_names", eid)
+
+    def get_singleton_json(self, singleton_name):
+        return self._send_command("get_singleton_json", singleton_name)
+
+    def set_singleton_json(self, singleton_name, singleton_json):
+        self._send_command("set_singleton_json", singleton_name, singleton_json)
+
+    def get_singleton_names(self):
+        return self._send_command("get_singleton_names")
 
     def _send_command(self, command_str, *command_params):
         if not self._process.is_alive():
