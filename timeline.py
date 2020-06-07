@@ -73,6 +73,8 @@ class Timeline:
         else:
             config = TimelineConfig()
             config.save_to(path / 'timeline.json')
+            new_point_path = path / Timeline.point_file_name(0)
+            new_point_path.touch(exist_ok=False)
 
         return Timeline(path)
 

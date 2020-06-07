@@ -334,13 +334,17 @@ class TimelinesProject:
         new_timeline_id = self._next_new_timeline_id
 
         if derive_from is None:
-            derive_from = self.root_node
+            derive_from_node = self.root_node
+            derive_from_tick = None
+        else:
+            derive_from_node = derive_from.timeline_node
+            derive_from_tick = derive_from.tick
 
-        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, derive_from.timeline_id())
+        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, derive_from_node.timeline_id)
         timeline_folder_path = self.timelines_dir_path / timeline_folder_name
 
-        new_timeline = Timeline.create_timeline(timeline_folder_path, derive_from.timeline(), derive_from.tick)
-        new_timeline_node = TimelineNode(derive_from.timeline_node, new_timeline_id, new_timeline)
+        new_timeline = Timeline.create_timeline(timeline_folder_path, derive_from_node.timeline, derive_from_tick)
+        new_timeline_node = TimelineNode(derive_from_node, new_timeline_id, new_timeline)
         self._next_new_timeline_id += 1
         return new_timeline_node
 
