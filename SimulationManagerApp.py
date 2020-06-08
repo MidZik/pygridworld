@@ -5,6 +5,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 from pathlib import Path
 import json
 from collections import deque
+from weakref import WeakKeyDictionary
 
 
 class _TaskRunner(QtCore.QRunnable):
@@ -96,7 +97,7 @@ class App:
 
         self._simulations = {}
 
-        self._timeline_tree_widget_map: Dict[sm.TimelineNode] = {}
+        self._timeline_tree_widget_map = WeakKeyDictionary()
 
         self._thread_pool = QtCore.QThreadPool()
 
@@ -186,7 +187,8 @@ class App:
 
         self._project = sm.TimelinesProject.load_project(project_dir)
 
-        self._timeline_tree_widget_map = {self._project.root_node: self._ui.timelineTree}
+        self._timeline_tree_widget_map = WeakKeyDictionary()
+        self._timeline_tree_widget_map[self._project.root_node] = self._ui.timelineTree.invisibleRootItem()
 
         ui = self._ui
 
@@ -195,14 +197,14 @@ class App:
         # node_deque contains (node, node_ui) pairs that have a ui element already created,
         # and their children need ui nodes still created
         node_deque = deque()
-        node_deque.append((self._project.root_node, ui.timelineTree))
+        node_deque.append(self._project.root_node)
 
         while node_deque:
-            cur_node, cur_ui_item = node_deque.pop()
+            cur_node = node_deque.pop()
             child_item = None
             for child_node in cur_node.child_nodes:
                 child_item = self._make_timeline_item(child_node, child_item)
-                node_deque.append((child_node, child_item))
+                node_deque.append(child_node)
 
         # TODO: Temp?
         self._on_timeline_tree_selected_item_changed()
@@ -518,7 +520,31 @@ class App:
         self._make_timeline_item(new_timeline_node, preceding_item)
 
     def _delete_selected_timeline(self):
-        pass
+        from PySide2.QtWidgets import QMessageBox
+        timeline_node = self.get_selected_timeline_node()
+
+        if timeline_node is not None:
+            number_of_nodes = 0
+
+            def count(_):
+                nonlocal number_of_nodes
+                number_of_nodes += 1
+
+            sm.TimelineNode.traverse(timeline_node, count)
+
+            result = QMessageBox(
+                QMessageBox.Warning,
+                "Confirm Timeline Deletion",
+                f"Selected timeline and all child timelines will be deleted ({number_of_nodes} total). Are you sure?",
+                QMessageBox.Yes | QMessageBox.No
+            ).exec_()
+
+            if result == QMessageBox.Yes:
+                parent_node = timeline_node.parent_node
+                self._project.delete_timeline(timeline_node)
+                widget: QtWidgets.QTreeWidgetItem = self._timeline_tree_widget_map[timeline_node]
+                parent_widget = self._timeline_tree_widget_map[parent_node]
+                parent_widget.removeChild(widget)
 
     def _on_selected_singleton_changed(self):
         ui = self._ui

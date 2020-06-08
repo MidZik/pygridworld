@@ -12,6 +12,7 @@ from bisect import insort
 from simrunner import SimulationRunnerProcess
 from timeline import Timeline
 from dataclasses import dataclass
+import sys
 
 
 class TimelineSimulation:
@@ -203,6 +204,15 @@ class TimelineSimulation:
 
 
 class TimelineNode:
+    @staticmethod
+    def traverse(root_node: 'TimelineNode', callback):
+        traversal_deque = deque([root_node])
+        while traversal_deque:
+            cur_node = traversal_deque.pop()
+            callback(cur_node)
+            for child in cur_node.child_nodes:
+                traversal_deque.append(child)
+
     def __init__(self,
                  parent_node: Optional['TimelineNode'] = None,
                  timeline_id: Optional[int] = None,
@@ -347,6 +357,38 @@ class TimelinesProject:
         new_timeline_node = TimelineNode(derive_from_node, new_timeline_id, new_timeline)
         self._next_new_timeline_id += 1
         return new_timeline_node
+
+    def delete_timeline(self, node_to_delete: TimelineNode):
+        """
+        Deletes all timeline data of the given node AND all its children.
+        :param node_to_delete: Node to delete
+        :return:
+        """
+        from shutil import rmtree
+        timelines_dir = self.timelines_dir_path.resolve(True)
+
+        def delete_timeline_data(node):
+            nonlocal timelines_dir
+            path: Path = node.timeline.path.resolve(True)
+            if path.parent == timelines_dir:
+                rmtree(path)
+            else:
+                print(f"Attempted to delete a timeline that is not part of this project. Node will be removed, "
+                      f"but data on disk will remain. ({path})", file=sys.stderr)
+
+        TimelineNode.traverse(node_to_delete, delete_timeline_data)
+        node_to_delete.parent_node.child_nodes.remove(node_to_delete)
+        node_to_delete.parent_node = None
+
+        max_id = 0
+
+        def find_max_id(node: TimelineNode):
+            nonlocal max_id
+            if node.timeline_id is not None:
+                max_id = max(max_id, node.timeline_id)
+
+        TimelineNode.traverse(self.root_node, find_max_id)
+        self._next_new_timeline_id = max_id + 1
 
     def load_all_timelines(self):
         timeline_nodes = {}
