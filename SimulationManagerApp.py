@@ -461,12 +461,16 @@ class App:
 
         if selected_sim is not None:
             selected_sim.start_simulation()
+            # TODO: temp?
+            self._refresh_simulation_start_stop_buttons()
 
     def _stop_selected_simulation(self):
         selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None:
             selected_sim.stop_simulation()
+            # TODO: temp?
+            self._refresh_simulation_start_stop_buttons()
 
     def _start_editing_selected_sim(self):
         selected_sim = self.get_selected_timeline_simulation()
