@@ -44,10 +44,10 @@ class TimelineSimulation:
         # 3. Simulation is not currently running.
         # 4. Not currently in edit mode.
         timeline = self.timeline
-        sim = self._simulation_process
+        ctrl = self._simulation_process.controller
         return (timeline.head() == timeline.tail() and
-                sim.get_tick() == timeline.head() and
-                not sim.is_running() and
+                ctrl.get_tick() == timeline.head() and
+                not ctrl.is_running() and
                 not self._is_editing)
 
     def start_editing(self):
@@ -97,7 +97,7 @@ class TimelineSimulation:
             raise RuntimeError('Cannot move to point while simulation is running.')
 
         with self.timeline.get_point_file_path(tick).open('r') as f:
-            self._simulation_process.set_state_json(f.read())
+            self._simulation_process.controller.set_state_json(f.read())
 
     def start_process(self, initial_tick=None):
         if initial_tick is None:
@@ -117,72 +117,73 @@ class TimelineSimulation:
         self._handle_queue_thread.start()
 
     def stop_process(self):
-        self._simulation_process.stop_and_join_process()
+        self._simulation_process.controller.stop_process()
+        self._simulation_process.join_process()
         self._simulation_state_queue.put(None)
         self._handle_queue_thread.join()
         self._handle_queue_thread = None
 
     def start_simulation(self):
         if not self._is_editing:
-            self._simulation_process.start_simulation()
+            self._simulation_process.controller.start_simulation()
 
     def stop_simulation(self):
-        self._simulation_process.stop_simulation()
+        self._simulation_process.controller.stop_simulation()
 
     def is_running(self):
-        return self._simulation_process.is_running()
+        return self._simulation_process.controller.is_running()
 
     def get_tick(self):
-        return self._simulation_process.get_tick()
+        return self._simulation_process.controller.get_tick()
 
     def get_state_json(self):
-        return self._simulation_process.get_state_json()
+        return self._simulation_process.controller.get_state_json()
 
     def set_state_json(self, state_json):
         if self._is_editing:
-            self._simulation_process.set_state_json(state_json)
+            self._simulation_process.controller.set_state_json(state_json)
 
     def create_entity(self):
         if self._is_editing:
-            return self._simulation_process.create_entity()
+            return self._simulation_process.controller.create_entity()
 
     def destroy_entity(self, eid):
         if self._is_editing:
-            self._simulation_process.destroy_entity(eid)
+            self._simulation_process.controller.destroy_entity(eid)
 
     def get_all_entities(self):
-        return self._simulation_process.get_all_entities()
+        return self._simulation_process.controller.get_all_entities()
 
     def assign_component(self, eid, com_name):
         if self._is_editing:
-            self._simulation_process.assign_component(eid, com_name)
+            self._simulation_process.controller.assign_component(eid, com_name)
 
     def get_component_json(self, eid, com_name):
-        return self._simulation_process.get_component_json(eid, com_name)
+        return self._simulation_process.controller.get_component_json(eid, com_name)
 
     def remove_component(self, eid, com_name):
         if self._is_editing:
-            self._simulation_process.remove_component(eid, com_name)
+            self._simulation_process.controller.remove_component(eid, com_name)
 
     def replace_component(self, eid, com_name, state_json):
         if self._is_editing:
-            self._simulation_process.replace_component(eid, com_name, state_json)
+            self._simulation_process.controller.replace_component(eid, com_name, state_json)
 
     def get_component_names(self):
-        return self._simulation_process.get_component_names()
+        return self._simulation_process.controller.get_component_names()
 
     def get_entity_component_names(self, eid):
-        return self._simulation_process.get_entity_component_names(eid)
+        return self._simulation_process.controller.get_entity_component_names(eid)
 
     def get_singleton_json(self, singleton_name):
-        return self._simulation_process.get_singleton_json(singleton_name)
+        return self._simulation_process.controller.get_singleton_json(singleton_name)
 
     def set_singleton_json(self, singleton_name, singleton_json):
         if self._is_editing:
-            self._simulation_process.set_singleton_json(singleton_name, singleton_json)
+            self._simulation_process.controller.set_singleton_json(singleton_name, singleton_json)
 
     def get_singleton_names(self):
-        return self._simulation_process.get_singleton_names()
+        return self._simulation_process.controller.get_singleton_names()
 
     def _handle_queue(self):
         while True:

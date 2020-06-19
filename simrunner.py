@@ -2,7 +2,7 @@
 @author: Matt Idzik (MidZik)
 """
 from importlib import util
-from multiprocessing.connection import Connection
+from multiprocessing.connection import Connection, wait
 from multiprocessing import Pipe, Process
 from threading import Lock, Thread
 from pathlib import Path
@@ -136,7 +136,7 @@ class SimulationRunner:
                 self._state_jsons_to_save_queue.task_done()
 
 
-def simulation_runner_loop(con: Connection, simulation_folder_path, runner_working_dir, state_file_queue):
+def simulation_runner_loop(initial_con: Connection, simulation_folder_path, runner_working_dir, state_file_queue):
     def _on_state_file_written(tick, state_file_path):
         state_file_queue.put((tick, state_file_path))
 
@@ -144,108 +144,107 @@ def simulation_runner_loop(con: Connection, simulation_folder_path, runner_worki
 
     runner = SimulationRunner(simulation_folder_path, runner_working_dir, state_file_written_callback)
 
+    connections = [initial_con]
+    halt_process = False
+
     try:
-        while True:
-            try:
-                cmd, params = con.recv()
-                if cmd == "stop_process":
-                    con.send((True, None))
-                    break
-                elif cmd == "start_simulation":
-                    runner.start_simulation()
-                    con.send((True, None))
-                elif cmd == "stop_simulation":
-                    runner.stop_simulation()
-                    con.send((True, None))
-                elif cmd == "is_running":
-                    running = runner.is_running()
-                    con.send((True, running))
-                elif cmd == "get_tick":
-                    tick = runner.get_tick()
-                    con.send((True, tick))
-                elif cmd == "get_state_json":
-                    state_json = runner.get_state_json()
-                    con.send((True, state_json))
-                elif cmd == "set_state_json":
-                    state_json, = params
-                    runner.set_state_json(state_json)
-                    con.send((True, None))
-                elif cmd == "create_entity":
-                    eid = runner.create_entity()
-                    con.send((True, eid))
-                elif cmd == "destroy_entity":
-                    eid, = params
-                    runner.destroy_entity(eid)
-                    con.send((True, None))
-                elif cmd == "get_all_entities":
-                    entities = runner.get_all_entities()
-                    con.send((True, entities))
-                elif cmd == "assign_component":
-                    eid, com_name = params
-                    runner.assign_component(eid, com_name)
-                    con.send((True, None))
-                elif cmd == "get_component_json":
-                    eid, com_name = params
-                    com_data = runner.get_component_json(eid, com_name)
-                    con.send((True, com_data))
-                elif cmd == "remove_component":
-                    eid, com_name = params
-                    runner.remove_component(eid, com_name)
-                    con.send((True, None))
-                elif cmd == "replace_component":
-                    eid, com_name, state_json = params
-                    runner.replace_component(eid, com_name, state_json)
-                    con.send((True, None))
-                elif cmd == "get_component_names":
-                    component_names = runner.get_component_names()
-                    con.send((True, component_names))
-                elif cmd == "get_entity_component_names":
-                    eid, = params
-                    entity_component_names = runner.get_entity_component_names(eid)
-                    con.send((True, entity_component_names))
-                elif cmd == "get_singleton_json":
-                    singleton_name, = params
-                    singleton_json = runner.get_singleton_json(singleton_name)
-                    con.send((True, singleton_json))
-                elif cmd == "set_singleton_json":
-                    singleton_name, singleton_json = params
-                    runner.set_singleton_json(singleton_name, singleton_json)
-                    con.send((True, None))
-                elif cmd == "get_singleton_names":
-                    singleton_names = runner.get_singleton_names()
-                    con.send((True, singleton_names))
-                else:
-                    con.send((False, f"Unknown command '{cmd}'."))
-            except EOFError:
-                # connection closed, end the simulation
-                break
-            except Exception as e:
-                # for any non-exiting exception, write to stderr and continue listening for commands
-                # (this simulation may no longer function as expected, but that is up to the
-                # creator of this process to decide, not this function)
-                logging.error('SimulationRunner encountered a non-exiting exception.', exc_info=e)
-                con.send((False, traceback.format_exc()))
+        while connections and not halt_process:
+            ready_connections = wait(connections)
+            for con in ready_connections:
+                try:
+                    cmd, params = con.recv()
+                    if cmd == "stop_process":
+                        con.send((True, None))
+                        halt_process = True
+                    elif cmd == "start_simulation":
+                        runner.start_simulation()
+                        con.send((True, None))
+                    elif cmd == "stop_simulation":
+                        runner.stop_simulation()
+                        con.send((True, None))
+                    elif cmd == "is_running":
+                        running = runner.is_running()
+                        con.send((True, running))
+                    elif cmd == "get_tick":
+                        tick = runner.get_tick()
+                        con.send((True, tick))
+                    elif cmd == "get_state_json":
+                        state_json = runner.get_state_json()
+                        con.send((True, state_json))
+                    elif cmd == "set_state_json":
+                        state_json, = params
+                        runner.set_state_json(state_json)
+                        con.send((True, None))
+                    elif cmd == "create_entity":
+                        eid = runner.create_entity()
+                        con.send((True, eid))
+                    elif cmd == "destroy_entity":
+                        eid, = params
+                        runner.destroy_entity(eid)
+                        con.send((True, None))
+                    elif cmd == "get_all_entities":
+                        entities = runner.get_all_entities()
+                        con.send((True, entities))
+                    elif cmd == "assign_component":
+                        eid, com_name = params
+                        runner.assign_component(eid, com_name)
+                        con.send((True, None))
+                    elif cmd == "get_component_json":
+                        eid, com_name = params
+                        com_data = runner.get_component_json(eid, com_name)
+                        con.send((True, com_data))
+                    elif cmd == "remove_component":
+                        eid, com_name = params
+                        runner.remove_component(eid, com_name)
+                        con.send((True, None))
+                    elif cmd == "replace_component":
+                        eid, com_name, state_json = params
+                        runner.replace_component(eid, com_name, state_json)
+                        con.send((True, None))
+                    elif cmd == "get_component_names":
+                        component_names = runner.get_component_names()
+                        con.send((True, component_names))
+                    elif cmd == "get_entity_component_names":
+                        eid, = params
+                        entity_component_names = runner.get_entity_component_names(eid)
+                        con.send((True, entity_component_names))
+                    elif cmd == "get_singleton_json":
+                        singleton_name, = params
+                        singleton_json = runner.get_singleton_json(singleton_name)
+                        con.send((True, singleton_json))
+                    elif cmd == "set_singleton_json":
+                        singleton_name, singleton_json = params
+                        runner.set_singleton_json(singleton_name, singleton_json)
+                        con.send((True, None))
+                    elif cmd == "get_singleton_names":
+                        singleton_names = runner.get_singleton_names()
+                        con.send((True, singleton_names))
+                    elif cmd == "add_connection":
+                        new_connection, = params
+                        connections.append(new_connection)
+                        con.send((True, None))
+                    else:
+                        con.send((False, f"Unknown command '{cmd}'."))
+                except EOFError:
+                    # connection closed
+                    connections.remove(con)
+                except Exception as e:
+                    # for any non-exiting exception, write to stderr and continue listening for commands
+                    # (this simulation may no longer function as expected, but that is up to the
+                    # creator of this process to decide, not this function)
+                    logging.error('SimulationRunner encountered a non-exiting exception.', exc_info=e)
+                    con.send((False, traceback.format_exc()))
     finally:
         runner.cleanup()
 
 
-class SimulationRunnerProcess:
-    """
-    Creates a SimulationRunner in a new process using multiprocessing.
-    Responsible for communicating with the other process.
-    """
-    def __init__(self, simulation_folder_path, runner_working_dir, state_file_queue=None):
-        self._conn, child_conn = Pipe()
-        args = (child_conn, simulation_folder_path, runner_working_dir, state_file_queue)
-        self._process = Process(target=simulation_runner_loop, args=args, daemon=True)
+class SimulationController:
+    def __init__(self, connection):
+        self._conn = connection
         self._lock = Lock()
 
-    def start_process(self):
-        self._process.start()
-
-    def stop_and_join_process(self):
+    def stop_process(self):
         self._send_command("stop_process")
-        self._process.join()
 
     def start_simulation(self):
         self._send_command("start_simulation")
@@ -301,10 +300,15 @@ class SimulationRunnerProcess:
     def get_singleton_names(self):
         return self._send_command("get_singleton_names")
 
-    def _send_command(self, command_str, *command_params):
-        if not self._process.is_alive():
-            raise RuntimeError("Unable to send command: process not running.")
+    def add_connection(self, new_connection: Connection):
+        self._send_command("add_connection", new_connection)
 
+    def new_controller(self):
+        controller_con, sim_con = Pipe()
+        self.add_connection(sim_con)
+        return SimulationController(controller_con)
+
+    def _send_command(self, command_str, *command_params):
         self._lock.acquire()
         self._conn.send((command_str, command_params))
         success, result = self._conn.recv()
@@ -313,3 +317,21 @@ class SimulationRunnerProcess:
             return result
         else:
             raise Exception(result)
+
+
+class SimulationRunnerProcess:
+    """
+    Creates a SimulationRunner in a new process using multiprocessing.
+    Responsible for communicating with the other process.
+    """
+    def __init__(self, simulation_folder_path, runner_working_dir, state_file_queue=None):
+        controller_conn, child_conn = Pipe()
+        args = (child_conn, simulation_folder_path, runner_working_dir, state_file_queue)
+        self._process = Process(target=simulation_runner_loop, args=args, daemon=True)
+        self.controller = SimulationController(controller_conn)
+
+    def start_process(self):
+        self._process.start()
+
+    def join_process(self):
+        self._process.join()
