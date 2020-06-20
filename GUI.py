@@ -76,10 +76,18 @@ def window_app(sim_controller: SimulationController):
             window.close()
             return
         frame_data = {}
+
+        predators = set()
+        for pred in state_obj["components"]["Predation"]:
+            predators.add(pred["EID"])
+
         for pos in state_obj["components"]["Position"]:
             eid = pos["EID"]
             pos_com = pos["Com"]
-            frame_data[eid] = RenderData(pos_com["x"], pos_com["y"], 'assets/PredatorEntity.png', (255, 0, 0))
+            if eid in predators:
+                frame_data[eid] = RenderData(pos_com["x"], pos_com["y"], 'assets/PredatorEntity.png', (255, 0, 0))
+            else:
+                frame_data[eid] = RenderData(pos_com["x"], pos_com["y"], 'assets/DefaultEntity.png', (0, 200, 50))
         window.update_frame_data(frame_data)
 
     try:
