@@ -70,7 +70,12 @@ def window_app(sim_controller: SimulationController):
     window = WorldWindow()
 
     def update(dt):
-        state_obj = json.loads(sim_controller.get_state_json())
+        nonlocal last_update_time, update_counter
+        try:
+            state_obj = json.loads(sim_controller.get_state_json())
+        except BrokenPipeError:
+            window.close()
+            return
         frame_data = {}
         for pos in state_obj["components"]["Position"]:
             eid = pos["EID"]
