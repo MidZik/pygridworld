@@ -73,7 +73,7 @@ def window_app(sim_controller: SimulationController):
         nonlocal last_update_time, update_counter
         try:
             state_obj = json.loads(sim_controller.get_state_json())
-        except BrokenPipeError:
+        except (BrokenPipeError, EOFError):
             window.close()
             return
         frame_data = {}
