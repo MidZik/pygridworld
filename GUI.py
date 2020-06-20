@@ -4,15 +4,11 @@ Created on Fri May  3 18:24:23 2019
 
 @author: Matt Idzik (MidZik)
 """
-
-from multiprocessing import Process, Pipe
-from multiprocessing.connection import Connection
-from threading import Thread
-
+from simrunner import SimulationController
+import json
+from multiprocessing import Process
 from weakref import WeakValueDictionary
 import pyglet
-
-
 
 
 class RenderData:
@@ -32,7 +28,7 @@ class WorldWindow(pyglet.window.Window):
         self._sprite_cache = {}
         self._image_cache = WeakValueDictionary()
         self._entity_batch = pyglet.graphics.Batch()
-        self.fps_display = pyglet.clock.ClockDisplay()
+        self.fps_display = pyglet.window.FPSDisplay(self)
 
     def update_frame_data(self, frame_data):
         self._latest_frame_data = frame_data
@@ -70,55 +66,25 @@ class WorldWindow(pyglet.window.Window):
         self.fps_display.draw()
 
 
-def window_app(conn: Connection):
+def window_app(sim_controller: SimulationController):
     window = WorldWindow()
 
     def update(dt):
-        if conn.poll():
-            frame_data = conn.recv()
-            conn.send(True)
-            window.update_frame_data(frame_data)
+        state_obj = json.loads(sim_controller.get_state_json())
+        frame_data = {}
+        for pos in state_obj["components"]["Position"]:
+            eid = pos["EID"]
+            pos_com = pos["Com"]
+            frame_data[eid] = RenderData(pos_com["x"], pos_com["y"], 'assets/PredatorEntity.png', (255, 0, 0))
+        window.update_frame_data(frame_data)
 
     try:
-        pyglet.clock.schedule_interval(update, 1 / 30)
+        pyglet.clock.schedule_interval(update, 1 / 20)
         pyglet.app.run()
     finally:
         pyglet.app.exit()
         window.close()
-        conn.send(False)
 
 
-class WorldWindowProcess:
-    def __init__(self):
-        self._conn, child_conn = Pipe()
-        self._process = Process(target=window_app, args=(child_conn,), daemon=True)
-        self._continue_frame_data_provider_thread = False
-        self._frame_sender_thread: Thread = None
-
-    def _frame_sender_loop(self, frame_data_provider):
-        process_conn = self._conn
-        frame_data = {}
-        gui_requesting_frame = True
-
-        # in case the previous frame request message wasn't consumed,
-        # consume it here now
-        if process_conn.poll():
-            gui_requesting_frame = process_conn.recv()
-
-        while gui_requesting_frame and self._continue_frame_data_provider_thread:
-            frame_data_provider(frame_data)
-            process_conn.send(frame_data)
-            frame_data.clear()
-            gui_requesting_frame = process_conn.recv()
-
-    def start_process(self):
-        self._process.start()
-
-    def start_frame_sender_thread(self, frame_data_provider):
-        self._continue_frame_data_provider_thread = True
-        self._frame_sender_thread = Thread(target=self._frame_sender_loop, args=(frame_data_provider,))
-        self._frame_sender_thread.start()
-
-    def stop_and_join_frame_data_thread(self):
-        self._continue_frame_data_provider_thread = False
-        self._frame_sender_thread.join()
+def create_gui_process(sim_controller: SimulationController):
+    return Process(target=window_app, args=(sim_controller,), daemon=True)

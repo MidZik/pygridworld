@@ -1,4 +1,5 @@
 import SimulationManager as sm
+from GUI import create_gui_process
 import window
 from typing import Optional, Dict
 from PySide2 import QtCore, QtGui, QtWidgets
@@ -61,6 +62,7 @@ class App:
 
         # Simulation Tab
         ui.startSimProcessButton.clicked.connect(self._start_sim_process_for_current_timeline)
+        ui.showVisualizerButton.clicked.connect(self._show_visualizer_for_current_timeline)
         ui.killSimProcessButton.clicked.connect(self._kill_sim_process_for_current_timeline)
 
         ui.startSimButton.clicked.connect(self._start_selected_simulation)
@@ -96,6 +98,7 @@ class App:
         self._project: Optional[sm.TimelinesProject] = None
 
         self._simulations = {}
+        self._visualizations = {}
 
         self._timeline_tree_widget_map = WeakKeyDictionary()
 
@@ -361,6 +364,16 @@ class App:
             timeline_node = self.get_selected_timeline_node()
             if timeline_node is not None:
                 self.start_simulation_process(timeline_node.head_point())
+
+    def _show_visualizer_for_current_timeline(self):
+        sim = self.get_selected_timeline_simulation()
+        if sim is not None:
+            timeline_node = self.get_selected_timeline_node()
+            timeline_id = timeline_node.timeline_id
+            if timeline_id not in self._visualizations or not self._visualizations[timeline_id].is_alive():
+                new_visualization = create_gui_process(sim.new_controller())
+                new_visualization.start()
+                self._visualizations[timeline_node.timeline_id] = new_visualization
 
     def _kill_sim_process_for_current_timeline(self):
         timeline_node = self.get_selected_timeline_node()

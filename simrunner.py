@@ -241,7 +241,17 @@ def simulation_runner_loop(initial_con: Connection, simulation_folder_path, runn
 class SimulationController:
     def __init__(self, connection):
         self._conn = connection
-        self._lock = Lock()
+
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls)
+        obj._lock = Lock()
+        return obj
+
+    def __getstate__(self):
+        return self._conn
+
+    def __setstate__(self, state):
+        self._conn = state
 
     def stop_process(self):
         self._send_command("stop_process")

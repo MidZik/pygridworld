@@ -185,6 +185,9 @@ class TimelineSimulation:
     def get_singleton_names(self):
         return self._simulation_process.controller.get_singleton_names()
 
+    def new_controller(self):
+        return self._simulation_process.controller.new_controller()
+
     def _handle_queue(self):
         while True:
             queue_item = self._simulation_state_queue.get()

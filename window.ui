@@ -92,6 +92,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="showVisualizerButton">
+              <property name="text">
+               <string>Show Visualizer</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="killSimProcessButton">
               <property name="palette">
                <palette>

@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Sat Jun  6 04:27:44 2020
+# Created: Sat Jun 20 03:59:14 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -52,6 +52,9 @@ class Ui_MainWindow(object):
         self.startSimProcessButton.setPalette(palette)
         self.startSimProcessButton.setObjectName("startSimProcessButton")
         self.horizontalLayout_2.addWidget(self.startSimProcessButton)
+        self.showVisualizerButton = QtWidgets.QPushButton(self.simulationTab)
+        self.showVisualizerButton.setObjectName("showVisualizerButton")
+        self.horizontalLayout_2.addWidget(self.showVisualizerButton)
         self.killSimProcessButton = QtWidgets.QPushButton(self.simulationTab)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(170, 0, 0))
@@ -248,6 +251,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "MainWindow", None, -1))
         self.startSimProcessButton.setText(QtWidgets.QApplication.translate("MainWindow", "Start Simulation Process", None, -1))
+        self.showVisualizerButton.setText(QtWidgets.QApplication.translate("MainWindow", "Show Visualizer", None, -1))
         self.killSimProcessButton.setText(QtWidgets.QApplication.translate("MainWindow", "Kill Simulation Process", None, -1))
         self.startSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Start", None, -1))
         self.stopSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Stop", None, -1))
