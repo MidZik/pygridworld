@@ -84,7 +84,7 @@ class Signal:
         operation, at the expense of making callback calling order undefined.
         :param index: Index to remove from the slots list.
         """
-        if index == len(index) - 1 or index == -1:
+        if index == len(self._callbacks) - 1 or index == -1:
             self._callbacks.pop()
         else:
             self._callbacks[index] = self._callbacks.pop()
