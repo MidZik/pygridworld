@@ -3,7 +3,6 @@
 """
 from collections import defaultdict, deque
 import multiprocessing
-from multiprocessing.connection import Connection, Listener, wait
 from threading import Thread
 from pathlib import Path
 import json
@@ -13,6 +12,10 @@ from bisect import insort
 from simrunner import SimulationRunnerProcess
 from timeline import Timeline
 from dataclasses import dataclass
+import grpc
+import TimelinesService_pb2
+import TimelinesService_pb2_grpc
+from concurrent import futures
 import sys
 
 
@@ -294,6 +297,38 @@ class TimelinePoint:
         return self.timeline_node.timeline
 
 
+class TimelinesService(TimelinesService_pb2_grpc.TimelineServiceServicer):
+    def __init__(self, project):
+        self._project = project
+
+    def GetTimelineTicks(self, request, context):
+        try:
+            node = self._project._timeline_nodes[request.timeline_id]
+            message = TimelinesService_pb2.TimelineTicksResponse()
+            message.ticks[:] = node.timeline.tick_list
+            return message
+        except LookupError:
+            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
+            context.set_details('Timeline ID not found.')
+            raise ValueError('Timeline ID not found.')
+
+    def GetTimelineData(self, request, context):
+        try:
+            timeline_id = request.timeline_id
+            tick = request.tick
+            point = self._project._timeline_nodes[timeline_id].point(tick)
+            with point.point_file_path().open('rb') as point_file:
+                return TimelinesService_pb2.TimelineDataResponse(data=point_file.read())
+        except LookupError:
+            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
+            context.set_details('Timeline ID not found.')
+            raise ValueError('Timeline ID not found.')
+        except ValueError:
+            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
+            context.set_details('tick not found.')
+            raise ValueError('tick not found.')
+
+
 class TimelinesProject:
     @staticmethod
     def create_new_project(project_root_dir):
@@ -345,8 +380,7 @@ class TimelinesProject:
         self._next_new_timeline_id = 1
         self._timeline_nodes = {}
 
-        self.server_thread = Thread(target=self.start_project_server)
-        self.server_thread.start()
+        self.server = self.start_project_server()
 
     def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
         new_timeline_id = self._next_new_timeline_id
@@ -439,31 +473,9 @@ class TimelinesProject:
         return self._timeline_nodes[timeline_id]
 
     def start_project_server(self):
-        def request_handler(connection: Connection):
-            while True:
-                try:
-                    cmd, params = connection.recv()
-                    if cmd == "get_ticks":
-                        timeline_id, = params
-                        node = self._timeline_nodes[timeline_id]
-                        connection.send((True, node.timeline.tick_list))
-                    if cmd == "get_state":
-                        timeline_id, tick = params
-                        point: TimelinePoint = self._timeline_nodes[timeline_id].point(tick)
-                        with point.point_file_path().open('r') as point_file:
-                            connection.send((True, point_file.read()))
-                except (EOFError, ConnectionError):
-                    break
-                except Exception as e:
-                    connection.send((False, None))
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
 
-        request_thread = Thread(target=request_handler)
-        listener = Listener(('127.0.0.1', 4969), authkey=b'local-timelines-project-server')
-
-        while True:
-            try:
-                new_con = listener.accept()
-                new_request_thread = Thread(target=request_handler, args=(new_con,))
-                new_request_thread.start()
-            except multiprocessing.context.AuthenticationError:
-                pass
+        TimelinesService_pb2_grpc.add_TimelineServiceServicer_to_server(TimelinesService(self), server)
+        server.add_insecure_port('[::]:4969')
+        server.start()
+        return server

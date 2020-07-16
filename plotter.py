@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 from collections import defaultdict
 import json
-from multiprocessing.connection import Client
+import grpc
+import TimelinesService_pb2
+import TimelinesService_pb2_grpc
 
 
 class PopulationsFigure:
@@ -48,17 +50,11 @@ class PopulationsFigure:
 
 
 def make_pop_plotter(timeline_id, server='127.0.0.1', port=4969):
-    con = Client((server, port), authkey=b'local-timelines-project-server')
-    con.send(("get_ticks", (timeline_id,)))
-    result, ticks = con.recv()
-    if not result:
-        raise RuntimeError()
-
-    pop_plotter = PopulationsFigure(timeline_id)
-
-    for tick in ticks:
-        con.send(("get_state", (timeline_id, tick)))
-        result, state = con.recv()
-        pop_plotter.add_json_data(state)
-
-    return pop_plotter
+    with grpc.insecure_channel('localhost:4969') as channel:
+        stub = TimelinesService_pb2_grpc.TimelineServiceStub(channel)
+        response = stub.GetTimelineTicks(TimelinesService_pb2.TimelineTicksRequest(timeline_id=timeline_id))
+        pop_plotter = PopulationsFigure(timeline_id)
+        for tick in response.ticks:
+            request = TimelinesService_pb2.TimelineDataRequest(timeline_id=timeline_id, tick=tick)
+            state = stub.GetTimelineData(request).data
+            pop_plotter.add_json_data(state)
