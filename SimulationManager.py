@@ -3,6 +3,7 @@
 """
 from collections import defaultdict, deque
 import multiprocessing
+from multiprocessing.connection import Connection, Listener, wait
 from threading import Thread
 from pathlib import Path
 import json
@@ -344,6 +345,9 @@ class TimelinesProject:
         self._next_new_timeline_id = 1
         self._timeline_nodes = {}
 
+        self.server_thread = Thread(target=self.start_project_server)
+        self.server_thread.start()
+
     def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
         new_timeline_id = self._next_new_timeline_id
 
@@ -433,3 +437,33 @@ class TimelinesProject:
 
     def get_timeline_node(self, timeline_id):
         return self._timeline_nodes[timeline_id]
+
+    def start_project_server(self):
+        def request_handler(connection: Connection):
+            while True:
+                try:
+                    cmd, params = connection.recv()
+                    if cmd == "get_ticks":
+                        timeline_id, = params
+                        node = self._timeline_nodes[timeline_id]
+                        connection.send((True, node.timeline.tick_list))
+                    if cmd == "get_state":
+                        timeline_id, tick = params
+                        point: TimelinePoint = self._timeline_nodes[timeline_id].point(tick)
+                        with point.point_file_path().open('r') as point_file:
+                            connection.send((True, point_file.read()))
+                except (EOFError, ConnectionError):
+                    break
+                except Exception as e:
+                    connection.send((False, None))
+
+        request_thread = Thread(target=request_handler)
+        listener = Listener(('127.0.0.1', 4969), authkey=b'local-timelines-project-server')
+
+        while True:
+            try:
+                new_con = listener.accept()
+                new_request_thread = Thread(target=request_handler, args=(new_con,))
+                new_request_thread.start()
+            except multiprocessing.context.AuthenticationError:
+                pass
