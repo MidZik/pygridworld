@@ -7,6 +7,7 @@ from pathlib import Path
 import json
 from collections import deque
 from weakref import WeakKeyDictionary
+from ts_server import Server
 
 
 class _TaskRunner(QtCore.QRunnable):
@@ -96,6 +97,7 @@ class App:
         ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
 
         self._project: Optional[sm.TimelinesProject] = None
+        self._server = None
 
         self._simulations = {}
         self._visualizations = {}
@@ -189,6 +191,10 @@ class App:
         project_dir = QFileDialog.getExistingDirectory(self._main_window, options=QFileDialog.ShowDirsOnly)
 
         self._project = sm.TimelinesProject.load_project(project_dir)
+        if self._server is not None:
+            self._server.stop()
+        self._server = Server(self._project)
+        self._server.start()
 
         self._timeline_tree_widget_map = WeakKeyDictionary()
         self._timeline_tree_widget_map[self._project.root_node] = self._ui.timelineTree.invisibleRootItem()

@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 from collections import defaultdict
 import json
-import grpc
-import TimelinesService_pb2
-import TimelinesService_pb2_grpc
+import ts_client
 
 
 class PopulationsFigure:
@@ -49,12 +47,10 @@ class PopulationsFigure:
         self._ax.autoscale_view()
 
 
-def make_pop_plotter(timeline_id, server='127.0.0.1', port=4969):
-    with grpc.insecure_channel('localhost:4969') as channel:
-        stub = TimelinesService_pb2_grpc.TimelineServiceStub(channel)
-        response = stub.GetTimelineTicks(TimelinesService_pb2.TimelineTicksRequest(timeline_id=timeline_id))
+def make_pop_plotter(timeline_id, address='127.0.0.1:4969'):
+    with ts_client.Client(address) as client:
+        ticks = client.get_timeline_ticks(timeline_id)
         pop_plotter = PopulationsFigure(timeline_id)
-        for tick in response.ticks:
-            request = TimelinesService_pb2.TimelineDataRequest(timeline_id=timeline_id, tick=tick)
-            state = stub.GetTimelineData(request).data
+        for tick in ticks:
+            state = client.get_timeline_data(timeline_id, tick)
             pop_plotter.add_json_data(state)
