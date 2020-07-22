@@ -53,7 +53,7 @@ class Server:
     def start(self):
         self.server.start()
 
-    def stop(self, grace=None):
+    def stop(self, grace=0):
         self.server.stop(grace)
 
     def __del__(self):
