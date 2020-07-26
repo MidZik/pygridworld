@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SimulationServer": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

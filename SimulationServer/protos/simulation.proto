@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+service Simulation {
+    rpc GetTick(GetTickRequest) returns (GetTickResponse);
+    rpc GetStateJson(GetStateJsonRequest) returns (GetStateJsonResponse);
+    rpc SetStateJson(SetStateJsonRequest) returns (SetStateJsonResponse);
+    rpc CreateEntity(CreateEntityRequest) returns (CreateEntityResponse);
+    rpc DestroyEntity(DestroyEntityRequest) returns (DestroyEntityResponse);
+    rpc GetAllEntities(GetAllEntitesRequest) returns (GetAllEntitiesResponse);
+    rpc StartSimulation(StartSimulationRequest) returns (StartSimulationResponse);
+    rpc StopSimulation(StopSimulationRequest) returns (StopSimulationResponse);
+    rpc IsRunning(IsRunningRequest) returns (IsRunningResponse);
+    rpc AssignComponent(AssignComponentRequest) returns (AssignComponentResponse);
+    rpc GetComponentJson(GetComponentJsonRequest) returns (GetComponentJsonResponse);
+    rpc RemoveComponent(RemoveComponentRequest) returns (RemoveComponentResponse);
+    rpc ReplaceComponent(ReplaceComponentRequest) returns (ReplaceComponentResponse);
+    rpc GetComponentNames(GetComponentNamesRequest) returns (GetComponentNamesResponse);
+    rpc GetEntityComponentNames(GetEntityComponentNamesRequest) returns (GetEntityComponentNamesResponse);
+    rpc GetSingletonJson(GetSingletonJsonRequest) returns (GetSingletonJsonResponse);
+    rpc SetSingletonJson(SetSingletonJsonRequest) returns (SetSingletonJsonResponse);
+    rpc GetSingletonNames(GetSingletonNamesRequest) returns (GetSingletonNamesResponse);
+    rpc GetEvents(GetEventsRequest) returns (stream GetEventsResponse);
+}
+
+message GetTickRequest {
+}
+
+message GetTickResponse {
+    uint64 tick = 1;
+}
+
+message GetStateJsonRequest {
+}
+
+message GetStateJsonResponse {
+    string json = 1;
+}
+
+message SetStateJsonRequest {
+    string json = 1;
+}
+
+message SetStateJsonResponse {
+}
+
+message CreateEntityRequest {
+}
+
+message CreateEntityResponse {
+    uint64 eid = 1;
+}
+
+message DestroyEntityRequest {
+    uint64 eid = 1;
+}
+
+message DestroyEntityResponse {
+}
+
+message GetAllEntitesRequest {
+}
+
+message GetAllEntitiesResponse {
+    repeated uint64 eids = 1;
+}
+
+message StartSimulationRequest {
+}
+
+message StartSimulationResponse {
+}
+
+message StopSimulationRequest {
+}
+
+message StopSimulationResponse {
+}
+
+message IsRunningRequest {
+}
+
+message IsRunningResponse {
+    bool running = 1;
+}
+
+message AssignComponentRequest {
+    uint64 eid = 1;
+    string component_name = 2;
+}
+
+message AssignComponentResponse {
+}
+
+message GetComponentJsonRequest {
+    uint64 eid = 1;
+    string component_name = 2;
+}
+
+message GetComponentJsonResponse {
+    string json = 1;
+}
+
+message RemoveComponentRequest {
+    uint64 eid = 1;
+    string component_name = 2;
+}
+
+message RemoveComponentResponse {
+}
+
+message ReplaceComponentRequest {
+    uint64 eid = 1;
+    string component_name = 2;
+    string json = 3;
+}
+
+message ReplaceComponentResponse {
+}
+
+message GetComponentNamesRequest {
+}
+
+message GetComponentNamesResponse {
+    repeated string component_names = 1;
+}
+
+message GetEntityComponentNamesRequest {
+    uint64 eid = 1;
+}
+
+message GetEntityComponentNamesResponse {
+    repeated string component_names = 1;
+}
+
+message GetSingletonJsonRequest {
+    string singleton_name = 1;
+}
+
+message GetSingletonJsonResponse {
+    string json = 1;
+}
+
+message SetSingletonJsonRequest {
+    string singleton_name = 1;
+    string json = 2;
+}
+
+message SetSingletonJsonResponse {
+}
+
+message GetSingletonNamesRequest {
+}
+
+message GetSingletonNamesResponse {
+    repeated string singleton_names = 1;
+}
+
+message GetEventsRequest {
+}
+
+message GetEventsResponse {
+    string data = 2;
+}
