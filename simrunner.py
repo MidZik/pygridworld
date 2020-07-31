@@ -1,347 +1,205 @@
 """
 @author: Matt Idzik (MidZik)
 """
-from importlib import util
-from multiprocessing.connection import Connection, wait
-from multiprocessing import Pipe, Process
-from threading import Lock, Thread
-from pathlib import Path
-import json
-from datetime import datetime
-import queue
-import logging
-import traceback
+from subprocess import Popen, PIPE
+from threading import Thread
+from typing import Optional
+
+import grpc
+import simulation_pb2 as sim
+import simulation_pb2_grpc as sim_grpc
 
 
-class SimulationRunner:
-    """
-    Loads and wraps the simulation module.
-    """
-    def __init__(self, simulation_folder_path, runner_working_dir, state_file_written_callback=None):
-        simulation_module_path = (simulation_folder_path / "simulation.pyd").resolve(True)
-        spec = util.spec_from_file_location("simulation", simulation_module_path)
-        self.module = util.module_from_spec(spec)
-        spec.loader.exec_module(self.module)
+class SimulationProcess:
+    _simulation_server_path = r'.\SimulationServer\bin\x64\Release\netcoreapp3.1\SimulationServer.exe'
 
-        self.simulation = self.module.Simulation()
-        self.simulation.set_event_callback(self._on_simulation_event)
+    def __init__(self, simulation_library_path, event_state_writer):
+        self._simulation_library_path = simulation_library_path
+        self._event_state_writer = event_state_writer
 
-        self._working_dir = Path(runner_working_dir).resolve()
-        self._saved_states_dir = (self._working_dir / 'saved_states').resolve()
-        self._saved_states_dir.mkdir(exist_ok=True)
-        self._logs_dir = (self._working_dir / 'logs').resolve()
-        self._logs_dir.mkdir(exist_ok=True)
-        self._cur_log_file = (self._logs_dir / f'log-{datetime.now():%Y-%m-%d}.txt').resolve()
+        self._process = None
+        self._port = None
+        self._client: Optional[SimulationClient] = None
+        self._event_thread = None
+        self._stream_context = None
 
-        self._state_file_written_callback = state_file_written_callback
+    def __del__(self):
+        self.stop()
 
-        self._state_jsons_to_save_queue = queue.Queue(100)
-        self._state_writer_thread = Thread(target=self._queued_states_writer)
-        self._state_writer_thread.start()
+    def start(self):
+        process = Popen([SimulationProcess._simulation_server_path, str(self._simulation_library_path)], stdout=PIPE, stdin=PIPE)
+        self._process = process
 
-    def cleanup(self):
-        # Shut off and join all threads
-        self.simulation.stop_simulation()
-        self._state_jsons_to_save_queue.put(None)
-        self._state_jsons_to_save_queue.join()
-        self._state_writer_thread.join()
+        process.stdin.write(b"port\n")
+        process.stdin.flush()
+        self._port = int(process.stdout.readline())
+        self._client = self.make_new_client()
+        self._client.open()
+
+        if self._event_state_writer:
+            self._stream_context = self._client.get_event_stream()
+            self._event_thread = Thread(target=self._event_handler)
+            self._event_thread.start()
+
+    def stop(self):
+        if self._process.poll() is None:
+            if self._event_state_writer:
+                self._stream_context.cancel()
+                self._event_thread.join()
+            self._process.stdin.write(b"exit\n")
+            self._process.stdin.flush()
+            self._process.wait()
+
+    def get_port(self):
+        return self._port
+
+    def get_server_address(self):
+        return f'localhost:{self._port}'
+
+    def get_client(self):
+        return self._client
+
+    def make_new_client(self):
+        return SimulationClient(self.get_server_address())
+
+    def _event_handler(self):
+        for (tick, event_json, state_json) in self._stream_context:
+            self._event_state_writer(tick, event_json, state_json)
+
+
+class SimulationClient:
+    def __init__(self, address):
+        self._address = address
+        self._channel = None
+
+    def open(self):
+        self._channel = grpc.insecure_channel(self._address)
+
+    def close(self):
+        self._channel.close()
+        self._channel = None
 
     def start_simulation(self):
-        self.simulation.start_simulation()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.StartSimulationRequest()
+        stub.StartSimulation(request)
 
     def stop_simulation(self):
-        self.simulation.stop_simulation()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.StopSimulationRequest()
+        stub.StopSimulation(request)
 
     def is_running(self):
-        """
-        :return: True if the simulation is running, false otherwise.
-        """
-        return self.simulation.is_running()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.IsRunningRequest()
+        response = stub.IsRunning(request)
+        return response.running
 
     def get_tick(self):
-        return self.simulation.get_tick()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetTickRequest()
+        response = stub.GetTick(request)
+        return response.tick
 
     def get_state_json(self):
-        return self.simulation.get_state_json()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetStateJsonRequest()
+        response = stub.GetStateJson(request)
+        return response.json
 
-    def set_state_json(self, state_json : str):
-        self.simulation.set_state_json(state_json)
+    def set_state_json(self, state_json: str):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.SetStateJsonRequest(json=state_json)
+        stub.SetStateJson(request)
 
     def create_entity(self):
-        return self.simulation.create_entity()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.CreateEntityRequest()
+        response = stub.CreateEntity(request)
+        return response.eid
 
     def destroy_entity(self, eid):
-        self.simulation.destroy_entity(eid)
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.DestroyEntityRequest(eid=eid)
+        stub.DestroyEntity(request)
 
     def get_all_entities(self):
-        return self.simulation.get_all_entities()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetAllEntitesRequest()
+        response = stub.GetAllEntities(request)
+        return response.eids
 
     def assign_component(self, eid, com_name):
-        self.simulation.assign_component(eid, com_name)
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.AssignComponentRequest(eid=eid, component_name=com_name)
+        stub.AssignComponent(request)
 
     def get_component_json(self, eid, com_name):
-        return self.simulation.get_component_json(eid, com_name)
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetComponentJsonRequest(eid=eid, component_name=com_name)
+        response = stub.GetComponentJson(request)
+        return response.json
 
     def remove_component(self, eid, com_name):
-        self.simulation.remove_component(eid, com_name)
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.RemoveComponentRequest(eid=eid, component_name=com_name)
+        stub.RemoveComponent(request)
 
     def replace_component(self, eid, com_name, state_json):
-        self.simulation.replace_component(eid, com_name, state_json)
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.ReplaceComponentRequest(eid=eid, component_name=com_name, json=state_json)
+        stub.ReplaceComponent(request)
 
     def get_component_names(self):
-        return self.simulation.get_component_names()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetComponentNamesRequest()
+        response = stub.GetComponentNames(request)
+        return response.component_names
 
     def get_entity_component_names(self, eid):
-        return self.simulation.get_entity_component_names(eid)
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetEntityComponentNamesRequest(eid=eid)
+        response = stub.GetEntityComponentNames(request)
+        return response.component_names
 
     def get_singleton_json(self, singleton_name):
-        return self.simulation.get_singleton_json(singleton_name)
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetSingletonJsonRequest(singleton_name=singleton_name)
+        response = stub.GetSingletonJson(request)
+        return response.json
 
-    def set_singleton_json(self, singleton_name, singleton_json):
-        self.simulation.set_singleton_json(singleton_name, singleton_json)
+    def set_singleton_json(self, singleton_name, json):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.SetSingletonJsonRequest(singleton_name=singleton_name, json=json)
+        stub.SetSingletonJson(request)
 
     def get_singleton_names(self):
-        return self.simulation.get_singleton_names()
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetSingletonNamesRequest()
+        response = stub.GetSingletonNames(request)
+        return response.singleton_names
 
-    def _on_simulation_event(self, events_json):
-        events_obj = json.loads(events_json)
-        self._state_jsons_to_save_queue.put(self.get_state_json())
+    class EventStreamContext:
+        def __init__(self, responses):
+            self.responses = responses
 
-    def _queued_states_writer(self):
-        while True:
+        def __iter__(self):
+            return self
+
+        def __next__(self):
             try:
-                state_json_to_write = self._state_jsons_to_save_queue.get(True, 1.0)
-            except queue.Empty:
-                continue
-
-            try:
-                if state_json_to_write is None:
-                    break  # This is the sole exit condition for this loop
-                else:
-                    state_obj = json.loads(state_json_to_write)
-                    tick = state_obj['singletons']['STickCounter']
-                    if isinstance(tick, int):
-                        state_file_path = (self._saved_states_dir / f'{tick}.json').resolve()
-                        with state_file_path.open('w') as state_file:
-                            state_file.write(state_json_to_write)
-                        if self._state_file_written_callback is not None:
-                            self._state_file_written_callback(tick, str(state_file_path))
-                    else:
-                        with self._cur_log_file.open('a') as log:
-                            log.write(f'[{datetime.now():%H:%M:%S}] Could not write state, bad tick format: {tick}\n')
+                response = self.responses.__next__()
             except Exception as e:
-                with self._cur_log_file.open('a') as log:
-                    log.write(f'[{datetime.now():%H:%M:%S}] Unknown exception when writing state: {e}\n')
-            finally:
-                self._state_jsons_to_save_queue.task_done()
+                if e is self.responses:
+                    # for now, assuming cancellation. Should maybe handle other cases.
+                    raise StopIteration()
+                raise
+            return response.tick, response.events_json, response.state_json
 
+        def cancel(self):
+            self.responses.cancel()
 
-def simulation_runner_loop(initial_con: Connection, simulation_folder_path, runner_working_dir, state_file_queue):
-    def _on_state_file_written(tick, state_file_path):
-        state_file_queue.put((tick, state_file_path))
-
-    state_file_written_callback = _on_state_file_written if state_file_queue is not None else None
-
-    runner = SimulationRunner(simulation_folder_path, runner_working_dir, state_file_written_callback)
-
-    connections = [initial_con]
-    halt_process = False
-
-    try:
-        while connections and not halt_process:
-            ready_connections = wait(connections)
-            for con in ready_connections:
-                try:
-                    cmd, params = con.recv()
-                    if cmd == "stop_process":
-                        con.send((True, None))
-                        halt_process = True
-                    elif cmd == "start_simulation":
-                        runner.start_simulation()
-                        con.send((True, None))
-                    elif cmd == "stop_simulation":
-                        runner.stop_simulation()
-                        con.send((True, None))
-                    elif cmd == "is_running":
-                        running = runner.is_running()
-                        con.send((True, running))
-                    elif cmd == "get_tick":
-                        tick = runner.get_tick()
-                        con.send((True, tick))
-                    elif cmd == "get_state_json":
-                        state_json = runner.get_state_json()
-                        con.send((True, state_json))
-                    elif cmd == "set_state_json":
-                        state_json, = params
-                        runner.set_state_json(state_json)
-                        con.send((True, None))
-                    elif cmd == "create_entity":
-                        eid = runner.create_entity()
-                        con.send((True, eid))
-                    elif cmd == "destroy_entity":
-                        eid, = params
-                        runner.destroy_entity(eid)
-                        con.send((True, None))
-                    elif cmd == "get_all_entities":
-                        entities = runner.get_all_entities()
-                        con.send((True, entities))
-                    elif cmd == "assign_component":
-                        eid, com_name = params
-                        runner.assign_component(eid, com_name)
-                        con.send((True, None))
-                    elif cmd == "get_component_json":
-                        eid, com_name = params
-                        com_data = runner.get_component_json(eid, com_name)
-                        con.send((True, com_data))
-                    elif cmd == "remove_component":
-                        eid, com_name = params
-                        runner.remove_component(eid, com_name)
-                        con.send((True, None))
-                    elif cmd == "replace_component":
-                        eid, com_name, state_json = params
-                        runner.replace_component(eid, com_name, state_json)
-                        con.send((True, None))
-                    elif cmd == "get_component_names":
-                        component_names = runner.get_component_names()
-                        con.send((True, component_names))
-                    elif cmd == "get_entity_component_names":
-                        eid, = params
-                        entity_component_names = runner.get_entity_component_names(eid)
-                        con.send((True, entity_component_names))
-                    elif cmd == "get_singleton_json":
-                        singleton_name, = params
-                        singleton_json = runner.get_singleton_json(singleton_name)
-                        con.send((True, singleton_json))
-                    elif cmd == "set_singleton_json":
-                        singleton_name, singleton_json = params
-                        runner.set_singleton_json(singleton_name, singleton_json)
-                        con.send((True, None))
-                    elif cmd == "get_singleton_names":
-                        singleton_names = runner.get_singleton_names()
-                        con.send((True, singleton_names))
-                    elif cmd == "add_connection":
-                        new_connection, = params
-                        connections.append(new_connection)
-                        con.send((True, None))
-                    else:
-                        con.send((False, f"Unknown command '{cmd}'."))
-                except EOFError:
-                    # connection closed
-                    connections.remove(con)
-                except Exception as e:
-                    # for any non-exiting exception, write to stderr and continue listening for commands
-                    # (this simulation may no longer function as expected, but that is up to the
-                    # creator of this process to decide, not this function)
-                    logging.error('SimulationRunner encountered a non-exiting exception.', exc_info=e)
-                    con.send((False, traceback.format_exc()))
-    finally:
-        runner.cleanup()
-
-
-class SimulationController:
-    def __init__(self, connection):
-        self._conn = connection
-
-    def __new__(cls, *args, **kwargs):
-        obj = super().__new__(cls)
-        obj._lock = Lock()
-        return obj
-
-    def __getstate__(self):
-        return self._conn
-
-    def __setstate__(self, state):
-        self._conn = state
-
-    def stop_process(self):
-        self._send_command("stop_process")
-
-    def start_simulation(self):
-        self._send_command("start_simulation")
-
-    def stop_simulation(self):
-        self._send_command("stop_simulation")
-
-    def is_running(self):
-        return self._send_command("is_running")
-
-    def get_tick(self):
-        return self._send_command("get_tick")
-
-    def get_state_json(self):
-        return self._send_command("get_state_json")
-
-    def set_state_json(self, state_json):
-        self._send_command("set_state_json", state_json)
-
-    def create_entity(self):
-        return self._send_command("create_entity")
-
-    def destroy_entity(self, eid):
-        self._send_command("destroy_entity", eid)
-
-    def get_all_entities(self):
-        return self._send_command("get_all_entities")
-
-    def assign_component(self, eid, com_name):
-        self._send_command("assign_component", eid, com_name)
-
-    def get_component_json(self, eid, com_name):
-        return self._send_command("get_component_json", eid, com_name)
-
-    def remove_component(self, eid, com_name):
-        self._send_command("remove_component", eid, com_name)
-
-    def replace_component(self, eid, com_name, state_json):
-        self._send_command("replace_component", eid, com_name, state_json)
-
-    def get_component_names(self):
-        return self._send_command("get_component_names")
-
-    def get_entity_component_names(self, eid):
-        return self._send_command("get_entity_component_names", eid)
-
-    def get_singleton_json(self, singleton_name):
-        return self._send_command("get_singleton_json", singleton_name)
-
-    def set_singleton_json(self, singleton_name, singleton_json):
-        self._send_command("set_singleton_json", singleton_name, singleton_json)
-
-    def get_singleton_names(self):
-        return self._send_command("get_singleton_names")
-
-    def add_connection(self, new_connection: Connection):
-        self._send_command("add_connection", new_connection)
-
-    def new_controller(self):
-        controller_con, sim_con = Pipe()
-        self.add_connection(sim_con)
-        return SimulationController(controller_con)
-
-    def _send_command(self, command_str, *command_params):
-        self._lock.acquire()
-        self._conn.send((command_str, command_params))
-        success, result = self._conn.recv()
-        self._lock.release()
-        if success:
-            return result
-        else:
-            raise Exception(result)
-
-
-class SimulationRunnerProcess:
-    """
-    Creates a SimulationRunner in a new process using multiprocessing.
-    Responsible for communicating with the other process.
-    """
-    def __init__(self, simulation_folder_path, runner_working_dir, state_file_queue=None):
-        controller_conn, child_conn = Pipe()
-        args = (child_conn, simulation_folder_path, runner_working_dir, state_file_queue)
-        self._process = Process(target=simulation_runner_loop, args=args, daemon=True)
-        self.controller = SimulationController(controller_conn)
-
-    def start_process(self):
-        self._process.start()
-
-    def join_process(self):
-        self._process.join()
+    def get_event_stream(self):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetEventsRequest()
+        return self.EventStreamContext(stub.GetEvents(request))

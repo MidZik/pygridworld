@@ -9,7 +9,7 @@ import json
 import re
 from typing import Optional
 from bisect import insort
-from simrunner import SimulationRunnerProcess
+from simrunner import SimulationProcess
 from timeline import Timeline
 from dataclasses import dataclass
 import sys
@@ -19,18 +19,10 @@ class TimelineSimulation:
     """
     Manages a SimulationRunnerProcess associated with a timeline.
     """
-    def __init__(self, timeline, working_dir):
-
+    def __init__(self, timeline):
         self.timeline: Timeline = timeline
 
-        self._simulation_state_queue = multiprocessing.Queue(1000)
-
-        self._process_working_dir = Path(working_dir).resolve()
-        self._process_working_dir.mkdir(exist_ok=True)
-
-        self._simulation_process: Optional[SimulationRunnerProcess] = None
-
-        self._handle_queue_thread: Optional[Thread] = None
+        self._simulation_process: Optional[SimulationProcess] = None
 
         self._is_editing = False
 
@@ -44,10 +36,10 @@ class TimelineSimulation:
         # 3. Simulation is not currently running.
         # 4. Not currently in edit mode.
         timeline = self.timeline
-        ctrl = self._simulation_process.controller
+        client = self._simulation_process.get_client()
         return (timeline.head() == timeline.tail() and
-                ctrl.get_tick() == timeline.head() and
-                not ctrl.is_running() and
+                client.get_tick() == timeline.head() and
+                not client.is_running() and
                 not self._is_editing)
 
     def start_editing(self):
@@ -97,7 +89,7 @@ class TimelineSimulation:
             raise RuntimeError('Cannot move to point while simulation is running.')
 
         with self.timeline.get_point_file_path(tick).open('r') as f:
-            self._simulation_process.controller.set_state_json(f.read())
+            self._simulation_process.get_client().set_state_json(f.read())
 
     def start_process(self, initial_tick=None):
         if initial_tick is None:
@@ -105,106 +97,87 @@ class TimelineSimulation:
         elif initial_tick not in self.timeline.tick_list:
             raise ValueError('Attempted to start timeline simulation at an invalid tick.')
 
-        self._simulation_process = SimulationRunnerProcess(
+        self._simulation_process = SimulationProcess(
             self.timeline.config.simulation_path,
-            self._process_working_dir,
-            self._simulation_state_queue)
-        self._simulation_process.start_process()
+            self._handle_event)
+        self._simulation_process.start()
 
         self.move_to_tick(initial_tick)
 
-        self._handle_queue_thread = Thread(target=self._handle_queue, daemon=False)
-        self._handle_queue_thread.start()
-
     def stop_process(self):
-        self._simulation_process.controller.stop_process()
-        self._simulation_process.join_process()
-        self._simulation_state_queue.put(None)
-        self._handle_queue_thread.join()
-        self._handle_queue_thread = None
+        self._simulation_process.stop()
 
     def start_simulation(self):
         if not self._is_editing:
-            self._simulation_process.controller.start_simulation()
+            self._simulation_process.get_client().start_simulation()
 
     def stop_simulation(self):
-        self._simulation_process.controller.stop_simulation()
+        self._simulation_process.get_client().stop_simulation()
 
     def is_running(self):
-        return self._simulation_process.controller.is_running()
+        return self._simulation_process.get_client().is_running()
 
     def get_tick(self):
-        return self._simulation_process.controller.get_tick()
+        return self._simulation_process.get_client().get_tick()
 
     def get_state_json(self):
-        return self._simulation_process.controller.get_state_json()
+        return self._simulation_process.get_client().get_state_json()
 
     def set_state_json(self, state_json):
         if self._is_editing:
-            self._simulation_process.controller.set_state_json(state_json)
+            self._simulation_process.get_client().set_state_json(state_json)
 
     def create_entity(self):
         if self._is_editing:
-            return self._simulation_process.controller.create_entity()
+            return self._simulation_process.get_client().create_entity()
 
     def destroy_entity(self, eid):
         if self._is_editing:
-            self._simulation_process.controller.destroy_entity(eid)
+            self._simulation_process.get_client().destroy_entity(eid)
 
     def get_all_entities(self):
-        return self._simulation_process.controller.get_all_entities()
+        return self._simulation_process.get_client().get_all_entities()
 
     def assign_component(self, eid, com_name):
         if self._is_editing:
-            self._simulation_process.controller.assign_component(eid, com_name)
+            self._simulation_process.get_client().assign_component(eid, com_name)
 
     def get_component_json(self, eid, com_name):
-        return self._simulation_process.controller.get_component_json(eid, com_name)
+        return self._simulation_process.get_client().get_component_json(eid, com_name)
 
     def remove_component(self, eid, com_name):
         if self._is_editing:
-            self._simulation_process.controller.remove_component(eid, com_name)
+            self._simulation_process.get_client().remove_component(eid, com_name)
 
     def replace_component(self, eid, com_name, state_json):
         if self._is_editing:
-            self._simulation_process.controller.replace_component(eid, com_name, state_json)
+            self._simulation_process.get_client().replace_component(eid, com_name, state_json)
 
     def get_component_names(self):
-        return self._simulation_process.controller.get_component_names()
+        return self._simulation_process.get_client().get_component_names()
 
     def get_entity_component_names(self, eid):
-        return self._simulation_process.controller.get_entity_component_names(eid)
+        return self._simulation_process.get_client().get_entity_component_names(eid)
 
     def get_singleton_json(self, singleton_name):
-        return self._simulation_process.controller.get_singleton_json(singleton_name)
+        return self._simulation_process.get_client().get_singleton_json(singleton_name)
 
     def set_singleton_json(self, singleton_name, singleton_json):
         if self._is_editing:
-            self._simulation_process.controller.set_singleton_json(singleton_name, singleton_json)
+            self._simulation_process.get_client().set_singleton_json(singleton_name, singleton_json)
 
     def get_singleton_names(self):
-        return self._simulation_process.controller.get_singleton_names()
+        return self._simulation_process.get_client().get_singleton_names()
 
-    def new_controller(self):
-        return self._simulation_process.controller.new_controller()
+    def get_new_client(self):
+        return self._simulation_process.make_new_client()
 
-    def _handle_queue(self):
-        while True:
-            queue_item = self._simulation_state_queue.get()
-
-            if queue_item is None:
-                break
-
-            tick, state_file_path = queue_item
-            state_file_path = Path(state_file_path).resolve(True)
-
-            if tick <= self.timeline.tail():
-                # discard already recorded states
-                state_file_path.unlink()
-            else:
-                # create new point and move in its state
-                state_file_path.rename(self.timeline.get_point_file_path(tick))
-                self.timeline.tick_list.append(tick)
+    def _handle_event(self, tick, event_json, state_json):
+        if tick not in self.timeline.tick_list:
+            state_file_path = self.timeline.get_point_file_path(tick)
+            with state_file_path.open('w') as state_file:
+                state_file.write(state_json)
+            self.timeline.tick_list.append(tick)
 
 
 class TimelineNode:

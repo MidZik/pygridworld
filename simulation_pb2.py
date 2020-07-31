@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x10simulation.proto\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"!\n\x11GetEventsResponse\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\t2\x8c\n\n\nSimulation\x12,\n\x07GetTick\x12\x0f.GetTickRequest\x1a\x10.GetTickResponse\x12;\n\x0cGetStateJson\x12\x14.GetStateJsonRequest\x1a\x15.GetStateJsonResponse\x12;\n\x0cSetStateJson\x12\x14.SetStateJsonRequest\x1a\x15.SetStateJsonResponse\x12;\n\x0c\x43reateEntity\x12\x14.CreateEntityRequest\x1a\x15.CreateEntityResponse\x12>\n\rDestroyEntity\x12\x15.DestroyEntityRequest\x1a\x16.DestroyEntityResponse\x12@\n\x0eGetAllEntities\x12\x15.GetAllEntitesRequest\x1a\x17.GetAllEntitiesResponse\x12\x44\n\x0fStartSimulation\x12\x17.StartSimulationRequest\x1a\x18.StartSimulationResponse\x12\x41\n\x0eStopSimulation\x12\x16.StopSimulationRequest\x1a\x17.StopSimulationResponse\x12\x32\n\tIsRunning\x12\x11.IsRunningRequest\x1a\x12.IsRunningResponse\x12\x44\n\x0f\x41ssignComponent\x12\x17.AssignComponentRequest\x1a\x18.AssignComponentResponse\x12G\n\x10GetComponentJson\x12\x18.GetComponentJsonRequest\x1a\x19.GetComponentJsonResponse\x12\x44\n\x0fRemoveComponent\x12\x17.RemoveComponentRequest\x1a\x18.RemoveComponentResponse\x12G\n\x10ReplaceComponent\x12\x18.ReplaceComponentRequest\x1a\x19.ReplaceComponentResponse\x12J\n\x11GetComponentNames\x12\x19.GetComponentNamesRequest\x1a\x1a.GetComponentNamesResponse\x12\\\n\x17GetEntityComponentNames\x12\x1f.GetEntityComponentNamesRequest\x1a .GetEntityComponentNamesResponse\x12G\n\x10GetSingletonJson\x12\x18.GetSingletonJsonRequest\x1a\x19.GetSingletonJsonResponse\x12G\n\x10SetSingletonJson\x12\x18.SetSingletonJsonRequest\x1a\x19.SetSingletonJsonResponse\x12J\n\x11GetSingletonNames\x12\x19.GetSingletonNamesRequest\x1a\x1a.GetSingletonNamesResponse\x12\x34\n\tGetEvents\x12\x11.GetEventsRequest\x1a\x12.GetEventsResponse0\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x10simulation.proto\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"J\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12\x13\n\x0b\x65vents_json\x18\x02 \x01(\t\x12\x12\n\nstate_json\x18\x03 \x01(\t2\x8c\n\n\nSimulation\x12,\n\x07GetTick\x12\x0f.GetTickRequest\x1a\x10.GetTickResponse\x12;\n\x0cGetStateJson\x12\x14.GetStateJsonRequest\x1a\x15.GetStateJsonResponse\x12;\n\x0cSetStateJson\x12\x14.SetStateJsonRequest\x1a\x15.SetStateJsonResponse\x12;\n\x0c\x43reateEntity\x12\x14.CreateEntityRequest\x1a\x15.CreateEntityResponse\x12>\n\rDestroyEntity\x12\x15.DestroyEntityRequest\x1a\x16.DestroyEntityResponse\x12@\n\x0eGetAllEntities\x12\x15.GetAllEntitesRequest\x1a\x17.GetAllEntitiesResponse\x12\x44\n\x0fStartSimulation\x12\x17.StartSimulationRequest\x1a\x18.StartSimulationResponse\x12\x41\n\x0eStopSimulation\x12\x16.StopSimulationRequest\x1a\x17.StopSimulationResponse\x12\x32\n\tIsRunning\x12\x11.IsRunningRequest\x1a\x12.IsRunningResponse\x12\x44\n\x0f\x41ssignComponent\x12\x17.AssignComponentRequest\x1a\x18.AssignComponentResponse\x12G\n\x10GetComponentJson\x12\x18.GetComponentJsonRequest\x1a\x19.GetComponentJsonResponse\x12\x44\n\x0fRemoveComponent\x12\x17.RemoveComponentRequest\x1a\x18.RemoveComponentResponse\x12G\n\x10ReplaceComponent\x12\x18.ReplaceComponentRequest\x1a\x19.ReplaceComponentResponse\x12J\n\x11GetComponentNames\x12\x19.GetComponentNamesRequest\x1a\x1a.GetComponentNamesResponse\x12\\\n\x17GetEntityComponentNames\x12\x1f.GetEntityComponentNamesRequest\x1a .GetEntityComponentNamesResponse\x12G\n\x10GetSingletonJson\x12\x18.GetSingletonJsonRequest\x1a\x19.GetSingletonJsonResponse\x12G\n\x10SetSingletonJson\x12\x18.SetSingletonJsonRequest\x1a\x19.SetSingletonJsonResponse\x12J\n\x11GetSingletonNames\x12\x19.GetSingletonNamesRequest\x1a\x1a.GetSingletonNamesResponse\x12\x34\n\tGetEvents\x12\x11.GetEventsRequest\x1a\x12.GetEventsResponse0\x01\x62\x06proto3')
 )
 
 
@@ -1096,8 +1096,22 @@ _GETEVENTSRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='data', full_name='GetEventsResponse.data', index=0,
+      name='tick', full_name='GetEventsResponse.tick', index=0,
+      number=1, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='events_json', full_name='GetEventsResponse.events_json', index=1,
       number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='state_json', full_name='GetEventsResponse.state_json', index=2,
+      number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -1115,7 +1129,7 @@ _GETEVENTSRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=1410,
-  serialized_end=1443,
+  serialized_end=1484,
 )
 
 DESCRIPTOR.message_types_by_name['GetTickRequest'] = _GETTICKREQUEST
@@ -1432,8 +1446,8 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1446,
-  serialized_end=2738,
+  serialized_start=1487,
+  serialized_end=2779,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTick',

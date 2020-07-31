@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace SimulationServer
 {
@@ -9,20 +10,22 @@ namespace SimulationServer
     {
         static void Main(string[] args)
         {
+            //System.Diagnostics.Debugger.Launch();
+
+            int server_port = 0;
+
             if (args.Length < 1)
             {
                 Console.WriteLine("Missing simulation library path.");
                 return;
             }
 
-            if (args.Length < 2)
+            if (args.Length >= 2)
             {
-                Console.WriteLine("Missing port number.");
-                return;
+                server_port = int.Parse(args[1]);
             }
 
             string simulation_library_path = args[0];
-            int server_port = int.Parse(args[1]);
 
             SimulationWrapper wrapper = new SimulationWrapper(simulation_library_path);
 
@@ -34,9 +37,26 @@ namespace SimulationServer
 
             server.Start();
 
-            Console.WriteLine($"Server started, hosting simulation \"{simulation_library_path}\" on port {server_port}.");
+            while(true)
+            {
+                string input = Console.ReadLine();
 
-            server.ShutdownTask.Wait();
+                switch(input)
+                {
+                    case "exit":
+                        server.ShutdownAsync();
+                        server.ShutdownTask.Wait();
+                        return;
+                    case "port":
+                        Console.WriteLine(server.Ports.First().BoundPort);
+                        break;
+                    default:
+                        Console.WriteLine("");
+                        break;
+                }
+
+                Console.Out.Flush();
+            }
         }
     }
 }

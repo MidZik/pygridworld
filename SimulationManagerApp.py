@@ -377,7 +377,7 @@ class App:
             timeline_node = self.get_selected_timeline_node()
             timeline_id = timeline_node.timeline_id
             if timeline_id not in self._visualizations or not self._visualizations[timeline_id].is_alive():
-                new_visualization = create_gui_process(sim.new_controller())
+                new_visualization = create_gui_process(sim.get_new_client())
                 new_visualization.start()
                 self._visualizations[timeline_node.timeline_id] = new_visualization
 
@@ -412,8 +412,7 @@ class App:
             return
 
         timeline = point.timeline()
-        working_dir = timeline.path / 'working'
-        new_sim = sm.TimelineSimulation(timeline, working_dir)
+        new_sim = sm.TimelineSimulation(timeline)
         new_sim.start_process(point.tick)
 
         self._simulations[point.timeline_id()] = new_sim

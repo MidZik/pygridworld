@@ -8,17 +8,18 @@ namespace SimulationServer
     class SimulationService : Simulation.SimulationBase
     {
         private SimulationWrapper simulation;
-        private event SimulationWrapper.StringResultHandler simulation_event;
+        private delegate void SimulationEventDelegate(ulong tick, string event_json, string state_json);
+        private event SimulationEventDelegate simulation_event;
 
-        public SimulationService(SimulationWrapper p_simulation)
+        public SimulationService(SimulationWrapper simulation)
         {
-            simulation = p_simulation;
+            this.simulation = simulation;
             simulation.SetEventCallback(EventCallback);
         }
 
         private void EventCallback(string s)
         {
-            simulation_event(s);
+            simulation_event(simulation.GetTick(), s, simulation.GetStateJson());
         }
 
         public override Task<AssignComponentResponse> AssignComponent(AssignComponentRequest request, ServerCallContext context)
@@ -71,12 +72,13 @@ namespace SimulationServer
 
         public override async Task GetEvents(GetEventsRequest request, IServerStreamWriter<GetEventsResponse> responseStream, ServerCallContext context)
         {
-            SimulationWrapper.StringResultHandler handler = async (string s) =>
+            SimulationEventDelegate handler = async (ulong tick, string event_json, string state_json) =>
             {
-                await responseStream.WriteAsync(new GetEventsResponse { Data = s });
+                await responseStream.WriteAsync(new GetEventsResponse { Tick = tick, EventsJson = event_json, StateJson = state_json});
             };
             simulation_event += handler;
-            context.CancellationToken.Register(() => simulation_event -= handler);
+            await Task.Delay(-1, context.CancellationToken);
+            simulation_event -= handler;
         }
 
         public override Task<GetSingletonJsonResponse> GetSingletonJson(GetSingletonJsonRequest request, ServerCallContext context)

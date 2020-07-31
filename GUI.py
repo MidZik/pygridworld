@@ -4,7 +4,7 @@ Created on Fri May  3 18:24:23 2019
 
 @author: Matt Idzik (MidZik)
 """
-from simrunner import SimulationController
+from simrunner import SimulationClient
 import json
 from multiprocessing import Process
 from weakref import WeakValueDictionary
@@ -66,12 +66,12 @@ class WorldWindow(pyglet.window.Window):
         self.fps_display.draw()
 
 
-def window_app(sim_controller: SimulationController):
+def window_app(sim_client: SimulationClient):
     window = WorldWindow()
 
     def update(dt):
         try:
-            state_obj = json.loads(sim_controller.get_state_json())
+            state_obj = json.loads(sim_client.get_state_json())
         except (BrokenPipeError, EOFError):
             window.close()
             return
@@ -91,12 +91,14 @@ def window_app(sim_controller: SimulationController):
         window.update_frame_data(frame_data)
 
     try:
+        sim_client.open()
         pyglet.clock.schedule_interval(update, 1 / 20)
         pyglet.app.run()
     finally:
+        sim_client.close()
         pyglet.app.exit()
         window.close()
 
 
-def create_gui_process(sim_controller: SimulationController):
-    return Process(target=window_app, args=(sim_controller,), daemon=True)
+def create_gui_process(sim_client: SimulationClient):
+    return Process(target=window_app, args=(sim_client,), daemon=True)

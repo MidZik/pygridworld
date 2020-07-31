@@ -56,6 +56,8 @@ namespace SimulationServer
         IntPtr simulation_library_handle;
         IntPtr simulation_handle;
 
+        StringResultHandler current_event_callback = null;
+
         public SimulationWrapper(string simulation_library_path)
         {
             simulation_library_handle = NativeLibrary.Load(simulation_library_path);
@@ -110,9 +112,11 @@ namespace SimulationServer
         {
             string result = "";
 
-            IntPtr handler = DelegateToUnmanaged<StringResultHandler>((string s) => { result = s; });
+            StringResultHandler handler = (string s) => { result = s; };
 
-            get_state_json(simulation_handle, handler);
+            get_state_json(simulation_handle, DelegateToUnmanaged(handler));
+
+            GC.KeepAlive(handler);
 
             return result;
         }
@@ -136,9 +140,11 @@ namespace SimulationServer
         {
             List<ulong> eids = new List<ulong>();
 
-            IntPtr handler = DelegateToUnmanaged<ULongResultHandler>((ulong l) => { eids.Add(l); });
+            ULongResultHandler handler = (ulong l) => { eids.Add(l); };
 
-            get_all_entities(simulation_handle, handler);
+            get_all_entities(simulation_handle, DelegateToUnmanaged(handler));
+
+            GC.KeepAlive(handler);
 
             return eids;
         }
@@ -167,9 +173,11 @@ namespace SimulationServer
         {
             string result = "";
 
-            IntPtr handler = DelegateToUnmanaged<StringResultHandler>((string s) => { result = s; });
+            StringResultHandler handler = (string s) => { result = s; };
 
-            get_component_json(simulation_handle, handler, eid, component_name);
+            get_component_json(simulation_handle, DelegateToUnmanaged(handler), eid, component_name);
+
+            GC.KeepAlive(handler);
 
             return result;
         }
@@ -188,9 +196,11 @@ namespace SimulationServer
         {
             List<string> names = new List<string>();
 
-            IntPtr handler = DelegateToUnmanaged<StringResultHandler>((string s) => { names.Add(s); });
+            StringResultHandler handler = (string s) => { names.Add(s); };
 
-            get_component_names(simulation_handle, handler);
+            get_component_names(simulation_handle, DelegateToUnmanaged(handler));
+
+            GC.KeepAlive(handler);
 
             return names;
         }
@@ -199,9 +209,11 @@ namespace SimulationServer
         {
             List<string> names = new List<string>();
 
-            IntPtr handler = DelegateToUnmanaged<StringResultHandler>((string s) => { names.Add(s); });
+            StringResultHandler handler = (string s) => { names.Add(s); };
 
-            get_entity_component_names(simulation_handle, handler, eid);
+            get_entity_component_names(simulation_handle, DelegateToUnmanaged(handler), eid);
+
+            GC.KeepAlive(handler);
 
             return names;
         }
@@ -210,9 +222,11 @@ namespace SimulationServer
         {
             string result = "";
 
-            IntPtr handler = DelegateToUnmanaged<StringResultHandler>((string s) => { result = s; });
+            StringResultHandler handler = (string s) => { result = s; };
 
-            get_singleton_json(simulation_handle, handler, singleton_name);
+            get_singleton_json(simulation_handle, DelegateToUnmanaged(handler), singleton_name);
+
+            GC.KeepAlive(handler);
 
             return result;
         }
@@ -226,18 +240,26 @@ namespace SimulationServer
         {
             List<string> names = new List<string>();
 
-            IntPtr handler = DelegateToUnmanaged<StringResultHandler>((string s) => { names.Add(s); });
+            StringResultHandler handler = (string s) => { names.Add(s); };
 
-            get_singleton_names(simulation_handle, handler);
+            get_singleton_names(simulation_handle, DelegateToUnmanaged(handler));
+
+            GC.KeepAlive(handler);
 
             return names;
         }
 
         public void SetEventCallback(StringResultHandler callback)
         {
-            IntPtr handler = DelegateToUnmanaged<StringResultHandler>(callback);
+            current_event_callback = callback;
+            IntPtr handler_ptr = IntPtr.Zero;
 
-            set_event_callback(simulation_handle, handler);
+            if (current_event_callback != null)
+            {
+                handler_ptr = DelegateToUnmanaged<StringResultHandler>(current_event_callback);
+            }
+
+            set_event_callback(simulation_handle, handler_ptr);
         }
     }
 }

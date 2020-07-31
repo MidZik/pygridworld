@@ -159,5 +159,7 @@ message GetEventsRequest {
 }
 
 message GetEventsResponse {
-    string data = 2;
+    uint64 tick = 1;
+    string events_json = 2;
+    string state_json = 3;
 }
