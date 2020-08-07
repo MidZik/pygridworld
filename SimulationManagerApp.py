@@ -8,6 +8,7 @@ import json
 from collections import deque
 from weakref import WeakKeyDictionary
 from ts_server import Server
+from PySide2.QtWidgets import QFileDialog
 
 
 class _TaskRunner(QtCore.QRunnable):
@@ -44,6 +45,7 @@ class _ReadFileTask(_Task):
 class App:
     _PointRole = QtCore.Qt.UserRole + 0
     _TimelineTreeNodeRole = QtCore.Qt.UserRole + 1
+    _SimIdentifierRole = QtCore.Qt.UserRole + 2
 
     def __init__(self, argv):
         self._app = QtWidgets.QApplication(argv)
@@ -95,6 +97,19 @@ class App:
         # Timeline Tab
         ui.createTimelineAtSelectionButton.clicked.connect(self._create_timeline_at_selection)
         ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
+
+        # Simulation Registry Tab
+        ui.addSimSourceButton.clicked.connect(self._add_sim_source)
+        ui.simSourceList.itemSelectionChanged.connect(self._on_selected_sim_source_changed)
+
+        ui.registerSimFromSourceButton.clicked.connect(self._register_from_selected_sim_source)
+        ui.removeSimSourceButton.clicked.connect(self._delete_selected_sim_source)
+
+        ui.registeredSimList.itemSelectionChanged.connect(self._on_selected_registered_sim_changed)
+
+        ui.saveRegisteredSimDescButton.clicked.connect(self._save_registered_sim_description)
+        ui.discardRegisteredSimDescButton.clicked.connect(self._discard_registered_sim_description)
+        ui.unregisterSimButton.clicked.connect(self._unregister_selected_sim_registration)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._server = None
@@ -171,6 +186,22 @@ class App:
         else:
             return None
 
+    def get_selected_simulation_source(self) -> Optional[sm.SimulationSource]:
+        items = self._ui.simSourceList.selectedItems()
+
+        if items:
+            return sm.SimulationSource(items[0].data(App._SimIdentifierRole))
+        else:
+            return None
+
+    def get_selected_registration_uuid(self):
+        items = self._ui.registeredSimList.selectedItems()
+
+        if items:
+            return items[0].data(App._SimIdentifierRole)
+        else:
+            return None
+
     def _on_application_quitting(self):
         for sim in self._simulations.values():
             sim.stop_process()
@@ -187,7 +218,6 @@ class App:
         return result_item
 
     def _open_project(self):
-        from PySide2.QtWidgets import QFileDialog
         project_dir = QFileDialog.getExistingDirectory(self._main_window, options=QFileDialog.ShowDirsOnly)
 
         self._project = sm.TimelinesProject.load_project(project_dir)
@@ -217,6 +247,7 @@ class App:
 
         # TODO: Temp?
         self._on_timeline_tree_selected_item_changed()
+        self._refresh_sim_registry_tab()
 
     def _on_timeline_tree_selected_item_changed(self):
         ui = self._ui
@@ -594,6 +625,101 @@ class App:
         if sim is not None and singleton is not None:
             singleton_state_json = self._ui.singletonStateTextEdit.toPlainText()
             sim.set_singleton_json(singleton, singleton_state_json)
+
+    def _refresh_sim_registry_tab(self):
+        self._refresh_simulation_source_list()
+        self._refresh_simulation_source_section()
+        self._refresh_registered_sim_list()
+        self._refresh_registered_sim_section()
+
+    def _refresh_simulation_source_list(self):
+        ui = self._ui
+        ui.simSourceList.clear()
+        for source in self._project.get_simulation_source_paths():
+            source = sm.SimulationSource(source)
+            item = QtWidgets.QListWidgetItem(f"{source.name}")
+            item.setData(App._SimIdentifierRole, source.source_file_path)
+            ui.simSourceList.addItem(item)
+
+    def _refresh_simulation_source_section(self):
+        ui = self._ui
+        selected_source = self.get_selected_simulation_source()
+        if selected_source:
+            ui.simSourceFilePathLabel.setText(str(selected_source.source_file_path))
+            ui.sourceFileContentsTextEdit.setPlainText(selected_source.get_json())
+        else:
+            ui.simSourceFilePathLabel.setText("")
+            ui.sourceFileContentsTextEdit.setPlainText("")
+
+    def _refresh_registered_sim_list(self):
+        ui = self._ui
+        ui.registeredSimList.clear()
+        for uuid, reg in self._project.get_registered_simulations():
+            item = QtWidgets.QListWidgetItem(str(uuid))
+            item.setData(App._SimIdentifierRole, uuid)
+            ui.registeredSimList.addItem(item)
+
+    def _refresh_registered_sim_section(self):
+        ui = self._ui
+        uuid = self.get_selected_registration_uuid()
+        if uuid:
+            selected_reg = self._project.get_registered_simulation(uuid)
+            ui.registeredSimDescriptionTextEdit.setPlainText(selected_reg.get_description())
+            ui.registeredSimMetadataTextEdit.setPlainText(selected_reg.get_metadata_json())
+        else:
+            ui.registeredSimDescriptionTextEdit.setPlainText("")
+            ui.registeredSimMetadataTextEdit.setPlainText("")
+
+    def _add_sim_source(self):
+        source_file, _ = QFileDialog.getOpenFileName(self._main_window, filter="SM Source (*.smsource)")
+        if not source_file:
+            return
+
+        self._project.add_simulation_source_path(source_file)
+        source = sm.SimulationSource(source_file)
+        item = QtWidgets.QListWidgetItem(f"{source.name}")
+        item.setData(App._SimIdentifierRole, source.source_file_path)
+        self._ui.simSourceList.addItem(item)
+
+    def _on_selected_sim_source_changed(self):
+        self._refresh_simulation_source_section()
+
+    def _register_from_selected_sim_source(self):
+        selected_source = self.get_selected_simulation_source()
+        if selected_source:
+            uuid, reg = self._project.register_simulation(selected_source)
+            item = QtWidgets.QListWidgetItem(str(uuid))
+            item.setData(App._SimIdentifierRole, uuid)
+            self._ui.registeredSimList.addItem(item)
+
+    def _delete_selected_sim_source(self):
+        selected_source = self.get_selected_simulation_source()
+        if selected_source:
+            self._project.remove_simulation_source_path(selected_source.source_file_path)
+            self._refresh_simulation_source_list()
+            self._refresh_simulation_source_section()
+
+    def _on_selected_registered_sim_changed(self):
+        self._refresh_registered_sim_section()
+
+    def _save_registered_sim_description(self):
+        uuid = self.get_selected_registration_uuid()
+        if uuid:
+            selected_reg = self._project.get_registered_simulation(uuid)
+            selected_reg.set_description(self._ui.registeredSimDescriptionTextEdit.toPlainText())
+
+    def _discard_registered_sim_description(self):
+        uuid = self.get_selected_registration_uuid()
+        if uuid:
+            selected_reg = self._project.get_registered_simulation(uuid)
+            self._ui.registeredSimDescriptionTextEdit.setPlainText(selected_reg.get_description())
+
+    def _unregister_selected_sim_registration(self):
+        uuid = self.get_selected_registration_uuid()
+        if uuid:
+            self._project.unregister_simulation(uuid)
+            self._refresh_registered_sim_list()
+            self._refresh_registered_sim_section()
 
     def run(self):
         self._main_window.show()

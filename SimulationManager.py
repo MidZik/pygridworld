@@ -2,9 +2,7 @@
 @author: Matt Idzik (MidZik)
 """
 from collections import defaultdict, deque
-import multiprocessing
-from threading import Thread
-from pathlib import Path
+from pathlib import Path, PurePath
 import json
 import re
 from typing import Optional
@@ -13,6 +11,11 @@ from simrunner import SimulationProcess
 from timeline import Timeline
 from dataclasses import dataclass
 import sys
+from datetime import datetime
+from uuid import uuid4, UUID
+import shutil
+import subprocess
+import os
 
 
 class TimelineSimulation:
@@ -266,6 +269,94 @@ class TimelinePoint:
         return self.timeline_node.timeline
 
 
+class SimulationSource:
+    AM_GIT_ARCHIVE_WORKING = 'git-archive-working'
+
+    def __init__(self, source_file_path):
+        self.source_file_path = Path(source_file_path).resolve(True)
+
+        try:
+            with open(self.source_file_path) as f:
+                data = json.load(f)
+
+            self.name = data['name']
+            self.binary = data['binary']
+            self.archive_method = data['archive_method']
+        except (LookupError, json.JSONDecodeError):
+            raise ValueError('Source file not formatted correctly.')
+
+        if self.archive_method not in [SimulationSource.AM_GIT_ARCHIVE_WORKING]:
+            raise ValueError('Bad archive method in simulation source file.')
+
+    def get_json(self):
+        with open(self.source_file_path) as f:
+            data = json.load(f)
+            return json.dumps(data, indent=4)
+
+
+class SimulationRegistration:
+    @staticmethod
+    def create_registration(registration_folder: Path, name: str, binary_name: str, created_from: str, description: str):
+        registration_folder.mkdir()
+
+        registration = SimulationRegistration(registration_folder)
+
+        registration.get_bin_path().mkdir()
+        registration.get_src_path().mkdir()
+
+        meta = {
+            'name': name,
+            'binary': binary_name,
+            'created_from': created_from,
+            'creation_date': str(datetime.today())
+        }
+
+        with open(str(registration.get_metadata_file_path()), "w") as mf:
+            json.dump(meta, mf)
+
+        with open(str(registration.get_description_file_path()), "w") as df:
+            df.write(description)
+
+        return registration
+
+    def __init__(self, path):
+        self.path: Path = Path(path).resolve(True)
+
+    def get_metadata_file_path(self):
+        return self.path / "metadata.json"
+
+    def get_description_file_path(self):
+        return self.path / "description.txt"
+
+    def get_bin_path(self):
+        return self.path / "bin"
+
+    def get_src_path(self):
+        return self.path / "src"
+
+    def get_metadata(self):
+        with open(str(self.get_metadata_file_path())) as f:
+            return json.load(f)
+
+    def get_metadata_json(self):
+        return json.dumps(self.get_metadata(), indent=4)
+
+    def get_description(self):
+        with open(str(self.get_description_file_path())) as f:
+            return f.read()
+
+    def set_description(self, description):
+        with open(str(self.get_description_file_path()), "w") as f:
+            f.write(description)
+
+    def get_simulation_binary_path(self):
+        metadata = self.get_metadata()
+        binary_path = Path(metadata['binary'])
+        if len(binary_path.parts) != 1:
+            raise RuntimeError("Simulation registry binary name is not valid.")
+        return (self.get_bin_path() / binary_path).resolve(True)
+
+
 class TimelinesProject:
     @staticmethod
     def create_new_project(project_root_dir):
@@ -284,6 +375,8 @@ class TimelinesProject:
         project = TimelinesProject(project_root_dir)
 
         project.load_all_timelines()
+        project.load_all_simulation_sources()
+        project.load_simulation_registry()
         project._project_file_handle = project.project_file_path.open('r+')
 
         return project
@@ -312,10 +405,13 @@ class TimelinesProject:
         self.root_dir_path = Path(project_root_dir).resolve()
         self.timelines_dir_path = self.root_dir_path / 'timelines'
         self.project_file_path = self.root_dir_path / 'timelines.project'
+        self.simulation_registry_path = self.root_dir_path / 'sim_registry'
         self.project_file_handle = None
         self.root_node = TimelineNode()
         self._next_new_timeline_id = 1
         self._timeline_nodes = {}
+        self._simulation_source_paths = []
+        self._simulation_registry = {}
 
     def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
         new_timeline_id = self._next_new_timeline_id
@@ -406,3 +502,117 @@ class TimelinesProject:
 
     def get_timeline_node(self, timeline_id):
         return self._timeline_nodes[timeline_id]
+
+    def load_all_simulation_sources(self):
+        self._simulation_source_paths = []
+        sources_file_path = self.simulation_registry_path / 'sources.txt'
+        self.simulation_registry_path.mkdir(exist_ok=True)
+        sources_file_path.touch(exist_ok=True)
+        with open(sources_file_path) as sf:
+            for line in sf.readlines():
+                line = line.strip()
+                if line:
+                    try:
+                        path = Path(line)
+                        SimulationSource(path)
+                        self._simulation_source_paths.append(path)
+                    except (ValueError, FileNotFoundError):
+                        print(f"Failed to load source {line}.")
+
+    def get_simulation_source_paths(self):
+        yield from self._simulation_source_paths
+
+    def add_simulation_source_path(self, source_path):
+        source_path = Path(source_path).resolve(True)
+        if source_path in self._simulation_source_paths:
+            raise ValueError("Source path already in sources list.")
+        SimulationSource(source_path)  # validate that path is a valid source
+
+        with open(self.simulation_registry_path / 'sources.txt', 'ba+') as f:
+            if f.tell() != 0:
+                f.seek(-1, 2)
+                last_char = f.read(1)
+                if last_char != b'\n':
+                    f.write(os.linesep.encode('utf-8'))
+            f.write(str(source_path).encode('utf-8'))
+            f.write(os.linesep.encode('utf-8'))
+
+        self._simulation_source_paths.append(source_path)
+
+    def remove_simulation_source_path(self, source_path):
+        source_path = Path(source_path).resolve(True)
+        self._simulation_source_paths.remove(source_path)
+
+        with open(self.simulation_registry_path / 'sources.txt', 'w') as f:
+            f.writelines((str(p) for p in self._simulation_source_paths))
+
+    def load_simulation_registry(self):
+        self._simulation_registry = {}
+        for dir_path in (x for x in self.simulation_registry_path.iterdir() if x.is_dir()):
+            try:
+                reg_id = UUID(dir_path.name)
+            except ValueError:
+                print(f"Bad registered simulation UUID: {dir_path.name}")
+                continue
+
+            if reg_id in self._simulation_registry:
+                print(f"Registered simulation appears twice with the same UUID {reg_id}")
+                continue
+
+            self._simulation_registry[reg_id] = SimulationRegistration(dir_path)
+
+    def get_registered_simulations(self):
+        yield from self._simulation_registry.items()
+
+    def get_registered_simulation(self, uuid):
+        return self._simulation_registry[uuid]
+
+    def register_simulation(self, source: SimulationSource, description=""):
+        uuid = uuid4()
+        while uuid in self._simulation_registry:
+            # duplicate prevention
+            uuid = uuid4()
+
+        registration_path = self.simulation_registry_path / str(uuid)
+        registration = SimulationRegistration.create_registration(
+            registration_path,
+            source.name,
+            source.binary,
+            str(source.source_file_path),
+            description
+        )
+
+        try:
+            # after creating the registration, need to copy over the binaries + code
+            binary_path = (source.source_file_path.parent / source.binary).resolve(True)
+            shutil.copy2(str(binary_path), str(registration.get_bin_path()))
+
+            # copying code depends on the archive method
+            dst_source_path = registration.get_src_path()
+            if source.archive_method == SimulationSource.AM_GIT_ARCHIVE_WORKING:
+                archive_path = dst_source_path / 'code.tar.gz'
+                git = subprocess.Popen(('git', 'ls-files', '-o', '-c', '--exclude-standard'),
+                                       cwd=source.source_file_path.parent,
+                                       stdout=subprocess.PIPE)
+                subprocess.run(('tar', 'T', '-', '-czf', str(archive_path)),
+                               cwd=source.source_file_path.parent,
+                               stdin=git.stdout,
+                               check=True)
+                if git.wait():
+                    raise RuntimeError("git encountered an error.")
+            else:
+                raise ValueError(f"Source file has unknown archive method: {source.archive_method}")
+
+            self._simulation_registry[uuid] = registration
+        except Exception:
+            shutil.rmtree(registration.path)
+            raise
+
+        return uuid, registration
+
+    def unregister_simulation(self, uuid):
+        registration = self._simulation_registry[uuid]
+        if registration.path.parent != self.simulation_registry_path:
+            raise RuntimeError("Cannot unregister: registration path is not within simulation registry.")
+        shutil.rmtree(registration.path)
+        del self._simulation_registry[uuid]
