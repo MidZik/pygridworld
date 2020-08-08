@@ -2,7 +2,7 @@
 @author: Matt Idzik (MidZik)
 """
 from collections import defaultdict, deque
-from pathlib import Path, PurePath
+from pathlib import Path
 import json
 import re
 from typing import Optional

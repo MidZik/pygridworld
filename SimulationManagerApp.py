@@ -1,8 +1,8 @@
 import SimulationManager as sm
 from GUI import create_gui_process
 import window
-from typing import Optional, Dict
-from PySide2 import QtCore, QtGui, QtWidgets
+from typing import Optional
+from PySide2 import QtCore, QtWidgets
 from pathlib import Path
 import json
 from collections import deque
