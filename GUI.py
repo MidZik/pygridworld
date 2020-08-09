@@ -4,7 +4,7 @@ Created on Fri May  3 18:24:23 2019
 
 @author: Matt Idzik (MidZik)
 """
-from simrunner import SimulationClient
+from simrunner import SimulationClient, RpcError
 import json
 from multiprocessing import Process
 from weakref import WeakValueDictionary
@@ -72,7 +72,8 @@ def window_app(sim_client: SimulationClient):
     def update(dt):
         try:
             state_obj = json.loads(sim_client.get_state_json())
-        except (BrokenPipeError, EOFError):
+        except RpcError:
+            # grpc doesn't provide easy-to-use exceptions so for now just handle all grpc errors cleanly
             window.close()
             return
         frame_data = {}

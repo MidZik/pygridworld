@@ -9,6 +9,8 @@ import grpc
 import simulation_pb2 as sim
 import simulation_pb2_grpc as sim_grpc
 
+RpcError = grpc.RpcError
+
 
 class SimulationProcess:
     _simulation_server_path = r'.\SimulationServer\bin\x64\Release\netcoreapp3.1\SimulationServer.exe'
