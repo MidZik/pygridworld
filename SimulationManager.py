@@ -22,8 +22,9 @@ class TimelineSimulation:
     """
     Manages a SimulationRunnerProcess associated with a timeline.
     """
-    def __init__(self, timeline):
+    def __init__(self, timeline, simulation_binary_path):
         self.timeline: Timeline = timeline
+        self.simulation_binary_path = simulation_binary_path
 
         self._simulation_process: Optional[SimulationProcess] = None
 
@@ -101,7 +102,7 @@ class TimelineSimulation:
             raise ValueError('Attempted to start timeline simulation at an invalid tick.')
 
         self._simulation_process = SimulationProcess(
-            self.timeline.config.simulation_path,
+            self.simulation_binary_path,
             self._handle_event)
         self._simulation_process.start()
 
@@ -292,6 +293,9 @@ class SimulationSource:
         with open(self.source_file_path) as f:
             data = json.load(f)
             return json.dumps(data, indent=4)
+
+    def get_binary_name(self):
+        return Path(self.binary).name
 
 
 class SimulationRegistration:
@@ -500,7 +504,7 @@ class TimelinesProject:
         self._timeline_nodes = timeline_nodes
         self._next_new_timeline_id = largest_loaded_timeline_id + 1
 
-    def get_timeline_node(self, timeline_id):
+    def get_timeline_node(self, timeline_id) -> TimelineNode:
         return self._timeline_nodes[timeline_id]
 
     def load_all_simulation_sources(self):
@@ -564,7 +568,7 @@ class TimelinesProject:
     def get_registered_simulations(self):
         yield from self._simulation_registry.items()
 
-    def get_registered_simulation(self, uuid):
+    def get_registered_simulation(self, uuid) -> SimulationRegistration:
         return self._simulation_registry[uuid]
 
     def register_simulation(self, source: SimulationSource, description=""):
@@ -577,7 +581,7 @@ class TimelinesProject:
         registration = SimulationRegistration.create_registration(
             registration_path,
             source.name,
-            source.binary,
+            source.get_binary_name(),
             str(source.source_file_path),
             description
         )
@@ -616,3 +620,15 @@ class TimelinesProject:
             raise RuntimeError("Cannot unregister: registration path is not within simulation registry.")
         shutil.rmtree(registration.path)
         del self._simulation_registry[uuid]
+
+    def create_timeline_simulation(self, timeline_id):
+        node = self.get_timeline_node(timeline_id)
+        timeline = node.timeline
+        reg = self.get_registered_simulation(timeline.config.simulation_uuid)
+        return TimelineSimulation(timeline, reg.get_simulation_binary_path())
+
+    def change_timeline_simulation_uuid(self, timeline_id, uuid):
+        timeline = self.get_timeline_node(timeline_id).timeline
+        if uuid != timeline.config.simulation_uuid:
+            timeline.config.simulation_uuid = uuid
+            timeline.save_config()

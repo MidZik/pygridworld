@@ -9,6 +9,7 @@ from collections import deque
 from weakref import WeakKeyDictionary
 from ts_server import Server
 from PySide2.QtWidgets import QFileDialog
+from uuid import UUID
 
 
 class _TaskRunner(QtCore.QRunnable):
@@ -97,6 +98,7 @@ class App:
         # Timeline Tab
         ui.createTimelineAtSelectionButton.clicked.connect(self._create_timeline_at_selection)
         ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
+        ui.timelineSimToUseComboBox.currentIndexChanged.connect(self._on_sim_to_use_combo_box_changed)
 
         # Simulation Registry Tab
         ui.addSimSourceButton.clicked.connect(self._add_sim_source)
@@ -249,6 +251,14 @@ class App:
         self._on_timeline_tree_selected_item_changed()
         self._refresh_sim_registry_tab()
 
+        combo_box = self._ui.timelineSimToUseComboBox
+        combo_box.blockSignals(True)
+        combo_box.clear()
+        for uuid, _ in self._project.get_registered_simulations():
+            combo_box.addItem(str(uuid), str(uuid))
+        self._refresh_sim_to_use_combo_box()
+        combo_box.blockSignals(False)
+
     def _on_timeline_tree_selected_item_changed(self):
         ui = self._ui
 
@@ -256,12 +266,19 @@ class App:
 
         timeline_node = self.get_selected_timeline_node()
 
+        ui.timelineSimToUseComboBox.blockSignals(True)
         if timeline_node is not None:
+            index = ui.timelineSimToUseComboBox.findData(str(timeline_node.timeline.config.simulation_uuid))
+            ui.timelineSimToUseComboBox.setCurrentIndex(index)
             for point in timeline_node.points():
                 item = QtWidgets.QListWidgetItem(f"{point.tick}")
                 item.setData(App._PointRole, point)
                 ui.timelinePointList.addItem(item)
+        else:
+            ui.timelineSimToUseComboBox.setCurrentIndex(-1)
+        ui.timelineSimToUseComboBox.blockSignals(False)
 
+        self._refresh_sim_to_use_combo_box()
         self._refresh_simulation_tab()
 
     def _refresh_simulation_tab(self):
@@ -442,8 +459,7 @@ class App:
         if point.timeline_id() in self._simulations:
             return
 
-        timeline = point.timeline()
-        new_sim = sm.TimelineSimulation(timeline)
+        new_sim = self._project.create_timeline_simulation(point.timeline_id())
         new_sim.start_process(point.tick)
 
         self._simulations[point.timeline_id()] = new_sim
@@ -691,6 +707,10 @@ class App:
             item = QtWidgets.QListWidgetItem(str(uuid))
             item.setData(App._SimIdentifierRole, uuid)
             self._ui.registeredSimList.addItem(item)
+            combo_box = self._ui.timelineSimToUseComboBox
+            combo_box.blockSignals(True)
+            combo_box.addItem(str(uuid), str(uuid))
+            combo_box.blockSignals(False)
 
     def _delete_selected_sim_source(self):
         selected_source = self.get_selected_simulation_source()
@@ -720,6 +740,33 @@ class App:
             self._project.unregister_simulation(uuid)
             self._refresh_registered_sim_list()
             self._refresh_registered_sim_section()
+            combo_box = self._ui.timelineSimToUseComboBox
+            index = combo_box.findData(str(uuid))
+            combo_box.blockSignals(True)
+            combo_box.removeItem(index)
+            combo_box.blockSignals(False)
+
+    def _can_change_timeline_simulation_uuid(self, node):
+        if node is None:
+            return False
+
+        has_multiple_points = len(node.timeline.tick_list) > 1
+        simulation_running = node.timeline_id in self._simulations
+        return not (has_multiple_points or simulation_running)
+
+    def _refresh_sim_to_use_combo_box(self):
+        combo_box = self._ui.timelineSimToUseComboBox
+        selected_timeline_node = self.get_selected_timeline_node()
+        combo_box.setEnabled(self._can_change_timeline_simulation_uuid(selected_timeline_node))
+
+    def _on_sim_to_use_combo_box_changed(self, index):
+        selected_timeline_node = self.get_selected_timeline_node()
+        if self._can_change_timeline_simulation_uuid(selected_timeline_node):
+            if index != -1:
+                uuid = UUID(self._ui.timelineSimToUseComboBox.itemData(index))
+            else:
+                uuid = None
+            self._project.change_timeline_simulation_uuid(selected_timeline_node.timeline_id, uuid)
 
     def run(self):
         self._main_window.show()

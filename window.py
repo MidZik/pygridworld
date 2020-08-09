@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Fri Aug  7 06:06:37 2020
+# Created: Sat Aug  8 05:54:25 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -214,6 +214,16 @@ class Ui_MainWindow(object):
         self.deleteSelectedTimelineButton.setObjectName("deleteSelectedTimelineButton")
         self.horizontalLayout_4.addWidget(self.deleteSelectedTimelineButton)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_15.setObjectName("horizontalLayout_15")
+        self.label_5 = QtWidgets.QLabel(self.timelineTab)
+        self.label_5.setObjectName("label_5")
+        self.horizontalLayout_15.addWidget(self.label_5)
+        self.timelineSimToUseComboBox = QtWidgets.QComboBox(self.timelineTab)
+        self.timelineSimToUseComboBox.setObjectName("timelineSimToUseComboBox")
+        self.horizontalLayout_15.addWidget(self.timelineSimToUseComboBox)
+        self.horizontalLayout_15.setStretch(1, 1)
+        self.verticalLayout.addLayout(self.horizontalLayout_15)
         self.label = QtWidgets.QLabel(self.timelineTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -384,6 +394,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.simulationTab), QtWidgets.QApplication.translate("MainWindow", "Simulation", None, -1))
         self.createTimelineAtSelectionButton.setText(QtWidgets.QApplication.translate("MainWindow", "Create Timeline at Selection", None, -1))
         self.deleteSelectedTimelineButton.setText(QtWidgets.QApplication.translate("MainWindow", "Delete Selected Timeline", None, -1))
+        self.label_5.setText(QtWidgets.QApplication.translate("MainWindow", "Simulation to use:", None, -1))
         self.label.setText(QtWidgets.QApplication.translate("MainWindow", "Point State JSON", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.timelineTab), QtWidgets.QApplication.translate("MainWindow", "Timeline", None, -1))
         self.addSimSourceButton.setText(QtWidgets.QApplication.translate("MainWindow", "Add Source", None, -1))

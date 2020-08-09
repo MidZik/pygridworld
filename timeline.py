@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 import re
 import shutil
+from uuid import UUID
 from typing import Optional, List
 
 
@@ -16,22 +17,23 @@ class TimelineConfig:
         return config
 
     def __init__(self):
-        self.simulation_path: Optional[Path] = None
+        self.simulation_uuid: Optional[UUID] = None
 
     def load_from(self, path):
         path = Path(path).resolve(True)
         with path.open('r') as f:
             data = json.load(f)
-            simulation_path = data['simulation_path']
-            if simulation_path is not None:
-                self.simulation_path = Path(simulation_path)
+            try:
+                self.simulation_uuid = UUID(data['simulation_uuid'])
+            except (LookupError, TypeError):
+                self.simulation_uuid = None
 
     def save_to(self, path):
         path = Path(path).resolve()
         with path.open('w') as f:
-            simulation_path = str(self.simulation_path) if self.simulation_path else None
+            simulation_uuid = str(self.simulation_uuid) if self.simulation_uuid else None
             data = {
-                'simulation_path': simulation_path
+                'simulation_uuid': simulation_uuid
             }
             json.dump(data, f)
 
