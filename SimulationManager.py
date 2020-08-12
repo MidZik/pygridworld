@@ -297,6 +297,9 @@ class SimulationSource:
     def get_binary_name(self):
         return Path(self.binary).name
 
+    def get_binary_path(self):
+        return (self.source_file_path.parent / self.binary).resolve(False)
+
 
 class SimulationRegistration:
     @staticmethod
@@ -359,6 +362,21 @@ class SimulationRegistration:
         if len(binary_path.parts) != 1:
             raise RuntimeError("Simulation registry binary name is not valid.")
         return (self.get_bin_path() / binary_path).resolve(True)
+
+
+@dataclass(frozen=True)
+class TimelineSimulationConfig:
+    __slots__ = ('uuid', 'source')
+    uuid: Optional[UUID]
+    source: Optional[Path]
+
+    def __str__(self):
+        if self.uuid is not None:
+            return "UUID: " + str(self.uuid)
+        elif self.source is not None:
+            return "Source: " + str(self.source)
+        else:
+            return "No Config"
 
 
 class TimelinesProject:
@@ -588,7 +606,7 @@ class TimelinesProject:
 
         try:
             # after creating the registration, need to copy over the binaries + code
-            binary_path = (source.source_file_path.parent / source.binary).resolve(True)
+            binary_path = source.get_binary_path().resolve(True)
             shutil.copy2(str(binary_path), str(registration.get_bin_path()))
 
             # copying code depends on the archive method
@@ -624,11 +642,49 @@ class TimelinesProject:
     def create_timeline_simulation(self, timeline_id):
         node = self.get_timeline_node(timeline_id)
         timeline = node.timeline
-        reg = self.get_registered_simulation(timeline.config.simulation_uuid)
-        return TimelineSimulation(timeline, reg.get_simulation_binary_path())
+        if timeline.config.simulation_uuid is not None:
+            reg = self.get_registered_simulation(timeline.config.simulation_uuid)
+            sim_path = reg.get_simulation_binary_path()
+        else:
+            source = SimulationSource(timeline.config.source_path)
+            sim_path = source.get_binary_path()
+        return TimelineSimulation(timeline, sim_path)
 
     def change_timeline_simulation_uuid(self, timeline_id, uuid):
         timeline = self.get_timeline_node(timeline_id).timeline
         if uuid != timeline.config.simulation_uuid:
             timeline.config.simulation_uuid = uuid
-            timeline.save_config()
+            timeline.config.source_path = None
+            timeline.save()
+
+    def change_timeline_simulation_path(self, timeline_id, path):
+        timeline = self.get_timeline_node(timeline_id).timeline
+        if path != timeline.config.source_path:
+            timeline.config.simulation_uuid = None
+            timeline.config.source_path = path
+            timeline.save()
+
+    def get_timeline_simulation_configs(self):
+        for source in self.get_simulation_source_paths():
+            yield TimelineSimulationConfig(None, source)
+        for uuid, reg in self.get_registered_simulations():
+            yield TimelineSimulationConfig(uuid, None)
+
+    def get_timeline_simulation_config_from_timeline(self, timeline_id):
+        node = self.get_timeline_node(timeline_id)
+        timeline = node.timeline
+        sim_uuid = timeline.config.simulation_uuid
+        if sim_uuid is not None:
+            return self.get_timeline_simulation_config_from_uuid(sim_uuid)
+        else:
+            return self.get_timeline_simulation_config_from_source(timeline.config.source_path)
+
+    def get_timeline_simulation_config_from_uuid(self, uuid):
+        reg = self.get_registered_simulation(uuid)
+        return TimelineSimulationConfig(uuid, reg.get_simulation_binary_path())
+
+    def get_timeline_simulation_config_from_source(self, source_path):
+        if source_path not in self._simulation_source_paths:
+            return None
+
+        return TimelineSimulationConfig(None, source_path)

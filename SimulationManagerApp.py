@@ -48,6 +48,8 @@ class App:
     _TimelineTreeNodeRole = QtCore.Qt.UserRole + 1
     _SimIdentifierRole = QtCore.Qt.UserRole + 2
 
+    _SimulationConfig = QtCore.Qt.UserRole + 1
+
     def __init__(self, argv):
         self._app = QtWidgets.QApplication(argv)
         self._app.setQuitOnLastWindowClosed(True)
@@ -204,6 +206,9 @@ class App:
         else:
             return None
 
+    def get_selected_timeline_simulation_config(self) -> Optional[sm.TimelineSimulationConfig]:
+        return self._ui.timelineSimToUseComboBox.currentData(App._SimulationConfig)
+
     def _on_application_quitting(self):
         for sim in self._simulations.values():
             sim.stop_process()
@@ -254,8 +259,8 @@ class App:
         combo_box = self._ui.timelineSimToUseComboBox
         combo_box.blockSignals(True)
         combo_box.clear()
-        for uuid, _ in self._project.get_registered_simulations():
-            combo_box.addItem(str(uuid), str(uuid))
+        for config in self._project.get_timeline_simulation_configs():
+            self._add_timeline_simulation_config_to_combo_box(config)
         self._refresh_sim_to_use_combo_box()
         combo_box.blockSignals(False)
 
@@ -268,14 +273,14 @@ class App:
 
         ui.timelineSimToUseComboBox.blockSignals(True)
         if timeline_node is not None:
-            index = ui.timelineSimToUseComboBox.findData(str(timeline_node.timeline.config.simulation_uuid))
-            ui.timelineSimToUseComboBox.setCurrentIndex(index)
+            config = self._project.get_timeline_simulation_config_from_timeline(timeline_node.timeline_id)
+            self._switch_timeline_simulation_config_combo_box_to_config(config)
             for point in timeline_node.points():
                 item = QtWidgets.QListWidgetItem(f"{point.tick}")
                 item.setData(App._PointRole, point)
                 ui.timelinePointList.addItem(item)
         else:
-            ui.timelineSimToUseComboBox.setCurrentIndex(-1)
+            self._switch_timeline_simulation_config_combo_box_to_config(None)
         ui.timelineSimToUseComboBox.blockSignals(False)
 
         self._refresh_sim_to_use_combo_box()
@@ -697,6 +702,12 @@ class App:
         item.setData(App._SimIdentifierRole, source.source_file_path)
         self._ui.simSourceList.addItem(item)
 
+        combo_box = self._ui.timelineSimToUseComboBox
+        config = self._project.get_timeline_simulation_config_from_source(source.source_file_path)
+        combo_box.blockSignals(True)
+        self._add_timeline_simulation_config_to_combo_box(config)
+        combo_box.blockSignals(False)
+
     def _on_selected_sim_source_changed(self):
         self._refresh_simulation_source_section()
 
@@ -707,9 +718,11 @@ class App:
             item = QtWidgets.QListWidgetItem(str(uuid))
             item.setData(App._SimIdentifierRole, uuid)
             self._ui.registeredSimList.addItem(item)
+
             combo_box = self._ui.timelineSimToUseComboBox
+            config = self._project.get_timeline_simulation_config_from_uuid(uuid)
             combo_box.blockSignals(True)
-            combo_box.addItem(str(uuid), str(uuid))
+            self._add_timeline_simulation_config_to_combo_box(config)
             combo_box.blockSignals(False)
 
     def _delete_selected_sim_source(self):
@@ -741,12 +754,13 @@ class App:
             self._refresh_registered_sim_list()
             self._refresh_registered_sim_section()
             combo_box = self._ui.timelineSimToUseComboBox
-            index = combo_box.findData(str(uuid))
+            config = self._project.get_timeline_simulation_config_from_uuid(uuid)
+            index = combo_box.findData(str(config))
             combo_box.blockSignals(True)
             combo_box.removeItem(index)
             combo_box.blockSignals(False)
 
-    def _can_change_timeline_simulation_uuid(self, node):
+    def _can_change_timeline_simulation_config(self, node):
         if node is None:
             return False
 
@@ -757,16 +771,38 @@ class App:
     def _refresh_sim_to_use_combo_box(self):
         combo_box = self._ui.timelineSimToUseComboBox
         selected_timeline_node = self.get_selected_timeline_node()
-        combo_box.setEnabled(self._can_change_timeline_simulation_uuid(selected_timeline_node))
+        combo_box.setEnabled(self._can_change_timeline_simulation_config(selected_timeline_node))
 
     def _on_sim_to_use_combo_box_changed(self, index):
         selected_timeline_node = self.get_selected_timeline_node()
-        if self._can_change_timeline_simulation_uuid(selected_timeline_node):
-            if index != -1:
-                uuid = UUID(self._ui.timelineSimToUseComboBox.itemData(index))
+        if self._can_change_timeline_simulation_config(selected_timeline_node):
+            config = self.get_selected_timeline_simulation_config()
+            if config is None:
+                self._project.change_timeline_simulation_uuid(selected_timeline_node.timeline_id, None)
+            elif config.uuid is not None:
+                self._project.change_timeline_simulation_uuid(selected_timeline_node.timeline_id, config.uuid)
             else:
-                uuid = None
-            self._project.change_timeline_simulation_uuid(selected_timeline_node.timeline_id, uuid)
+                self._project.change_timeline_simulation_path(selected_timeline_node.timeline_id, config.source)
+
+    def _add_timeline_simulation_config_to_combo_box(self, config: sm.TimelineSimulationConfig):
+        combo_box = self._ui.timelineSimToUseComboBox
+        if config.uuid is not None:
+            index = combo_box.count()
+        else:
+            index = 0
+
+        combo_box.insertItem(index, str(config), str(config))
+        combo_box.setItemData(index, config, App._SimulationConfig)
+
+    def _switch_timeline_simulation_config_combo_box_to_config(self, config: Optional[sm.TimelineSimulationConfig]):
+        combo_box = self._ui.timelineSimToUseComboBox
+        if config is None:
+            combo_box.setCurrentIndex(-1)
+        else:
+            index = combo_box.findData(str(config))
+            if index == -1:
+                raise ValueError("Provided config does not exist in combo box.")
+            combo_box.setCurrentIndex(index)
 
     def run(self):
         self._main_window.show()

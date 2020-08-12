@@ -18,6 +18,7 @@ class TimelineConfig:
 
     def __init__(self):
         self.simulation_uuid: Optional[UUID] = None
+        self.source_path: Optional[Path] = None
 
     def load_from(self, path):
         path = Path(path).resolve(True)
@@ -27,15 +28,26 @@ class TimelineConfig:
                 self.simulation_uuid = UUID(data['simulation_uuid'])
             except (LookupError, TypeError):
                 self.simulation_uuid = None
+            try:
+                self.source_path = Path(data['source_path'])
+            except LookupError:
+                self.source_path = None
+        self._validate()
 
     def save_to(self, path):
+        self._validate()
         path = Path(path).resolve()
+        data = {}
         with path.open('w') as f:
-            simulation_uuid = str(self.simulation_uuid) if self.simulation_uuid else None
-            data = {
-                'simulation_uuid': simulation_uuid
-            }
+            if self.simulation_uuid:
+                data['simulation_uuid'] = str(self.simulation_uuid)
+            if self.source_path:
+                data['source_path'] = str(self.source_path)
             json.dump(data, f)
+
+    def _validate(self):
+        if self.simulation_uuid is not None and self.source_path is not None:
+            raise ValueError("Timeline config has simulation UUID and Source Path configured simultaneously.")
 
 
 class Timeline:
@@ -102,7 +114,7 @@ class Timeline:
     def get_config_file_path(self):
         return self.path / 'timeline.json'
 
-    def save_config(self):
+    def save(self):
         self.config.save_to(self.get_config_file_path())
 
     def head(self):
