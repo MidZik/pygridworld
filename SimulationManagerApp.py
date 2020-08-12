@@ -423,6 +423,7 @@ class App:
             timeline_node = self.get_selected_timeline_node()
             if timeline_node is not None:
                 self.start_simulation_process(timeline_node.head_point())
+        self._refresh_sim_to_use_combo_box()
 
     def _show_visualizer_for_current_timeline(self):
         sim = self.get_selected_timeline_simulation()
@@ -442,6 +443,7 @@ class App:
             sim.stop_process()
             del self._simulations[timeline_node.timeline_id]
             self._refresh_simulation_tab()
+            self._refresh_sim_to_use_combo_box()
 
     def _create_entity_on_selected_sim(self):
         sim = self.get_selected_timeline_simulation()
