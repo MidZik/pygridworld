@@ -5,6 +5,9 @@ using McMaster.Extensions.CommandLineUtils;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
+using McMaster.Extensions.CommandLineUtils.Validation;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace SimulationServer
 {
@@ -89,10 +92,10 @@ namespace SimulationServer
                     .IsRequired()
                     .Accepts(v => v.Values("json"));
 
-                var out_file = convertBinCmd.Option("-o|--output <FILE>", "If specified, the file to write the result into", CommandOptionType.SingleValue)
+                var out_file = convertBinCmd.Option("-o|--output <FILES>", "If specified, the files to write the result into", CommandOptionType.MultipleValue)
                     .Accepts(v => v.LegalFilePath());
 
-                var binary_file = convertBinCmd.Option("-b|--binary <FILE>", "The binary state file to convert. It must have been created by the provided simulation.", CommandOptionType.SingleValue)
+                var binary_file = convertBinCmd.Option("-b|--binary <FILES>", "The binary state files to convert. It must have been created by the provided simulation.", CommandOptionType.MultipleValue)
                     .IsRequired()
                     .Accepts(v => v.ExistingFile());
 
@@ -100,33 +103,51 @@ namespace SimulationServer
                     .IsRequired()
                     .Accepts(v => v.ExistingFile());
 
+                convertBinCmd.OnValidate((context) =>
+                {
+                    if (out_file.HasValue())
+                    {
+                        if (out_file.Values.Count != binary_file.Values.Count)
+                        {
+                            return new ValidationResult("Number of output files does not match number of input files.");
+                        }
+                    }
+
+                    return ValidationResult.Success;
+                });
+
                 convertBinCmd.OnExecute(() =>
                 {
                     SimulationWrapper wrapper = new SimulationWrapper(simulation_library_path.Value);
 
-                    byte[] bin = File.ReadAllBytes(binary_file.Value());
-
-                    wrapper.SetStateBinary(bin);
-
-                    Stream out_stream;
-
-                    if (out_file.HasValue())
+                    for (int i = 0; i < binary_file.Values.Count; ++i)
                     {
-                        out_stream = new FileStream(out_file.Value(), FileMode.Create, FileAccess.Write);
-                    }
-                    else
-                    {
-                        out_stream = Console.OpenStandardOutput();
+                        byte[] bin = File.ReadAllBytes(binary_file.Values[i]);
+
+                        wrapper.SetStateBinary(bin);
+
+                        Stream out_stream;
+
+                        if (out_file.HasValue())
+                        {
+                            out_stream = new FileStream(out_file.Values[i], FileMode.Create, FileAccess.Write);
+                        }
+                        else
+                        {
+                            out_stream = Console.OpenStandardOutput();
+                        }
+
+                        switch (format.Value())
+                        {
+                            case "json":
+                                out_stream.Write(Encoding.UTF8.GetBytes(wrapper.GetStateJson()));
+                                break;
+                            default:
+                                return 1;
+                        }
                     }
 
-                    switch (format.Value())
-                    {
-                        case "json":
-                            out_stream.Write(Encoding.UTF8.GetBytes(wrapper.GetStateJson()));
-                            return 0;
-                        default:
-                            return 1;
-                    }
+                    return 0;
                 });
             });
 
