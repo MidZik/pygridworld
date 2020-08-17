@@ -29,7 +29,7 @@ class SimulationProcess:
         self.stop()
 
     def start(self):
-        process = Popen([SimulationProcess._simulation_server_path, str(self._simulation_library_path)], stdout=PIPE, stdin=PIPE)
+        process = Popen([SimulationProcess._simulation_server_path, 'serve', str(self._simulation_library_path)], stdout=PIPE, stdin=PIPE)
         self._process = process
 
         process.stdin.write(b"port\n")
