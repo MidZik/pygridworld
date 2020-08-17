@@ -9,6 +9,7 @@ namespace SimulationServer
     {
         public delegate void StringResultHandler(string s);
         public delegate void ULongResultHandler(ulong l);
+        public delegate void BufferResultHandler(IntPtr buffer, ulong size);
 
         delegate IntPtr CreateSimulationDelegate();
         CreateSimulationDelegate create_simulation;
@@ -52,6 +53,10 @@ namespace SimulationServer
         GetSingletonNamesDelegate get_singleton_names;
         delegate void SetEventCallbackDelegate(IntPtr sim, IntPtr string_result_handler);
         SetEventCallbackDelegate set_event_callback;
+        delegate void GetStateBinaryDelegate(IntPtr sim, IntPtr buffer_result_handler);
+        GetStateBinaryDelegate get_state_binary;
+        delegate void SetStateBinaryDelegate(IntPtr sim, IntPtr binary, ulong size);
+        SetStateBinaryDelegate set_state_binary;
 
         IntPtr simulation_library_handle;
         IntPtr simulation_handle;
@@ -83,6 +88,8 @@ namespace SimulationServer
             set_singleton_json = Marshal.GetDelegateForFunctionPointer<SetSingletonJsonDelegate>(GetExport("set_singleton_json"));
             get_singleton_names = Marshal.GetDelegateForFunctionPointer<GetSingletonNamesDelegate>(GetExport("get_singleton_names"));
             set_event_callback = Marshal.GetDelegateForFunctionPointer<SetEventCallbackDelegate>(GetExport("set_event_callback"));
+            get_state_binary = Marshal.GetDelegateForFunctionPointer<GetStateBinaryDelegate>(GetExport("get_state_binary"));
+            set_state_binary = Marshal.GetDelegateForFunctionPointer<SetStateBinaryDelegate>(GetExport("set_state_binary"));
 
             simulation_handle = create_simulation();
         }
@@ -260,6 +267,27 @@ namespace SimulationServer
             }
 
             set_event_callback(simulation_handle, handler_ptr);
+        }
+
+        public byte[] GetStateBinary()
+        {
+            byte[] bin = null;
+
+            BufferResultHandler handler = (IntPtr buf, ulong size) => { bin = new byte[size]; Marshal.Copy(buf, bin, 0, (int)size); };
+
+            get_state_binary(simulation_handle, DelegateToUnmanaged(handler));
+
+            GC.KeepAlive(handler);
+
+            return bin;
+        }
+
+        public void SetStateBinary(byte[] bin)
+        {
+            var bin_handle = GCHandle.Alloc(bin, GCHandleType.Pinned);
+            IntPtr ptr = bin_handle.AddrOfPinnedObject();
+            set_state_binary(simulation_handle, ptr, (ulong)bin.Length);
+            bin_handle.Free();
         }
     }
 }

@@ -2,6 +2,9 @@
 using System;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
+using System.IO;
+using System.Text;
+using System.Diagnostics;
 
 namespace SimulationServer
 {
@@ -74,6 +77,55 @@ namespace SimulationServer
                         }
 
                         Console.Out.Flush();
+                    }
+                });
+            });
+
+            app.Command("convert-bin", convertBinCmd =>
+            {
+                convertBinCmd.Description = "Convert a binary state file to a different format";
+
+                var format = convertBinCmd.Option("-f|--format <FORMAT>", "The format to convert into", CommandOptionType.SingleValue)
+                    .IsRequired()
+                    .Accepts(v => v.Values("json"));
+
+                var out_file = convertBinCmd.Option("-o|--output <FILE>", "If specified, the file to write the result into", CommandOptionType.SingleValue)
+                    .Accepts(v => v.LegalFilePath());
+
+                var binary_file = convertBinCmd.Option("-b|--binary <FILE>", "The binary state file to convert. It must have been created by the provided simulation.", CommandOptionType.SingleValue)
+                    .IsRequired()
+                    .Accepts(v => v.ExistingFile());
+
+                var simulation_library_path = convertBinCmd.Argument("simulation", "The simulation library to use for conversion")
+                    .IsRequired()
+                    .Accepts(v => v.ExistingFile());
+
+                convertBinCmd.OnExecute(() =>
+                {
+                    SimulationWrapper wrapper = new SimulationWrapper(simulation_library_path.Value);
+
+                    byte[] bin = File.ReadAllBytes(binary_file.Value());
+
+                    wrapper.SetStateBinary(bin);
+
+                    Stream out_stream;
+
+                    if (out_file.HasValue())
+                    {
+                        out_stream = new FileStream(out_file.Value(), FileMode.Create, FileAccess.Write);
+                    }
+                    else
+                    {
+                        out_stream = Console.OpenStandardOutput();
+                    }
+
+                    switch (format.Value())
+                    {
+                        case "json":
+                            out_stream.Write(Encoding.UTF8.GetBytes(wrapper.GetStateJson()));
+                            return 0;
+                        default:
+                            return 1;
                     }
                 });
             });
