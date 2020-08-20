@@ -5,9 +5,7 @@ using McMaster.Extensions.CommandLineUtils;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
-using McMaster.Extensions.CommandLineUtils.Validation;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 
 namespace SimulationServer
 {
@@ -84,30 +82,37 @@ namespace SimulationServer
                 });
             });
 
-            app.Command("convert-bin", convertBinCmd =>
+            app.Command("convert", convertBinCmd =>
             {
-                convertBinCmd.Description = "Convert a binary state file to a different format";
+                convertBinCmd.Description = "Convert a state file from one format and simulation version to another format and/or simulation version";
 
-                var format = convertBinCmd.Option("-f|--format <FORMAT>", "The format to convert into", CommandOptionType.SingleValue)
+                var input_format = convertBinCmd.Option("-if|--input_format <FORMAT>", "The input file format", CommandOptionType.SingleValue)
                     .IsRequired()
-                    .Accepts(v => v.Values("json"));
+                    .Accepts(v => v.Values("json", "binary"));
 
-                var out_file = convertBinCmd.Option("-o|--output <FILES>", "If specified, the files to write the result into", CommandOptionType.MultipleValue)
-                    .Accepts(v => v.LegalFilePath());
-
-                var binary_file = convertBinCmd.Option("-b|--binary <FILES>", "The binary state files to convert. It must have been created by the provided simulation.", CommandOptionType.MultipleValue)
+                var input = convertBinCmd.Option("-i|--input <FILE>", "The files to convert.", CommandOptionType.MultipleValue)
                     .IsRequired()
                     .Accepts(v => v.ExistingFile());
 
-                var simulation_library_path = convertBinCmd.Argument("simulation", "The simulation library to use for conversion")
+                var input_simulation = convertBinCmd.Option("-is|--input_sim <SIMULATION>", "The simulation the input file was generated from.", CommandOptionType.SingleValue)
                     .IsRequired()
+                    .Accepts(v => v.ExistingFile());
+
+                var output_format = convertBinCmd.Option("-of|--output_format <FORMAT>", "The output file format", CommandOptionType.SingleValue)
+                    .IsRequired()
+                    .Accepts(v => v.Values("json", "binary"));
+
+                var output = convertBinCmd.Option("-o|--output <FILE>", "The files to write the results into.", CommandOptionType.MultipleValue)
+                    .Accepts(v => v.LegalFilePath());
+
+                var output_simulation = convertBinCmd.Option("-os|--output_sim <SIMULATION>", "The simulation to generate the output from. If not provided, will use input simulation.", CommandOptionType.SingleValue)
                     .Accepts(v => v.ExistingFile());
 
                 convertBinCmd.OnValidate((context) =>
                 {
-                    if (out_file.HasValue())
+                    if (output.HasValue())
                     {
-                        if (out_file.Values.Count != binary_file.Values.Count)
+                        if (output.Values.Count != input.Values.Count)
                         {
                             return new ValidationResult("Number of output files does not match number of input files.");
                         }
@@ -118,33 +123,62 @@ namespace SimulationServer
 
                 convertBinCmd.OnExecute(() =>
                 {
-                    SimulationWrapper wrapper = new SimulationWrapper(simulation_library_path.Value);
-
-                    for (int i = 0; i < binary_file.Values.Count; ++i)
+                    string input_sim_path = Path.GetFullPath(input_simulation.Value());
+                    SimulationWrapper input_wrapper = new SimulationWrapper(input_sim_path);
+                    SimulationWrapper output_wrapper = input_wrapper;
+                    if (output_simulation.HasValue())
                     {
-                        byte[] bin = File.ReadAllBytes(binary_file.Values[i]);
+                        string output_sim_path = Path.GetFullPath(output_simulation.Value());
+                        if (output_sim_path != input_sim_path)
+                        {
+                            output_wrapper = new SimulationWrapper(output_sim_path);
+                        }
+                    }
 
-                        wrapper.SetStateBinary(bin);
+                    for (int i = 0; i < input.Values.Count; ++i)
+                    {
+                        switch (input_format.Value())
+                        {
+                            case "json":
+                                input_wrapper.SetStateJson(File.ReadAllText(input.Values[i]));
+                                break;
+                            case "binary":
+                                input_wrapper.SetStateBinary(File.ReadAllBytes(input.Values[i]));
+                                break;
+                            default:
+                                return 1;
+                        }
+
+                        if (input_wrapper != output_wrapper)
+                        {
+                            // Converting versions, the json states are expected to work between versions
+                            output_wrapper.SetStateJson(input_wrapper.GetStateJson());
+                        }
 
                         Stream out_stream;
 
-                        if (out_file.HasValue())
+                        if (output.HasValue())
                         {
-                            out_stream = new FileStream(out_file.Values[i], FileMode.Create, FileAccess.Write);
+                            out_stream = new FileStream(output.Values[i], FileMode.Create, FileAccess.Write);
                         }
                         else
                         {
                             out_stream = Console.OpenStandardOutput();
                         }
 
-                        switch (format.Value())
+                        switch (output_format.Value())
                         {
                             case "json":
-                                out_stream.Write(Encoding.UTF8.GetBytes(wrapper.GetStateJson()));
+                                out_stream.Write(Encoding.UTF8.GetBytes(output_wrapper.GetStateJson()));
+                                break;
+                            case "binary":
+                                out_stream.Write(output_wrapper.GetStateBinary());
                                 break;
                             default:
                                 return 1;
                         }
+
+                        out_stream.Flush();
                     }
 
                     return 0;
