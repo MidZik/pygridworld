@@ -109,6 +109,16 @@ class SimulationStub(object):
         request_serializer=simulation__pb2.GetEventsRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetEventsResponse.FromString,
         )
+    self.GetStateBinary = channel.unary_unary(
+        '/Simulation/GetStateBinary',
+        request_serializer=simulation__pb2.GetStateBinaryRequest.SerializeToString,
+        response_deserializer=simulation__pb2.GetStateBinaryResponse.FromString,
+        )
+    self.SetStateBinary = channel.unary_unary(
+        '/Simulation/SetStateBinary',
+        request_serializer=simulation__pb2.SetStateBinaryRequest.SerializeToString,
+        response_deserializer=simulation__pb2.SetStateBinaryResponse.FromString,
+        )
 
 
 class SimulationServicer(object):
@@ -248,6 +258,20 @@ class SimulationServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def GetStateBinary(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def SetStateBinary(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_SimulationServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -345,6 +369,16 @@ def add_SimulationServicer_to_server(servicer, server):
           servicer.GetEvents,
           request_deserializer=simulation__pb2.GetEventsRequest.FromString,
           response_serializer=simulation__pb2.GetEventsResponse.SerializeToString,
+      ),
+      'GetStateBinary': grpc.unary_unary_rpc_method_handler(
+          servicer.GetStateBinary,
+          request_deserializer=simulation__pb2.GetStateBinaryRequest.FromString,
+          response_serializer=simulation__pb2.GetStateBinaryResponse.SerializeToString,
+      ),
+      'SetStateBinary': grpc.unary_unary_rpc_method_handler(
+          servicer.SetStateBinary,
+          request_deserializer=simulation__pb2.SetStateBinaryRequest.FromString,
+          response_serializer=simulation__pb2.SetStateBinaryResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

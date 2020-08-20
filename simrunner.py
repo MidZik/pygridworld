@@ -65,8 +65,8 @@ class SimulationProcess:
         return SimulationClient(self.get_server_address())
 
     def _event_handler(self):
-        for (tick, event_json, state_json) in self._stream_context:
-            self._event_state_writer(tick, event_json, state_json)
+        for (tick, event_json, state_bin) in self._stream_context:
+            self._event_state_writer(tick, event_json, state_bin)
 
 
 class SimulationClient:
@@ -196,7 +196,7 @@ class SimulationClient:
                     # for now, assuming cancellation. Should maybe handle other cases.
                     raise StopIteration()
                 raise
-            return response.tick, response.events_json, response.state_json
+            return response.tick, response.events_json, response.state_bin
 
         def cancel(self):
             self.responses.cancel()
@@ -205,3 +205,14 @@ class SimulationClient:
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetEventsRequest()
         return self.EventStreamContext(stub.GetEvents(request))
+
+    def get_state_binary(self):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.GetStateBinaryRequest()
+        response = stub.GetStateBinary(request)
+        return response.binary
+
+    def set_state_binary(self, state_bin: str):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.SetStateBinaryRequest(binary=state_bin)
+        stub.SetStateBinary(request)

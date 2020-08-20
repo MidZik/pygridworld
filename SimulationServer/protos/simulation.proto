@@ -20,6 +20,8 @@ service Simulation {
     rpc SetSingletonJson(SetSingletonJsonRequest) returns (SetSingletonJsonResponse);
     rpc GetSingletonNames(GetSingletonNamesRequest) returns (GetSingletonNamesResponse);
     rpc GetEvents(GetEventsRequest) returns (stream GetEventsResponse);
+    rpc GetStateBinary(GetStateBinaryRequest) returns (GetStateBinaryResponse);
+    rpc SetStateBinary(SetStateBinaryRequest) returns (SetStateBinaryResponse);
 }
 
 message GetTickRequest {
@@ -161,5 +163,19 @@ message GetEventsRequest {
 message GetEventsResponse {
     uint64 tick = 1;
     string events_json = 2;
-    string state_json = 3;
+    bytes state_bin = 3;
+}
+
+message GetStateBinaryRequest {
+}
+
+message GetStateBinaryResponse {
+    bytes binary = 1;
+}
+
+message SetStateBinaryRequest {
+    bytes binary = 1;
+}
+
+message SetStateBinaryResponse {
 }

@@ -408,10 +408,15 @@ class App:
 
         point_file_path = point.point_file_path()
         if point_file_path is not None:
-            task = _ReadFileTask(point_file_path)
-            self._ui.pointStateJsonTextEdit.setPlainText(f"loading point {point}")
-            task.read_done.connect(update_text)
-            self._thread_pool.start(task.runner())
+            # TODO: state is no longer json, so either the binary should be converted or this should
+            # be removed entirely from the UI
+
+            # task = _ReadFileTask(point_file_path)
+            # self._ui.pointStateJsonTextEdit.setPlainText(f"loading point {point}")
+            # task.read_done.connect(update_text)
+            # self._thread_pool.start(task.runner())
+
+            self._ui.pointStateJsonTextEdit.setPlainText(f"Displaying point json is not currently implemented.")
         else:
             self._ui.pointStateJsonTextEdit.setPlainText(f"Selected point has no data.")
 

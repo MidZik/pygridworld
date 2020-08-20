@@ -8,7 +8,7 @@ namespace SimulationServer
     class SimulationService : Simulation.SimulationBase
     {
         private SimulationWrapper simulation;
-        private delegate void SimulationEventDelegate(ulong tick, string event_json, string state_json);
+        private delegate void SimulationEventDelegate(ulong tick, string event_json, byte[] state_json);
         private event SimulationEventDelegate simulation_event;
 
         public SimulationService(SimulationWrapper simulation)
@@ -19,7 +19,7 @@ namespace SimulationServer
 
         private void EventCallback(string s)
         {
-            simulation_event(simulation.GetTick(), s, simulation.GetStateJson());
+            simulation_event(simulation.GetTick(), s, simulation.GetStateBinary());
         }
 
         public override Task<AssignComponentResponse> AssignComponent(AssignComponentRequest request, ServerCallContext context)
@@ -72,9 +72,9 @@ namespace SimulationServer
 
         public override async Task GetEvents(GetEventsRequest request, IServerStreamWriter<GetEventsResponse> responseStream, ServerCallContext context)
         {
-            SimulationEventDelegate handler = async (ulong tick, string event_json, string state_json) =>
+            SimulationEventDelegate handler = async (ulong tick, string event_json, byte[] state_bin) =>
             {
-                await responseStream.WriteAsync(new GetEventsResponse { Tick = tick, EventsJson = event_json, StateJson = state_json});
+                await responseStream.WriteAsync(new GetEventsResponse { Tick = tick, EventsJson = event_json, StateBin = Google.Protobuf.ByteString.CopyFrom(state_bin)});
             };
             simulation_event += handler;
             await Task.Delay(-1, context.CancellationToken);
@@ -147,6 +147,18 @@ namespace SimulationServer
         {
             simulation.StopSimulation();
             return Task.FromResult(new StopSimulationResponse { });
+        }
+
+        public override Task<GetStateBinaryResponse> GetStateBinary(GetStateBinaryRequest request, ServerCallContext context)
+        {
+            byte[] bin = simulation.GetStateBinary();
+            return Task.FromResult(new GetStateBinaryResponse { Binary = Google.Protobuf.ByteString.CopyFrom(bin) }) ;
+        }
+
+        public override Task<SetStateBinaryResponse> SetStateBinary(SetStateBinaryRequest request, ServerCallContext context)
+        {
+            simulation.SetStateBinary(request.Binary.ToByteArray());
+            return Task.FromResult(new SetStateBinaryResponse { });
         }
     }
 

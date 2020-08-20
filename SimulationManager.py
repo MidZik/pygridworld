@@ -62,10 +62,10 @@ class TimelineSimulation:
         if not self._is_editing:
             raise RuntimeError("Cannot commit edits: not in edit mode.")
 
-        sim_state_json = self.get_state_json()
+        sim_state_binary = self.get_state_binary()
         head_point_path = self.timeline.get_point_file_path(self.timeline.head())
-        with head_point_path.open('w') as f:
-            f.write(sim_state_json)
+        with head_point_path.open('bw') as f:
+            f.write(sim_state_binary)
 
         self._is_editing = False
 
@@ -77,8 +77,8 @@ class TimelineSimulation:
             raise RuntimeError("Cannot discard edits: not in edit mode.")
 
         head_point_path = self.timeline.get_point_file_path(self.timeline.head())
-        with head_point_path.open('r') as f:
-            self.set_state_json(f.read())
+        with head_point_path.open('br') as f:
+            self.set_state_binary(f.read())
 
         self._is_editing = False
 
@@ -92,8 +92,8 @@ class TimelineSimulation:
         if self.is_running():
             raise RuntimeError('Cannot move to point while simulation is running.')
 
-        with self.timeline.get_point_file_path(tick).open('r') as f:
-            self._simulation_process.get_client().set_state_json(f.read())
+        with self.timeline.get_point_file_path(tick).open('br') as f:
+            self._simulation_process.get_client().set_state_binary(f.read())
 
     def start_process(self, initial_tick=None):
         if initial_tick is None:
@@ -176,11 +176,18 @@ class TimelineSimulation:
     def get_new_client(self):
         return self._simulation_process.make_new_client()
 
-    def _handle_event(self, tick, event_json, state_json):
+    def get_state_binary(self):
+        return self._simulation_process.get_client().get_state_binary()
+
+    def set_state_binary(self, state_binary):
+        if self._is_editing:
+            self._simulation_process.get_client().set_state_binary(state_binary)
+
+    def _handle_event(self, tick, event_json, state_bin):
         if tick not in self.timeline.tick_list:
             state_file_path = self.timeline.get_point_file_path(tick)
-            with state_file_path.open('w') as state_file:
-                state_file.write(state_json)
+            with state_file_path.open('bw') as state_file:
+                state_file.write(state_bin)
             self.timeline.tick_list.append(tick)
 
 
