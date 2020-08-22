@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Sat Aug  8 05:54:25 2020
+# Created: Thu Aug 20 05:27:29 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -214,14 +214,31 @@ class Ui_MainWindow(object):
         self.deleteSelectedTimelineButton.setObjectName("deleteSelectedTimelineButton")
         self.horizontalLayout_4.addWidget(self.deleteSelectedTimelineButton)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_16 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_16.setObjectName("horizontalLayout_16")
+        self.label_7 = QtWidgets.QLabel(self.timelineTab)
+        self.label_7.setObjectName("label_7")
+        self.horizontalLayout_16.addWidget(self.label_7)
+        self.currentTimelineSimLabel = QtWidgets.QLabel(self.timelineTab)
+        font = QtGui.QFont()
+        font.setWeight(75)
+        font.setBold(True)
+        self.currentTimelineSimLabel.setFont(font)
+        self.currentTimelineSimLabel.setObjectName("currentTimelineSimLabel")
+        self.horizontalLayout_16.addWidget(self.currentTimelineSimLabel)
+        self.horizontalLayout_16.setStretch(1, 1)
+        self.verticalLayout.addLayout(self.horizontalLayout_16)
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
         self.label_5 = QtWidgets.QLabel(self.timelineTab)
         self.label_5.setObjectName("label_5")
         self.horizontalLayout_15.addWidget(self.label_5)
-        self.timelineSimToUseComboBox = QtWidgets.QComboBox(self.timelineTab)
-        self.timelineSimToUseComboBox.setObjectName("timelineSimToUseComboBox")
-        self.horizontalLayout_15.addWidget(self.timelineSimToUseComboBox)
+        self.convertToSimComboBox = QtWidgets.QComboBox(self.timelineTab)
+        self.convertToSimComboBox.setObjectName("convertToSimComboBox")
+        self.horizontalLayout_15.addWidget(self.convertToSimComboBox)
+        self.convertToSimButton = QtWidgets.QPushButton(self.timelineTab)
+        self.convertToSimButton.setObjectName("convertToSimButton")
+        self.horizontalLayout_15.addWidget(self.convertToSimButton)
         self.horizontalLayout_15.setStretch(1, 1)
         self.verticalLayout.addLayout(self.horizontalLayout_15)
         self.label = QtWidgets.QLabel(self.timelineTab)
@@ -394,7 +411,10 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.simulationTab), QtWidgets.QApplication.translate("MainWindow", "Simulation", None, -1))
         self.createTimelineAtSelectionButton.setText(QtWidgets.QApplication.translate("MainWindow", "Create Timeline at Selection", None, -1))
         self.deleteSelectedTimelineButton.setText(QtWidgets.QApplication.translate("MainWindow", "Delete Selected Timeline", None, -1))
-        self.label_5.setText(QtWidgets.QApplication.translate("MainWindow", "Simulation to use:", None, -1))
+        self.label_7.setText(QtWidgets.QApplication.translate("MainWindow", "Current simulation:", None, -1))
+        self.currentTimelineSimLabel.setText(QtWidgets.QApplication.translate("MainWindow", "<current sim>", None, -1))
+        self.label_5.setText(QtWidgets.QApplication.translate("MainWindow", "Convert to simulation:", None, -1))
+        self.convertToSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Convert", None, -1))
         self.label.setText(QtWidgets.QApplication.translate("MainWindow", "Point State JSON", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.timelineTab), QtWidgets.QApplication.translate("MainWindow", "Timeline", None, -1))
         self.addSimSourceButton.setText(QtWidgets.QApplication.translate("MainWindow", "Add Source", None, -1))

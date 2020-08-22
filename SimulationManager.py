@@ -649,28 +649,38 @@ class TimelinesProject:
 
     def create_timeline_simulation(self, timeline_id):
         node = self.get_timeline_node(timeline_id)
+        config = self.get_timeline_simulation_config_from_timeline(timeline_id)
+        return TimelineSimulation(node.timeline, self._get_config_binary_path(config))
+
+    def change_timeline_simulation_config(self, timeline_id, new_config: TimelineSimulationConfig):
+        node = self.get_timeline_node(timeline_id)
+        head_point = node.head_point()
         timeline = node.timeline
-        if timeline.config.simulation_uuid is not None:
-            reg = self.get_registered_simulation(timeline.config.simulation_uuid)
-            sim_path = reg.get_simulation_binary_path()
-        else:
-            source = SimulationSource(timeline.config.source_path)
-            sim_path = source.get_binary_path()
-        return TimelineSimulation(timeline, sim_path)
+        old_config = self.get_timeline_simulation_config_from_timeline(timeline_id)
 
-    def change_timeline_simulation_uuid(self, timeline_id, uuid):
-        timeline = self.get_timeline_node(timeline_id).timeline
-        if uuid != timeline.config.simulation_uuid:
-            timeline.config.simulation_uuid = uuid
-            timeline.config.source_path = None
-            timeline.save()
+        head_point_path = head_point.point_file_path().resolve(True)
+        backup_path = head_point_path.with_suffix('.tmp')
 
-    def change_timeline_simulation_path(self, timeline_id, path):
-        timeline = self.get_timeline_node(timeline_id).timeline
-        if path != timeline.config.source_path:
-            timeline.config.simulation_uuid = None
-            timeline.config.source_path = path
-            timeline.save()
+        try:
+            shutil.copy2(str(head_point_path), str(backup_path))
+            old_sim_path = str(self._get_config_binary_path(old_config))
+            new_sim_path = str(self._get_config_binary_path(new_config))
+            SimulationProcess.simple_convert(str(backup_path), "binary", old_sim_path,
+                                             str(head_point_path), "binary", new_sim_path)
+
+            if new_config.uuid is not None:
+                timeline.config.simulation_uuid = new_config.uuid
+                timeline.config.source_path = None
+                timeline.save()
+            else:
+                timeline.config.simulation_uuid = None
+                timeline.config.source_path = new_config.source
+                timeline.save()
+        except Exception:
+            shutil.copy2(str(backup_path), str(head_point_path))
+            raise
+        finally:
+            Path(backup_path).unlink()
 
     def get_timeline_simulation_configs(self):
         for source in self.get_simulation_source_paths():
@@ -689,10 +699,18 @@ class TimelinesProject:
 
     def get_timeline_simulation_config_from_uuid(self, uuid):
         reg = self.get_registered_simulation(uuid)
-        return TimelineSimulationConfig(uuid, reg.get_simulation_binary_path())
+        return TimelineSimulationConfig(uuid, None)
 
     def get_timeline_simulation_config_from_source(self, source_path):
         if source_path not in self._simulation_source_paths:
             return None
 
         return TimelineSimulationConfig(None, source_path)
+
+    def _get_config_binary_path(self, config: TimelineSimulationConfig):
+        if config.uuid is not None:
+            reg = self.get_registered_simulation(config.uuid)
+            return reg.get_simulation_binary_path()
+        else:
+            source = SimulationSource(config.source)
+            return source.get_binary_path()

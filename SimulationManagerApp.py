@@ -100,7 +100,8 @@ class App:
         # Timeline Tab
         ui.createTimelineAtSelectionButton.clicked.connect(self._create_timeline_at_selection)
         ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
-        ui.timelineSimToUseComboBox.currentIndexChanged.connect(self._on_sim_to_use_combo_box_changed)
+        ui.convertToSimComboBox.currentIndexChanged.connect(self._on_convert_to_sim_combo_box_changed)
+        ui.convertToSimButton.clicked.connect(self._convert_to_selected_sim)
 
         # Simulation Registry Tab
         ui.addSimSourceButton.clicked.connect(self._add_sim_source)
@@ -206,8 +207,15 @@ class App:
         else:
             return None
 
+    def get_simulation_config_to_covert_to(self) -> Optional[sm.TimelineSimulationConfig]:
+        return self._ui.convertToSimComboBox.currentData(App._SimulationConfig)
+
     def get_selected_timeline_simulation_config(self) -> Optional[sm.TimelineSimulationConfig]:
-        return self._ui.timelineSimToUseComboBox.currentData(App._SimulationConfig)
+        selected_timeline_node = self.get_selected_timeline_node()
+        if selected_timeline_node is not None:
+            self._project.get_timeline_simulation_config_from_timeline(selected_timeline_node.timeline_id)
+        else:
+            return None
 
     def _on_application_quitting(self):
         for sim in self._simulations.values():
@@ -256,13 +264,11 @@ class App:
         self._on_timeline_tree_selected_item_changed()
         self._refresh_sim_registry_tab()
 
-        combo_box = self._ui.timelineSimToUseComboBox
-        combo_box.blockSignals(True)
+        combo_box = self._ui.convertToSimComboBox
         combo_box.clear()
         for config in self._project.get_timeline_simulation_configs():
             self._add_timeline_simulation_config_to_combo_box(config)
-        self._refresh_sim_to_use_combo_box()
-        combo_box.blockSignals(False)
+        self._refresh_convert_to_selected_sim_button()
 
     def _on_timeline_tree_selected_item_changed(self):
         ui = self._ui
@@ -271,19 +277,14 @@ class App:
 
         timeline_node = self.get_selected_timeline_node()
 
-        ui.timelineSimToUseComboBox.blockSignals(True)
         if timeline_node is not None:
-            config = self._project.get_timeline_simulation_config_from_timeline(timeline_node.timeline_id)
-            self._switch_timeline_simulation_config_combo_box_to_config(config)
             for point in timeline_node.points():
                 item = QtWidgets.QListWidgetItem(f"{point.tick}")
                 item.setData(App._PointRole, point)
                 ui.timelinePointList.addItem(item)
-        else:
-            self._switch_timeline_simulation_config_combo_box_to_config(None)
-        ui.timelineSimToUseComboBox.blockSignals(False)
 
-        self._refresh_sim_to_use_combo_box()
+        self._refresh_convert_to_selected_sim_button()
+        self._refresh_current_timeline_sim_label()
         self._refresh_simulation_tab()
 
     def _refresh_simulation_tab(self):
@@ -428,7 +429,7 @@ class App:
             timeline_node = self.get_selected_timeline_node()
             if timeline_node is not None:
                 self.start_simulation_process(timeline_node.head_point())
-        self._refresh_sim_to_use_combo_box()
+        self._refresh_convert_to_selected_sim_button()
 
     def _show_visualizer_for_current_timeline(self):
         sim = self.get_selected_timeline_simulation()
@@ -448,7 +449,7 @@ class App:
             sim.stop_process()
             del self._simulations[timeline_node.timeline_id]
             self._refresh_simulation_tab()
-            self._refresh_sim_to_use_combo_box()
+            self._refresh_convert_to_selected_sim_button()
 
     def _create_entity_on_selected_sim(self):
         sim = self.get_selected_timeline_simulation()
@@ -709,11 +710,9 @@ class App:
         item.setData(App._SimIdentifierRole, source.source_file_path)
         self._ui.simSourceList.addItem(item)
 
-        combo_box = self._ui.timelineSimToUseComboBox
+        combo_box = self._ui.convertToSimComboBox
         config = self._project.get_timeline_simulation_config_from_source(source.source_file_path)
-        combo_box.blockSignals(True)
         self._add_timeline_simulation_config_to_combo_box(config)
-        combo_box.blockSignals(False)
 
     def _on_selected_sim_source_changed(self):
         self._refresh_simulation_source_section()
@@ -726,11 +725,9 @@ class App:
             item.setData(App._SimIdentifierRole, uuid)
             self._ui.registeredSimList.addItem(item)
 
-            combo_box = self._ui.timelineSimToUseComboBox
+            combo_box = self._ui.convertToSimComboBox
             config = self._project.get_timeline_simulation_config_from_uuid(uuid)
-            combo_box.blockSignals(True)
             self._add_timeline_simulation_config_to_combo_box(config)
-            combo_box.blockSignals(False)
 
     def _delete_selected_sim_source(self):
         selected_source = self.get_selected_simulation_source()
@@ -760,12 +757,10 @@ class App:
             self._project.unregister_simulation(uuid)
             self._refresh_registered_sim_list()
             self._refresh_registered_sim_section()
-            combo_box = self._ui.timelineSimToUseComboBox
+            combo_box = self._ui.convertToSimComboBox
             config = self._project.get_timeline_simulation_config_from_uuid(uuid)
             index = combo_box.findData(str(config))
-            combo_box.blockSignals(True)
             combo_box.removeItem(index)
-            combo_box.blockSignals(False)
 
     def _can_change_timeline_simulation_config(self, node):
         if node is None:
@@ -775,24 +770,11 @@ class App:
         simulation_running = node.timeline_id in self._simulations
         return not (has_multiple_points or simulation_running)
 
-    def _refresh_sim_to_use_combo_box(self):
-        combo_box = self._ui.timelineSimToUseComboBox
-        selected_timeline_node = self.get_selected_timeline_node()
-        combo_box.setEnabled(self._can_change_timeline_simulation_config(selected_timeline_node))
-
-    def _on_sim_to_use_combo_box_changed(self, index):
-        selected_timeline_node = self.get_selected_timeline_node()
-        if self._can_change_timeline_simulation_config(selected_timeline_node):
-            config = self.get_selected_timeline_simulation_config()
-            if config is None:
-                self._project.change_timeline_simulation_uuid(selected_timeline_node.timeline_id, None)
-            elif config.uuid is not None:
-                self._project.change_timeline_simulation_uuid(selected_timeline_node.timeline_id, config.uuid)
-            else:
-                self._project.change_timeline_simulation_path(selected_timeline_node.timeline_id, config.source)
+    def _on_convert_to_sim_combo_box_changed(self, index):
+        self._refresh_convert_to_selected_sim_button()
 
     def _add_timeline_simulation_config_to_combo_box(self, config: sm.TimelineSimulationConfig):
-        combo_box = self._ui.timelineSimToUseComboBox
+        combo_box = self._ui.convertToSimComboBox
         if config.uuid is not None:
             index = combo_box.count()
         else:
@@ -801,15 +783,28 @@ class App:
         combo_box.insertItem(index, str(config), str(config))
         combo_box.setItemData(index, config, App._SimulationConfig)
 
-    def _switch_timeline_simulation_config_combo_box_to_config(self, config: Optional[sm.TimelineSimulationConfig]):
-        combo_box = self._ui.timelineSimToUseComboBox
-        if config is None:
-            combo_box.setCurrentIndex(-1)
+    def _refresh_current_timeline_sim_label(self):
+        label = self._ui.currentTimelineSimLabel
+        selected_timeline_node = self.get_selected_timeline_node()
+        if selected_timeline_node is None:
+            label.setText("N/A")
         else:
-            index = combo_box.findData(str(config))
-            if index == -1:
-                raise ValueError("Provided config does not exist in combo box.")
-            combo_box.setCurrentIndex(index)
+            config = self._project.get_timeline_simulation_config_from_timeline(selected_timeline_node.timeline_id)
+            if config is None:
+                label.setText("No simulation configured.")
+            else:
+                label.setText(str(config))
+
+    def _refresh_convert_to_selected_sim_button(self):
+        selected_timeline_node = self.get_selected_timeline_node()
+        self._ui.convertToSimButton.setEnabled(self._can_change_timeline_simulation_config(selected_timeline_node))
+
+    def _convert_to_selected_sim(self):
+        selected_timeline_node = self.get_selected_timeline_node()
+        if self._can_change_timeline_simulation_config(selected_timeline_node):
+            config = self.get_simulation_config_to_covert_to()
+            self._project.change_timeline_simulation_config(selected_timeline_node.timeline_id, config)
+            self._refresh_current_timeline_sim_label()
 
     def run(self):
         self._main_window.show()
