@@ -15,6 +15,28 @@ RpcError = grpc.RpcError
 class SimulationProcess:
     _simulation_server_path = r'.\SimulationServer\bin\x64\Release\netcoreapp3.1\SimulationServer.exe'
 
+    @staticmethod
+    def simple_convert(input_file: str,
+                       input_format: str,
+                       input_sim_path: str,
+                       output_file: str,
+                       output_format: str,
+                       output_sim_path: str = None):
+        args = []
+        args.append(SimulationProcess._simulation_server_path)
+        args.append('convert')
+        args.extend(('-i', input_file))
+        args.extend(('-if', input_format))
+        args.extend(('-is', input_sim_path))
+        args.extend(('-o', output_file))
+        args.extend(('-of', output_format))
+        if output_sim_path:
+            args.extend(('-os', output_sim_path))
+        process = Popen(args)
+        result = process.wait()
+        if result != 0:
+            raise RuntimeError("File conversion failed.")
+
     def __init__(self, simulation_library_path, event_state_writer):
         self._simulation_library_path = simulation_library_path
         self._event_state_writer = event_state_writer
