@@ -457,6 +457,7 @@ class TimelinesProject:
 
         new_timeline = Timeline.create_timeline(timeline_folder_path, derive_from_node.timeline, derive_from_tick)
         new_timeline_node = TimelineNode(derive_from_node, new_timeline_id, new_timeline)
+        self._timeline_nodes[new_timeline_id] = new_timeline_node
         self._next_new_timeline_id += 1
         return new_timeline_node
 
