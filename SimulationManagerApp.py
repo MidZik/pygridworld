@@ -1,3 +1,6 @@
+"""
+@author: Matt Idzik (MidZik)
+"""
 import SimulationManager as sm
 from GUI import create_gui_process
 import window
@@ -9,7 +12,6 @@ from collections import deque
 from weakref import WeakKeyDictionary
 from ts_server import Server
 from PySide2.QtWidgets import QFileDialog
-from uuid import UUID
 
 
 class _TaskRunner(QtCore.QRunnable):
