@@ -415,10 +415,10 @@ class SimulationSource:
             data = json.load(f)
             return json.dumps(data, indent=4)
 
-    def get_binary_name(self):
+    def get_simulation_binary_name(self):
         return Path(self.binary).name
 
-    def get_binary_path(self):
+    def get_simulation_binary_path(self):
         return (self.source_file_path.parent / self.binary).resolve(False)
 
 
@@ -721,14 +721,14 @@ class TimelinesProject:
         registration = SimulationRegistration.create_registration(
             registration_path,
             source.name,
-            source.get_binary_name(),
+            source.get_simulation_binary_name(),
             str(source.source_file_path),
             description
         )
 
         try:
             # after creating the registration, need to copy over the binaries + code
-            binary_path = source.get_binary_path().resolve(True)
+            binary_path = source.get_simulation_binary_path().resolve(True)
             shutil.copy2(str(binary_path), str(registration.get_bin_path()))
 
             # copying code depends on the archive method
@@ -827,4 +827,4 @@ class TimelinesProject:
             return reg.get_simulation_binary_path()
         else:
             source = SimulationSource(config.source)
-            return source.get_binary_path()
+            return source.get_simulation_binary_path()
