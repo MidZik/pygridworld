@@ -17,47 +17,6 @@ import subprocess
 import os
 
 
-class TimelineConfig:
-    @staticmethod
-    def create_from_path(path):
-        config = TimelineConfig()
-        config.load_from(path)
-        return config
-
-    def __init__(self):
-        self.simulation_uuid: Optional[UUID] = None
-        self.source_path: Optional[Path] = None
-
-    def load_from(self, path):
-        path = Path(path).resolve(True)
-        with path.open('r') as f:
-            data = json.load(f)
-            try:
-                self.simulation_uuid = UUID(data['simulation_uuid'])
-            except (LookupError, TypeError):
-                self.simulation_uuid = None
-            try:
-                self.source_path = Path(data['source_path'])
-            except LookupError:
-                self.source_path = None
-        self._validate()
-
-    def save_to(self, path):
-        self._validate()
-        path = Path(path).resolve()
-        data = {}
-        with path.open('w') as f:
-            if self.simulation_uuid:
-                data['simulation_uuid'] = str(self.simulation_uuid)
-            if self.source_path:
-                data['source_path'] = str(self.source_path)
-            json.dump(data, f)
-
-    def _validate(self):
-        if self.simulation_uuid is not None and self.source_path is not None:
-            raise ValueError("Timeline config has simulation UUID and Source Path configured simultaneously.")
-
-
 class Timeline:
     """
     Represents a timeline stored on disk
@@ -75,39 +34,31 @@ class Timeline:
         else:
             return None
 
-    @staticmethod
-    def create_timeline(path: Path, derive_from: Optional['Timeline'], derive_from_tick: Optional[int]):
-        """
-        Create and return a new timeline at a given location.
-        :param path: The folder that the timeline should be created in. (Must not exist)
-        :param derive_from: The timeline this timeline should be derived from
-        :param derive_from_tick: If derived from a timeline, the tick at which it should be derived from
-        :return: The newly created timeline.
-        """
-        path.mkdir()
-
-        if derive_from is not None:
-            derive_from.config.save_to(path / 'timeline.json')
-            derive_from_tick = derive_from_tick if derive_from_tick is not None else derive_from.tick_list[0]
-            derive_from_point_path = derive_from.get_point_file_path(derive_from_tick)
-            new_point_path = path / Timeline.point_file_name(derive_from_tick)
-            shutil.copyfile(str(derive_from_point_path), new_point_path)
-        else:
-            config = TimelineConfig()
-            config.save_to(path / 'timeline.json')
-            new_point_path = path / Timeline.point_file_name(0)
-            new_point_path.touch(exist_ok=False)
-
-        return Timeline(path)
-
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, simulation_binary_provider):
         """
         :param path: The folder the timeline data resides in.
         """
         self.path: Path = path.resolve(True)
-        self.config: TimelineConfig = TimelineConfig.create_from_path(self.get_config_file_path())
+        self.simulation_binary_provider = simulation_binary_provider
 
         self.tick_list: List[int] = []
+
+        self.refresh_tick_list()
+
+    def get_point_file_path(self, tick):
+        return self.path / Timeline.point_file_name(tick)
+
+    def head(self):
+        return self.tick_list[0]
+
+    def tail(self):
+        return self.tick_list[-1]
+
+    def get_simulation_binary_path(self):
+        return self.simulation_binary_provider.get_simulation_binary_path()
+
+    def refresh_tick_list(self):
+        self.tick_list = []
 
         for point_path in self.path.glob('*.point'):
             tick = Timeline.parse_point_file_name(point_path.name)
@@ -116,29 +67,13 @@ class Timeline:
 
         self.tick_list.sort()
 
-    def get_point_file_path(self, tick):
-        return self.path / Timeline.point_file_name(tick)
-
-    def get_config_file_path(self):
-        return self.path / 'timeline.json'
-
-    def save(self):
-        self.config.save_to(self.get_config_file_path())
-
-    def head(self):
-        return self.tick_list[0]
-
-    def tail(self):
-        return self.tick_list[-1]
-
 
 class TimelineSimulation:
     """
     Manages a SimulationRunnerProcess associated with a timeline.
     """
-    def __init__(self, timeline, simulation_binary_path):
+    def __init__(self, timeline):
         self.timeline: Timeline = timeline
-        self.simulation_binary_path = simulation_binary_path
 
         self._simulation_process: Optional[SimulationProcess] = None
 
@@ -216,7 +151,7 @@ class TimelineSimulation:
             raise ValueError('Attempted to start timeline simulation at an invalid tick.')
 
         self._simulation_process = SimulationProcess(
-            self.simulation_binary_path,
+            self.timeline.get_simulation_binary_path(),
             self._handle_event)
         self._simulation_process.start()
 
@@ -410,6 +345,9 @@ class SimulationSource:
         if self.archive_method not in [SimulationSource.AM_GIT_ARCHIVE_WORKING]:
             raise ValueError('Bad archive method in simulation source file.')
 
+    def __str__(self):
+        return f"Source: {self.source_file_path}"
+
     def get_json(self):
         with open(self.source_file_path) as f:
             data = json.load(f)
@@ -424,7 +362,8 @@ class SimulationSource:
 
 class SimulationRegistration:
     @staticmethod
-    def create_registration(registration_folder: Path, name: str, binary_name: str, created_from: str, description: str):
+    def create_registration(parent_folder: Path, uuid: UUID, name: str, binary_name: str, created_from: str, description: str):
+        registration_folder = parent_folder / str(uuid)
         registration_folder.mkdir()
 
         registration = SimulationRegistration(registration_folder)
@@ -449,6 +388,10 @@ class SimulationRegistration:
 
     def __init__(self, path):
         self.path: Path = Path(path).resolve(True)
+        self.uuid = UUID(self.path.name)
+
+    def __str__(self):
+        return f"Registration: {self.uuid}"
 
     def get_metadata_file_path(self):
         return self.path / "metadata.json"
@@ -485,21 +428,6 @@ class SimulationRegistration:
         return (self.get_bin_path() / binary_path).resolve(True)
 
 
-@dataclass(frozen=True)
-class TimelineSimulationConfig:
-    __slots__ = ('uuid', 'source')
-    uuid: Optional[UUID]
-    source: Optional[Path]
-
-    def __str__(self):
-        if self.uuid is not None:
-            return "UUID: " + str(self.uuid)
-        elif self.source is not None:
-            return "Source: " + str(self.source)
-        else:
-            return "No Config"
-
-
 class TimelinesProject:
     @staticmethod
     def create_new_project(project_root_dir):
@@ -517,9 +445,10 @@ class TimelinesProject:
     def load_project(project_root_dir):
         project = TimelinesProject(project_root_dir)
 
-        project.load_all_timelines()
         project.load_all_simulation_sources()
         project.load_simulation_registry()
+        project.load_all_timelines()
+
         project._project_file_handle = project.project_file_path.open('r+')
 
         return project
@@ -560,16 +489,32 @@ class TimelinesProject:
         new_timeline_id = self._next_new_timeline_id
 
         if derive_from is None:
+            parent_id = None
             derive_from_node = self.root_node
-            derive_from_tick = None
         else:
+            parent_id = derive_from.timeline_id()
             derive_from_node = derive_from.timeline_node
-            derive_from_tick = derive_from.tick
 
-        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, derive_from_node.timeline_id)
+        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, parent_id)
         timeline_folder_path = self.timelines_dir_path / timeline_folder_name
 
-        new_timeline = Timeline.create_timeline(timeline_folder_path, derive_from_node.timeline, derive_from_tick)
+        try:
+            timeline_folder_path.mkdir()
+
+            if derive_from is not None:
+                new_timeline = Timeline(timeline_folder_path, derive_from.timeline().simulation_binary_provider)
+                self._save_timeline(new_timeline)
+                shutil.copy(str(derive_from.point_file_path()), str(new_timeline.get_point_file_path(derive_from.tick)))
+                new_timeline.refresh_tick_list()
+            else:
+                new_timeline = Timeline(timeline_folder_path, None)
+                self._save_timeline(new_timeline)
+                new_timeline.get_point_file_path(0).touch(exist_ok=False)
+                new_timeline.refresh_tick_list()
+        except Exception:
+            shutil.rmtree(timeline_folder_path)
+            raise
+
         new_timeline_node = TimelineNode(derive_from_node, new_timeline_id, new_timeline)
         self._timeline_nodes[new_timeline_id] = new_timeline_node
         self._next_new_timeline_id += 1
@@ -619,7 +564,7 @@ class TimelinesProject:
                 print(f"WARNING: Improperly formatted folder found in timelines dir '{timeline_path.name}'.")
                 continue
 
-            timeline = Timeline(timeline_path)
+            timeline = self._load_timeline(timeline_path)
 
             timeline_children[parent_id].append((timeline_id, timeline))
             largest_loaded_timeline_id = max(largest_loaded_timeline_id, timeline_id)
@@ -706,7 +651,7 @@ class TimelinesProject:
             self._simulation_registry[reg_id] = SimulationRegistration(dir_path)
 
     def get_registered_simulations(self):
-        yield from self._simulation_registry.items()
+        yield from self._simulation_registry.values()
 
     def get_registered_simulation(self, uuid) -> SimulationRegistration:
         return self._simulation_registry[uuid]
@@ -717,9 +662,9 @@ class TimelinesProject:
             # duplicate prevention
             uuid = uuid4()
 
-        registration_path = self.simulation_registry_path / str(uuid)
         registration = SimulationRegistration.create_registration(
-            registration_path,
+            self.simulation_registry_path,
+            uuid,
             source.name,
             source.get_simulation_binary_name(),
             str(source.source_file_path),
@@ -752,7 +697,7 @@ class TimelinesProject:
             shutil.rmtree(registration.path)
             raise
 
-        return uuid, registration
+        return registration
 
     def unregister_simulation(self, uuid):
         registration = self._simulation_registry[uuid]
@@ -763,68 +708,70 @@ class TimelinesProject:
 
     def create_timeline_simulation(self, timeline_id):
         node = self.get_timeline_node(timeline_id)
-        config = self.get_timeline_simulation_config_from_timeline(timeline_id)
-        return TimelineSimulation(node.timeline, self._get_config_binary_path(config))
+        return TimelineSimulation(node.timeline)
 
-    def change_timeline_simulation_config(self, timeline_id, new_config: TimelineSimulationConfig):
+    def change_timeline_simulation_provider(self, timeline_id, new_simulation_provider):
         node = self.get_timeline_node(timeline_id)
         head_point = node.head_point()
         timeline = node.timeline
-        old_config = self.get_timeline_simulation_config_from_timeline(timeline_id)
 
         head_point_path = head_point.point_file_path().resolve(True)
         backup_path = head_point_path.with_suffix('.tmp')
 
         try:
             shutil.copy2(str(head_point_path), str(backup_path))
-            old_sim_path = str(self._get_config_binary_path(old_config))
-            new_sim_path = str(self._get_config_binary_path(new_config))
+            old_sim_path = str(timeline.get_simulation_binary_path())
+            new_sim_path = str(new_simulation_provider.get_simulation_binary_path())
             SimulationProcess.simple_convert(str(backup_path), "binary", old_sim_path,
                                              str(head_point_path), "binary", new_sim_path)
 
-            if new_config.uuid is not None:
-                timeline.config.simulation_uuid = new_config.uuid
-                timeline.config.source_path = None
-                timeline.save()
-            else:
-                timeline.config.simulation_uuid = None
-                timeline.config.source_path = new_config.source
-                timeline.save()
+            timeline.simulation_binary_provider = new_simulation_provider
+            self._save_timeline(timeline)
         except Exception:
             shutil.copy2(str(backup_path), str(head_point_path))
             raise
         finally:
             Path(backup_path).unlink()
 
-    def get_timeline_simulation_configs(self):
+    def get_all_simulation_providers(self):
         for source in self.get_simulation_source_paths():
-            yield TimelineSimulationConfig(None, source)
-        for uuid, reg in self.get_registered_simulations():
-            yield TimelineSimulationConfig(uuid, None)
+            yield SimulationSource(source)
+        yield from self.get_registered_simulations()
 
-    def get_timeline_simulation_config_from_timeline(self, timeline_id):
-        node = self.get_timeline_node(timeline_id)
-        timeline = node.timeline
-        sim_uuid = timeline.config.simulation_uuid
-        if sim_uuid is not None:
-            return self.get_timeline_simulation_config_from_uuid(sim_uuid)
-        else:
-            return self.get_timeline_simulation_config_from_source(timeline.config.source_path)
+    def _save_timeline(self, timeline: Timeline):
+        if timeline.path.parent != self.timelines_dir_path:
+            raise ValueError("Provided timeline node has invalid path data")
 
-    def get_timeline_simulation_config_from_uuid(self, uuid):
-        reg = self.get_registered_simulation(uuid)
-        return TimelineSimulationConfig(uuid, None)
+        timeline_config_path = (timeline.path / 'timeline.json').resolve()
+        data = {}
+        sim_binary_provider = timeline.simulation_binary_provider
+        with timeline_config_path.open('w') as f:
+            if isinstance(sim_binary_provider, SimulationRegistration):
+                data['simulation_uuid'] = str(timeline.simulation_binary_provider.uuid)
+            elif isinstance(sim_binary_provider, SimulationSource):
+                data['source_path'] = str(sim_binary_provider.source_file_path)
+            json.dump(data, f)
 
-    def get_timeline_simulation_config_from_source(self, source_path):
-        if source_path not in self._simulation_source_paths:
-            return None
+    def _load_timeline(self, timeline_path):
+        if timeline_path.parent != self.timelines_dir_path:
+            raise ValueError("Provided timeline path is not part of project")
 
-        return TimelineSimulationConfig(None, source_path)
+        timeline_config_path = (timeline_path / 'timeline.json').resolve(True)
+        with timeline_config_path.open('r') as f:
+            data = json.load(f)
 
-    def _get_config_binary_path(self, config: TimelineSimulationConfig):
-        if config.uuid is not None:
-            reg = self.get_registered_simulation(config.uuid)
-            return reg.get_simulation_binary_path()
-        else:
-            source = SimulationSource(config.source)
-            return source.get_simulation_binary_path()
+            if 'simulation_uuid' in data and 'source_path' in data:
+                raise ValueError("Timeline configured with both simulation uuid and source path.")
+
+            if 'simulation_uuid' in data:
+                uuid = UUID(data['simulation_uuid'])
+                simulation_binary_provider = self.get_registered_simulation(uuid)
+            elif 'source_path' in data:
+                source_path = Path(data['source_path'])
+                if source_path not in self._simulation_source_paths:
+                    raise ValueError("Timeline configured with source path that isn't part of the project.")
+                simulation_binary_provider = SimulationSource(source_path)
+            else:
+                simulation_binary_provider = None
+
+        return Timeline(timeline_path, simulation_binary_provider)

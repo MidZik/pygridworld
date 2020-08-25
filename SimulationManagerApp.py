@@ -49,8 +49,9 @@ class App:
     _PointRole = QtCore.Qt.UserRole + 0
     _TimelineTreeNodeRole = QtCore.Qt.UserRole + 1
     _SimIdentifierRole = QtCore.Qt.UserRole + 2
+    _SimulationRegistration = QtCore.Qt.UserRole + 0
 
-    _SimulationConfig = QtCore.Qt.UserRole + 1
+    _SimulationBinaryProvider = QtCore.Qt.UserRole + 1
 
     def __init__(self, argv):
         self._app = QtWidgets.QApplication(argv)
@@ -201,23 +202,16 @@ class App:
         else:
             return None
 
-    def get_selected_registration_uuid(self):
+    def get_selected_simulation_registration(self):
         items = self._ui.registeredSimList.selectedItems()
 
         if items:
-            return items[0].data(App._SimIdentifierRole)
+            return items[0].data(App._SimulationRegistration)
         else:
             return None
 
-    def get_simulation_config_to_covert_to(self) -> Optional[sm.TimelineSimulationConfig]:
-        return self._ui.convertToSimComboBox.currentData(App._SimulationConfig)
-
-    def get_selected_timeline_simulation_config(self) -> Optional[sm.TimelineSimulationConfig]:
-        selected_timeline_node = self.get_selected_timeline_node()
-        if selected_timeline_node is not None:
-            self._project.get_timeline_simulation_config_from_timeline(selected_timeline_node.timeline_id)
-        else:
-            return None
+    def get_sim_bin_provider_to_convert_to(self):
+        return self._ui.convertToSimComboBox.currentData(App._SimulationBinaryProvider)
 
     def _on_application_quitting(self):
         for sim in self._simulations.values():
@@ -268,8 +262,8 @@ class App:
 
         combo_box = self._ui.convertToSimComboBox
         combo_box.clear()
-        for config in self._project.get_timeline_simulation_configs():
-            self._add_timeline_simulation_config_to_combo_box(config)
+        for config in self._project.get_all_simulation_providers():
+            self._add_timeline_simulation_provider_to_combo_box(config)
         self._refresh_convert_to_selected_sim_button()
 
     def _on_timeline_tree_selected_item_changed(self):
@@ -685,14 +679,14 @@ class App:
     def _refresh_registered_sim_list(self):
         ui = self._ui
         ui.registeredSimList.clear()
-        for uuid, reg in self._project.get_registered_simulations():
-            item = QtWidgets.QListWidgetItem(str(uuid))
-            item.setData(App._SimIdentifierRole, uuid)
+        for reg in self._project.get_registered_simulations():
+            item = QtWidgets.QListWidgetItem(str(reg.uuid))
+            item.setData(App._SimulationRegistration, reg)
             ui.registeredSimList.addItem(item)
 
     def _refresh_registered_sim_section(self):
         ui = self._ui
-        uuid = self.get_selected_registration_uuid()
+        uuid = self.get_selected_simulation_registration()
         if uuid:
             selected_reg = self._project.get_registered_simulation(uuid)
             ui.registeredSimDescriptionTextEdit.setPlainText(selected_reg.get_description())
@@ -713,8 +707,7 @@ class App:
         self._ui.simSourceList.addItem(item)
 
         combo_box = self._ui.convertToSimComboBox
-        config = self._project.get_timeline_simulation_config_from_source(source.source_file_path)
-        self._add_timeline_simulation_config_to_combo_box(config)
+        self._add_timeline_simulation_provider_to_combo_box(source)
 
     def _on_selected_sim_source_changed(self):
         self._refresh_simulation_source_section()
@@ -722,14 +715,12 @@ class App:
     def _register_from_selected_sim_source(self):
         selected_source = self.get_selected_simulation_source()
         if selected_source:
-            uuid, reg = self._project.register_simulation(selected_source)
-            item = QtWidgets.QListWidgetItem(str(uuid))
-            item.setData(App._SimIdentifierRole, uuid)
+            reg = self._project.register_simulation(selected_source)
+            item = QtWidgets.QListWidgetItem(str(reg.uuid))
+            item.setData(App._SimulationRegistration, reg)
             self._ui.registeredSimList.addItem(item)
 
-            combo_box = self._ui.convertToSimComboBox
-            config = self._project.get_timeline_simulation_config_from_uuid(uuid)
-            self._add_timeline_simulation_config_to_combo_box(config)
+            self._add_timeline_simulation_provider_to_combo_box(reg)
 
     def _delete_selected_sim_source(self):
         selected_source = self.get_selected_simulation_source()
@@ -742,26 +733,25 @@ class App:
         self._refresh_registered_sim_section()
 
     def _save_registered_sim_description(self):
-        uuid = self.get_selected_registration_uuid()
+        uuid = self.get_selected_simulation_registration()
         if uuid:
             selected_reg = self._project.get_registered_simulation(uuid)
             selected_reg.set_description(self._ui.registeredSimDescriptionTextEdit.toPlainText())
 
     def _discard_registered_sim_description(self):
-        uuid = self.get_selected_registration_uuid()
+        uuid = self.get_selected_simulation_registration()
         if uuid:
             selected_reg = self._project.get_registered_simulation(uuid)
             self._ui.registeredSimDescriptionTextEdit.setPlainText(selected_reg.get_description())
 
     def _unregister_selected_sim_registration(self):
-        uuid = self.get_selected_registration_uuid()
-        if uuid:
-            self._project.unregister_simulation(uuid)
+        reg = self.get_selected_simulation_registration()
+        if reg:
+            self._project.unregister_simulation(reg.uuid)
             self._refresh_registered_sim_list()
             self._refresh_registered_sim_section()
             combo_box = self._ui.convertToSimComboBox
-            config = self._project.get_timeline_simulation_config_from_uuid(uuid)
-            index = combo_box.findData(str(config))
+            index = combo_box.findData(str(reg))
             combo_box.removeItem(index)
 
     def _can_change_timeline_simulation_config(self, node):
@@ -775,15 +765,15 @@ class App:
     def _on_convert_to_sim_combo_box_changed(self, index):
         self._refresh_convert_to_selected_sim_button()
 
-    def _add_timeline_simulation_config_to_combo_box(self, config: sm.TimelineSimulationConfig):
+    def _add_timeline_simulation_provider_to_combo_box(self, simulation_provider):
         combo_box = self._ui.convertToSimComboBox
-        if config.uuid is not None:
+        if isinstance(simulation_provider, sm.SimulationRegistration):
             index = combo_box.count()
         else:
             index = 0
 
-        combo_box.insertItem(index, str(config), str(config))
-        combo_box.setItemData(index, config, App._SimulationConfig)
+        combo_box.insertItem(index, str(simulation_provider), str(simulation_provider))
+        combo_box.setItemData(index, simulation_provider, App._SimulationBinaryProvider)
 
     def _refresh_current_timeline_sim_label(self):
         label = self._ui.currentTimelineSimLabel
@@ -791,11 +781,11 @@ class App:
         if selected_timeline_node is None:
             label.setText("N/A")
         else:
-            config = self._project.get_timeline_simulation_config_from_timeline(selected_timeline_node.timeline_id)
-            if config is None:
+            sim_bin_provider = selected_timeline_node.timeline.simulation_binary_provider
+            if sim_bin_provider is None:
                 label.setText("No simulation configured.")
             else:
-                label.setText(str(config))
+                label.setText(str(sim_bin_provider))
 
     def _refresh_convert_to_selected_sim_button(self):
         selected_timeline_node = self.get_selected_timeline_node()
@@ -804,8 +794,8 @@ class App:
     def _convert_to_selected_sim(self):
         selected_timeline_node = self.get_selected_timeline_node()
         if self._can_change_timeline_simulation_config(selected_timeline_node):
-            config = self.get_simulation_config_to_covert_to()
-            self._project.change_timeline_simulation_config(selected_timeline_node.timeline_id, config)
+            config = self.get_sim_bin_provider_to_convert_to()
+            self._project.change_timeline_simulation_provider(selected_timeline_node.timeline_id, config)
             self._refresh_current_timeline_sim_label()
 
     def run(self):
