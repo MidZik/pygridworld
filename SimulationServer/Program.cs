@@ -91,7 +91,6 @@ namespace SimulationServer
                     .Accepts(v => v.Values("json", "binary"));
 
                 var input = convertBinCmd.Option("-i|--input <FILE>", "The files to convert.", CommandOptionType.MultipleValue)
-                    .IsRequired()
                     .Accepts(v => v.ExistingFile());
 
                 var input_simulation = convertBinCmd.Option("-is|--input_sim <SIMULATION>", "The simulation the input file was generated from.", CommandOptionType.SingleValue)
@@ -108,8 +107,20 @@ namespace SimulationServer
                 var output_simulation = convertBinCmd.Option("-os|--output_sim <SIMULATION>", "The simulation to generate the output from. If not provided, will use input simulation.", CommandOptionType.SingleValue)
                     .Accepts(v => v.ExistingFile());
 
+                var io_from_input = convertBinCmd.Option("-iofi|--io_from_input", "If specified, the input and output files will be read from the input stream in pairs of lines.", CommandOptionType.NoValue);
+
                 convertBinCmd.OnValidate((context) =>
                 {
+                    if (io_from_input.HasValue() && (input.HasValue() || output.HasValue()))
+                    {
+                        return new ValidationResult("Cannot combine io_from_input flag with input or output options.");
+                    }
+
+                    if (!(io_from_input.HasValue() ^ input.HasValue()))
+                    {
+                        return new ValidationResult("Either --io_from_input or --input must be provided.");
+                    }
+
                     if (output.HasValue())
                     {
                         if (output.Values.Count != input.Values.Count)
@@ -132,6 +143,25 @@ namespace SimulationServer
                         if (output_sim_path != input_sim_path)
                         {
                             output_wrapper = new SimulationWrapper(output_sim_path);
+                        }
+                    }
+
+                    if (io_from_input.HasValue())
+                    {
+                        while(true)
+                        {
+                            string read_input = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(read_input))
+                            {
+                                break;
+                            }
+                            string read_output = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(read_output))
+                            {
+                                break;
+                            }
+                            input.Values.Add(read_input);
+                            output.Values.Add(read_output);
                         }
                     }
 

@@ -39,6 +39,33 @@ class SimulationProcess:
         if result != 0:
             raise RuntimeError("File conversion failed.")
 
+    @staticmethod
+    def convert_multiple(input_files,
+                         input_format: str,
+                         input_sim_path: str,
+                         output_files,
+                         output_format: str,
+                         output_sim_path: str = None):
+        args = []
+        args.append(SimulationProcess._simulation_server_path)
+        args.append('convert')
+        args.extend(('-if', input_format))
+        args.extend(('-is', input_sim_path))
+        args.extend(('-of', output_format))
+        args.append('-iofi')
+        if output_sim_path:
+            args.extend(('-os', output_sim_path))
+        process = Popen(args, stdin=PIPE, text=True)
+        for i, o in zip(input_files, output_files):
+            process.stdin.write(i + "\n")
+            process.stdin.write(o + "\n")
+            process.stdin.flush()
+        process.stdin.write("\n")
+        process.stdin.flush()
+        result = process.wait()
+        if result != 0:
+            raise RuntimeError("File conversions failed.")
+
     def __init__(self, simulation_library_path, event_state_writer):
         self._simulation_library_path = simulation_library_path
         self._event_state_writer = event_state_writer
