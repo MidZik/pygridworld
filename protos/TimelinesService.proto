@@ -10,7 +10,7 @@ message TimelineTicksRequest {
 }
 
 message TimelineTicksResponse {
-    repeated int64 tick = 1;
+    repeated int64 ticks = 1;
 }
 
 message TimelineDataRequest {
