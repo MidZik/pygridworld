@@ -27,8 +27,32 @@ class Client:
         response = stub.GetTimelineTicks(ts.TimelineTicksRequest(timeline_id=timeline_id))
         return response.ticks
 
-    def get_timeline_data(self, timeline_id, tick):
+    def get_timeline_data(self, timeline_id, *, ticks=None, start_tick=None, end_tick=None):
         stub = ts_grpc.TimelineServiceStub(self._channel)
-        request = ts.TimelineDataRequest(timeline_id=timeline_id, tick=tick)
-        response = stub.GetTimelineData(request)
-        return response.data
+        request = None
+        if ticks is not None:
+            tick_list = ts.TickList(ticks=ticks)
+            request = ts.TimelineDataRequest(timeline_id=timeline_id, tick_list=tick_list)
+        elif start_tick is not None:
+            tick_range = ts.TickRange(start_tick=start_tick, end_tick=end_tick)
+            request = ts.TimelineDataRequest(timeline_id=timeline_id, tick_range=tick_range)
+        responses = stub.GetTimelineData(request)
+        for response in responses:
+            yield response.tick, response.data
+
+    def get_timeline_json(self, timeline_id, *, ticks=None, start_tick=None, end_tick=None):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = None
+        if ticks is not None:
+            tick_list = ts.TickList(ticks=ticks)
+            request = ts.TimelineJsonRequest(timeline_id=timeline_id, tick_list=tick_list)
+        elif start_tick is not None:
+            if end_tick is None:
+                end_tick = -1
+            tick_range = ts.TickRange(start_tick=start_tick, end_tick=end_tick)
+            request = ts.TimelineJsonRequest(timeline_id=timeline_id, tick_range=tick_range)
+        else:
+            raise ValueError("Parameters incorrect.")
+        responses = stub.GetTimelineJson(request)
+        for response in responses:
+            yield response.tick, response.json

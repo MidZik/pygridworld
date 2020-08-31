@@ -55,8 +55,6 @@ class ScoresFigure:
 
 def make_score_plotter(timeline_id, address='127.0.0.1:4969'):
     with ts_client.Client(address) as client:
-        ticks = client.get_timeline_ticks(timeline_id)
         pop_plotter = ScoresFigure(timeline_id)
-        for tick in ticks:
-            state = client.get_timeline_data(timeline_id, tick)
+        for tick, state in client.get_timeline_json(timeline_id, start_tick=0):
             pop_plotter.add_json_data(state)

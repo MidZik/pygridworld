@@ -1,8 +1,20 @@
 syntax = "proto3";
 
+// python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
+
 service TimelineService {
     rpc GetTimelineTicks (TimelineTicksRequest) returns (TimelineTicksResponse) {}
-    rpc GetTimelineData (TimelineDataRequest) returns (TimelineDataResponse) {}
+    rpc GetTimelineData (TimelineDataRequest) returns (stream TimelineDataResponse) {}
+    rpc GetTimelineJson (TimelineJsonRequest) returns (stream TimelineJsonResponse) {}
+}
+
+message TickList {
+    repeated int64 ticks = 1;
+}
+
+message TickRange {
+    int64 start_tick = 1;
+    int64 end_tick = 2;
 }
 
 message TimelineTicksRequest {
@@ -10,14 +22,31 @@ message TimelineTicksRequest {
 }
 
 message TimelineTicksResponse {
-    repeated int64 ticks = 1;
+    TickList tick_list = 1;
 }
 
 message TimelineDataRequest {
     int32 timeline_id = 1;
-    int64 tick = 2;
+    oneof tick_option {
+        TickList tick_list = 2;
+        TickRange tick_range = 3;
+    }
 }
 
 message TimelineDataResponse {
-    bytes data = 1;
+    int64 tick = 1;
+    bytes data = 2;
+}
+
+message TimelineJsonRequest {
+    int32 timeline_id = 1;
+    oneof tick_option {
+        TickList tick_list = 2;
+        TickRange tick_range = 3;
+    }
+}
+
+message TimelineJsonResponse {
+    int64 tick = 1;
+    string json = 2;
 }

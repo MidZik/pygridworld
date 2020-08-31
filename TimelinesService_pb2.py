@@ -19,10 +19,79 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x16TimelinesService.proto\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"%\n\x15TimelineTicksResponse\x12\x0c\n\x04tick\x18\x01 \x03(\x03\"8\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"$\n\x14TimelineDataResponse\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x32\x98\x01\n\x0fTimelineService\x12\x43\n\x10GetTimelineTicks\x12\x15.TimelineTicksRequest\x1a\x16.TimelineTicksResponse\"\x00\x12@\n\x0fGetTimelineData\x12\x14.TimelineDataRequest\x1a\x15.TimelineDataResponse\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x16TimelinesService.proto\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"5\n\x15TimelineTicksResponse\x12\x1c\n\ttick_list\x18\x01 \x01(\x0b\x32\t.TickList\"8\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"{\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x1e\n\ttick_list\x18\x02 \x01(\x0b\x32\t.TickListH\x00\x12 \n\ntick_range\x18\x03 \x01(\x0b\x32\n.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t2\xde\x01\n\x0fTimelineService\x12\x43\n\x10GetTimelineTicks\x12\x15.TimelineTicksRequest\x1a\x16.TimelineTicksResponse\"\x00\x12\x42\n\x0fGetTimelineData\x12\x14.TimelineDataRequest\x1a\x15.TimelineDataResponse\"\x00\x30\x01\x12\x42\n\x0fGetTimelineJson\x12\x14.TimelineJsonRequest\x1a\x15.TimelineJsonResponse\"\x00\x30\x01\x62\x06proto3')
 )
 
 
+
+
+_TICKLIST = _descriptor.Descriptor(
+  name='TickList',
+  full_name='TickList',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='ticks', full_name='TickList.ticks', index=0,
+      number=1, type=3, cpp_type=2, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=26,
+  serialized_end=51,
+)
+
+
+_TICKRANGE = _descriptor.Descriptor(
+  name='TickRange',
+  full_name='TickRange',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='start_tick', full_name='TickRange.start_tick', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='end_tick', full_name='TickRange.end_tick', index=1,
+      number=2, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=53,
+  serialized_end=102,
+)
 
 
 _TIMELINETICKSREQUEST = _descriptor.Descriptor(
@@ -51,8 +120,8 @@ _TIMELINETICKSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=26,
-  serialized_end=69,
+  serialized_start=104,
+  serialized_end=147,
 )
 
 
@@ -64,9 +133,9 @@ _TIMELINETICKSRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='ticks', full_name='TimelineTicksResponse.ticks', index=0,
-      number=1, type=3, cpp_type=2, label=3,
-      has_default_value=False, default_value=[],
+      name='tick_list', full_name='TimelineTicksResponse.tick_list', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -82,8 +151,8 @@ _TIMELINETICKSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=71,
-  serialized_end=108,
+  serialized_start=149,
+  serialized_end=202,
 )
 
 
@@ -120,8 +189,8 @@ _TIMELINEDATAREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=110,
-  serialized_end=166,
+  serialized_start=204,
+  serialized_end=260,
 )
 
 
@@ -133,8 +202,15 @@ _TIMELINEDATARESPONSE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='data', full_name='TimelineDataResponse.data', index=0,
-      number=1, type=12, cpp_type=9, label=1,
+      name='tick', full_name='TimelineDataResponse.tick', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data', full_name='TimelineDataResponse.data', index=1,
+      number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -151,15 +227,128 @@ _TIMELINEDATARESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=168,
-  serialized_end=204,
+  serialized_start=262,
+  serialized_end=312,
 )
 
+
+_TIMELINEJSONREQUEST = _descriptor.Descriptor(
+  name='TimelineJsonRequest',
+  full_name='TimelineJsonRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='TimelineJsonRequest.timeline_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tick_list', full_name='TimelineJsonRequest.tick_list', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tick_range', full_name='TimelineJsonRequest.tick_range', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='tick_option', full_name='TimelineJsonRequest.tick_option',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=314,
+  serialized_end=437,
+)
+
+
+_TIMELINEJSONRESPONSE = _descriptor.Descriptor(
+  name='TimelineJsonResponse',
+  full_name='TimelineJsonResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='TimelineJsonResponse.tick', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='json', full_name='TimelineJsonResponse.json', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=439,
+  serialized_end=489,
+)
+
+_TIMELINETICKSRESPONSE.fields_by_name['tick_list'].message_type = _TICKLIST
+_TIMELINEJSONREQUEST.fields_by_name['tick_list'].message_type = _TICKLIST
+_TIMELINEJSONREQUEST.fields_by_name['tick_range'].message_type = _TICKRANGE
+_TIMELINEJSONREQUEST.oneofs_by_name['tick_option'].fields.append(
+  _TIMELINEJSONREQUEST.fields_by_name['tick_list'])
+_TIMELINEJSONREQUEST.fields_by_name['tick_list'].containing_oneof = _TIMELINEJSONREQUEST.oneofs_by_name['tick_option']
+_TIMELINEJSONREQUEST.oneofs_by_name['tick_option'].fields.append(
+  _TIMELINEJSONREQUEST.fields_by_name['tick_range'])
+_TIMELINEJSONREQUEST.fields_by_name['tick_range'].containing_oneof = _TIMELINEJSONREQUEST.oneofs_by_name['tick_option']
+DESCRIPTOR.message_types_by_name['TickList'] = _TICKLIST
+DESCRIPTOR.message_types_by_name['TickRange'] = _TICKRANGE
 DESCRIPTOR.message_types_by_name['TimelineTicksRequest'] = _TIMELINETICKSREQUEST
 DESCRIPTOR.message_types_by_name['TimelineTicksResponse'] = _TIMELINETICKSRESPONSE
 DESCRIPTOR.message_types_by_name['TimelineDataRequest'] = _TIMELINEDATAREQUEST
 DESCRIPTOR.message_types_by_name['TimelineDataResponse'] = _TIMELINEDATARESPONSE
+DESCRIPTOR.message_types_by_name['TimelineJsonRequest'] = _TIMELINEJSONREQUEST
+DESCRIPTOR.message_types_by_name['TimelineJsonResponse'] = _TIMELINEJSONRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+TickList = _reflection.GeneratedProtocolMessageType('TickList', (_message.Message,), dict(
+  DESCRIPTOR = _TICKLIST,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:TickList)
+  ))
+_sym_db.RegisterMessage(TickList)
+
+TickRange = _reflection.GeneratedProtocolMessageType('TickRange', (_message.Message,), dict(
+  DESCRIPTOR = _TICKRANGE,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:TickRange)
+  ))
+_sym_db.RegisterMessage(TickRange)
 
 TimelineTicksRequest = _reflection.GeneratedProtocolMessageType('TimelineTicksRequest', (_message.Message,), dict(
   DESCRIPTOR = _TIMELINETICKSREQUEST,
@@ -189,6 +378,20 @@ TimelineDataResponse = _reflection.GeneratedProtocolMessageType('TimelineDataRes
   ))
 _sym_db.RegisterMessage(TimelineDataResponse)
 
+TimelineJsonRequest = _reflection.GeneratedProtocolMessageType('TimelineJsonRequest', (_message.Message,), dict(
+  DESCRIPTOR = _TIMELINEJSONREQUEST,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:TimelineJsonRequest)
+  ))
+_sym_db.RegisterMessage(TimelineJsonRequest)
+
+TimelineJsonResponse = _reflection.GeneratedProtocolMessageType('TimelineJsonResponse', (_message.Message,), dict(
+  DESCRIPTOR = _TIMELINEJSONRESPONSE,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:TimelineJsonResponse)
+  ))
+_sym_db.RegisterMessage(TimelineJsonResponse)
+
 
 
 _TIMELINESERVICE = _descriptor.ServiceDescriptor(
@@ -197,8 +400,8 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=207,
-  serialized_end=359,
+  serialized_start=492,
+  serialized_end=714,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTimelineTicks',
@@ -216,6 +419,15 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_TIMELINEDATAREQUEST,
     output_type=_TIMELINEDATARESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetTimelineJson',
+    full_name='TimelineService.GetTimelineJson',
+    index=2,
+    containing_service=None,
+    input_type=_TIMELINEJSONREQUEST,
+    output_type=_TIMELINEJSONRESPONSE,
     serialized_options=None,
   ),
 ])

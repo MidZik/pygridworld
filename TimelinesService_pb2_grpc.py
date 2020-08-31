@@ -5,8 +5,9 @@ import TimelinesService_pb2 as TimelinesService__pb2
 
 
 class TimelineServiceStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
+
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -19,16 +20,22 @@ class TimelineServiceStub(object):
         request_serializer=TimelinesService__pb2.TimelineTicksRequest.SerializeToString,
         response_deserializer=TimelinesService__pb2.TimelineTicksResponse.FromString,
         )
-    self.GetTimelineData = channel.unary_unary(
+    self.GetTimelineData = channel.unary_stream(
         '/TimelineService/GetTimelineData',
         request_serializer=TimelinesService__pb2.TimelineDataRequest.SerializeToString,
         response_deserializer=TimelinesService__pb2.TimelineDataResponse.FromString,
         )
+    self.GetTimelineJson = channel.unary_stream(
+        '/TimelineService/GetTimelineJson',
+        request_serializer=TimelinesService__pb2.TimelineJsonRequest.SerializeToString,
+        response_deserializer=TimelinesService__pb2.TimelineJsonResponse.FromString,
+        )
 
 
 class TimelineServiceServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
+
+  """
 
   def GetTimelineTicks(self, request, context):
     # missing associated documentation comment in .proto file
@@ -44,6 +51,13 @@ class TimelineServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def GetTimelineJson(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_TimelineServiceServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -52,10 +66,15 @@ def add_TimelineServiceServicer_to_server(servicer, server):
           request_deserializer=TimelinesService__pb2.TimelineTicksRequest.FromString,
           response_serializer=TimelinesService__pb2.TimelineTicksResponse.SerializeToString,
       ),
-      'GetTimelineData': grpc.unary_unary_rpc_method_handler(
+      'GetTimelineData': grpc.unary_stream_rpc_method_handler(
           servicer.GetTimelineData,
           request_deserializer=TimelinesService__pb2.TimelineDataRequest.FromString,
           response_serializer=TimelinesService__pb2.TimelineDataResponse.SerializeToString,
+      ),
+      'GetTimelineJson': grpc.unary_stream_rpc_method_handler(
+          servicer.GetTimelineJson,
+          request_deserializer=TimelinesService__pb2.TimelineJsonRequest.FromString,
+          response_serializer=TimelinesService__pb2.TimelineJsonResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
