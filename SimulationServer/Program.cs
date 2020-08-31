@@ -6,12 +6,41 @@ using System.IO;
 using System.Text;
 using System.Diagnostics;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace SimulationServer
 {
     
     class Program
     {
+        private static IEnumerable<Tuple<string, string>> IterateOptions(CommandOption input, CommandOption output)
+        {
+            for(int i = 0; i < input.Values.Count; ++i)
+            {
+                string in_file = input.Values[i];
+                string out_file = null;
+                if (output.HasValue())
+                {
+                    out_file = output.Values[i];
+                }
+                yield return Tuple.Create(in_file, out_file);
+            }
+        }
+
+        private static IEnumerable<Tuple<string, string>> IterateInputStream()
+        {
+            while (true)
+            {
+                string read_input = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(read_input))
+                {
+                    yield break;
+                }
+                string read_output = Console.ReadLine();
+                yield return Tuple.Create(read_input, read_output);
+            }
+        }
+
         static int Main(string[] args)
         {
             //System.Diagnostics.Debugger.Launch();
@@ -146,34 +175,26 @@ namespace SimulationServer
                         }
                     }
 
+                    IEnumerable<Tuple<string, string>> files_iterator = null;
+
                     if (io_from_input.HasValue())
                     {
-                        while(true)
-                        {
-                            string read_input = Console.ReadLine();
-                            if (string.IsNullOrWhiteSpace(read_input))
-                            {
-                                break;
-                            }
-                            string read_output = Console.ReadLine();
-                            if (string.IsNullOrWhiteSpace(read_output))
-                            {
-                                break;
-                            }
-                            input.Values.Add(read_input);
-                            output.Values.Add(read_output);
-                        }
+                        files_iterator = IterateInputStream();
+                    }
+                    else
+                    {
+                        files_iterator = IterateOptions(input, output);
                     }
 
-                    for (int i = 0; i < input.Values.Count; ++i)
+                    foreach ((string input_file, string output_file) in files_iterator)
                     {
                         switch (input_format.Value())
                         {
                             case "json":
-                                input_wrapper.SetStateJson(File.ReadAllText(input.Values[i]));
+                                input_wrapper.SetStateJson(File.ReadAllText(input_file));
                                 break;
                             case "binary":
-                                input_wrapper.SetStateBinary(File.ReadAllBytes(input.Values[i]));
+                                input_wrapper.SetStateBinary(File.ReadAllBytes(input_file));
                                 break;
                             default:
                                 return 1;
@@ -187,9 +208,17 @@ namespace SimulationServer
 
                         Stream out_stream;
 
-                        if (output.HasValue())
+                        if (!string.IsNullOrWhiteSpace(output_file))
                         {
-                            out_stream = new FileStream(output.Values[i], FileMode.Create, FileAccess.Write);
+                            string out_value = output_file;
+                            if (!string.IsNullOrWhiteSpace(out_value))
+                            {
+                                out_stream = new FileStream(out_value, FileMode.Create, FileAccess.Write);
+                            }
+                            else
+                            {
+                                out_stream = Console.OpenStandardOutput();
+                            }
                         }
                         else
                         {
@@ -200,6 +229,7 @@ namespace SimulationServer
                         {
                             case "json":
                                 out_stream.Write(Encoding.UTF8.GetBytes(output_wrapper.GetStateJson()));
+                                out_stream.Write(Encoding.UTF8.GetBytes("\r\n"));
                                 break;
                             case "binary":
                                 out_stream.Write(output_wrapper.GetStateBinary());
