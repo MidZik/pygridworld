@@ -537,6 +537,7 @@ class TimelinesProject:
             else:
                 print(f"Attempted to delete a timeline that is not part of this project. Node will be removed, "
                       f"but data on disk will remain. ({path})", file=sys.stderr)
+            del self._timeline_nodes[node.timeline_id]
 
         TimelineNode.traverse(node_to_delete, delete_timeline_data)
         node_to_delete.parent_node.child_nodes.remove(node_to_delete)
