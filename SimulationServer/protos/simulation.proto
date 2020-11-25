@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+// python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
+
 service Simulation {
     rpc GetTick(GetTickRequest) returns (GetTickResponse);
     rpc GetStateJson(GetStateJsonRequest) returns (GetStateJsonResponse);
@@ -160,10 +162,24 @@ message GetSingletonNamesResponse {
 message GetEventsRequest {
 }
 
+message EventMessage {
+    string name = 1;
+    enum Type {
+     UNKNOWN = 0;
+     SIM = 1;
+     META = 2;
+	}
+    Type type = 2;
+    oneof data
+    {
+        string json = 3;
+        bytes bin = 4;
+    }
+}
+
 message GetEventsResponse {
     uint64 tick = 1;
-    string events_json = 2;
-    bytes state_bin = 3;
+    repeated EventMessage events = 2;
 }
 
 message GetStateBinaryRequest {

@@ -10,6 +10,7 @@ namespace SimulationServer
         public delegate void StringResultHandler(string s);
         public delegate void ULongResultHandler(ulong l);
         public delegate void BufferResultHandler(IntPtr buffer, ulong size);
+        public delegate void SimEventHandler(string name, string data);
 
         delegate IntPtr CreateSimulationDelegate();
         CreateSimulationDelegate create_simulation;
@@ -61,7 +62,7 @@ namespace SimulationServer
         IntPtr simulation_library_handle;
         IntPtr simulation_handle;
 
-        StringResultHandler current_event_callback = null;
+        SimEventHandler current_event_callback = null;
 
         public SimulationWrapper(string simulation_library_path)
         {
@@ -256,14 +257,14 @@ namespace SimulationServer
             return names;
         }
 
-        public void SetEventCallback(StringResultHandler callback)
+        public void SetEventCallback(SimEventHandler callback)
         {
             current_event_callback = callback;
             IntPtr handler_ptr = IntPtr.Zero;
 
             if (current_event_callback != null)
             {
-                handler_ptr = DelegateToUnmanaged<StringResultHandler>(current_event_callback);
+                handler_ptr = DelegateToUnmanaged<SimEventHandler>(current_event_callback);
             }
 
             set_event_callback(simulation_handle, handler_ptr);

@@ -8,8 +8,10 @@ namespace SimulationServer
     class SimulationService : Simulation.SimulationBase
     {
         private SimulationWrapper simulation;
-        private delegate void SimulationEventDelegate(ulong tick, string event_json, byte[] state_json);
-        private event SimulationEventDelegate simulation_event;
+        private delegate void CommitEventsDelegate(ulong tick, List<EventMessage> event_messages);
+        private event CommitEventsDelegate events_committed;
+
+        private List<EventMessage> event_messages = new List<EventMessage>();
 
         public SimulationService(SimulationWrapper simulation)
         {
@@ -17,9 +19,19 @@ namespace SimulationServer
             simulation.SetEventCallback(EventCallback);
         }
 
-        private void EventCallback(string s)
+        private void EventCallback(string name, string data)
         {
-            simulation_event(simulation.GetTick(), s, simulation.GetStateBinary());
+            if (!string.IsNullOrEmpty(name))
+            {
+                event_messages.Add(new EventMessage() { Name = name, Type = EventMessage.Types.Type.Sim, Json = data });
+            }
+            else
+            {
+                // byte[] state_bin = simulation.GetStateBinary();
+                // event_messages.Add(new EventMessage() { Name = "state", Type = EventMessage.Types.Type.Meta, Bin = Google.Protobuf.ByteString.CopyFrom(state_bin) });
+                events_committed(simulation.GetTick(), event_messages);
+                event_messages = new List<EventMessage>();
+            }
         }
 
         public override Task<AssignComponentResponse> AssignComponent(AssignComponentRequest request, ServerCallContext context)
@@ -72,13 +84,16 @@ namespace SimulationServer
 
         public override async Task GetEvents(GetEventsRequest request, IServerStreamWriter<GetEventsResponse> responseStream, ServerCallContext context)
         {
-            SimulationEventDelegate handler = async (ulong tick, string event_json, byte[] state_bin) =>
+            CommitEventsDelegate handler = async (ulong tick, List<EventMessage> eventMessages) =>
             {
-                await responseStream.WriteAsync(new GetEventsResponse { Tick = tick, EventsJson = event_json, StateBin = Google.Protobuf.ByteString.CopyFrom(state_bin)});
+                GetEventsResponse response = new GetEventsResponse();
+                response.Tick = tick;
+                response.Events.AddRange(eventMessages);
+                await responseStream.WriteAsync(response);
             };
-            simulation_event += handler;
+            events_committed += handler;
             await Task.Delay(-1, context.CancellationToken);
-            simulation_event -= handler;
+            events_committed -= handler;
         }
 
         public override Task<GetSingletonJsonResponse> GetSingletonJson(GetSingletonJsonRequest request, ServerCallContext context)

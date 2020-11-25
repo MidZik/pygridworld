@@ -19,10 +19,36 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x10simulation.proto\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"I\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12\x13\n\x0b\x65vents_json\x18\x02 \x01(\t\x12\x11\n\tstate_bin\x18\x03 \x01(\x0c\"\x17\n\x15GetStateBinaryRequest\"(\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse2\x92\x0b\n\nSimulation\x12,\n\x07GetTick\x12\x0f.GetTickRequest\x1a\x10.GetTickResponse\x12;\n\x0cGetStateJson\x12\x14.GetStateJsonRequest\x1a\x15.GetStateJsonResponse\x12;\n\x0cSetStateJson\x12\x14.SetStateJsonRequest\x1a\x15.SetStateJsonResponse\x12;\n\x0c\x43reateEntity\x12\x14.CreateEntityRequest\x1a\x15.CreateEntityResponse\x12>\n\rDestroyEntity\x12\x15.DestroyEntityRequest\x1a\x16.DestroyEntityResponse\x12@\n\x0eGetAllEntities\x12\x15.GetAllEntitesRequest\x1a\x17.GetAllEntitiesResponse\x12\x44\n\x0fStartSimulation\x12\x17.StartSimulationRequest\x1a\x18.StartSimulationResponse\x12\x41\n\x0eStopSimulation\x12\x16.StopSimulationRequest\x1a\x17.StopSimulationResponse\x12\x32\n\tIsRunning\x12\x11.IsRunningRequest\x1a\x12.IsRunningResponse\x12\x44\n\x0f\x41ssignComponent\x12\x17.AssignComponentRequest\x1a\x18.AssignComponentResponse\x12G\n\x10GetComponentJson\x12\x18.GetComponentJsonRequest\x1a\x19.GetComponentJsonResponse\x12\x44\n\x0fRemoveComponent\x12\x17.RemoveComponentRequest\x1a\x18.RemoveComponentResponse\x12G\n\x10ReplaceComponent\x12\x18.ReplaceComponentRequest\x1a\x19.ReplaceComponentResponse\x12J\n\x11GetComponentNames\x12\x19.GetComponentNamesRequest\x1a\x1a.GetComponentNamesResponse\x12\\\n\x17GetEntityComponentNames\x12\x1f.GetEntityComponentNamesRequest\x1a .GetEntityComponentNamesResponse\x12G\n\x10GetSingletonJson\x12\x18.GetSingletonJsonRequest\x1a\x19.GetSingletonJsonResponse\x12G\n\x10SetSingletonJson\x12\x18.SetSingletonJsonRequest\x1a\x19.SetSingletonJsonResponse\x12J\n\x11GetSingletonNames\x12\x19.GetSingletonNamesRequest\x1a\x1a.GetSingletonNamesResponse\x12\x34\n\tGetEvents\x12\x11.GetEventsRequest\x1a\x12.GetEventsResponse0\x01\x12\x41\n\x0eGetStateBinary\x12\x16.GetStateBinaryRequest\x1a\x17.GetStateBinaryResponse\x12\x41\n\x0eSetStateBinary\x12\x16.SetStateBinaryRequest\x1a\x17.SetStateBinaryResponseb\x06proto3')
+  serialized_pb=_b('\n\x10simulation.proto\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"\x8d\x01\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12 \n\x04type\x18\x02 \x01(\x0e\x32\x12.EventMessage.Type\x12\x0e\n\x04json\x18\x03 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x04 \x01(\x0cH\x00\"&\n\x04Type\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x07\n\x03SIM\x10\x01\x12\x08\n\x04META\x10\x02\x42\x06\n\x04\x64\x61ta\"@\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12\x1d\n\x06\x65vents\x18\x02 \x03(\x0b\x32\r.EventMessage\"\x17\n\x15GetStateBinaryRequest\"(\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse2\x92\x0b\n\nSimulation\x12,\n\x07GetTick\x12\x0f.GetTickRequest\x1a\x10.GetTickResponse\x12;\n\x0cGetStateJson\x12\x14.GetStateJsonRequest\x1a\x15.GetStateJsonResponse\x12;\n\x0cSetStateJson\x12\x14.SetStateJsonRequest\x1a\x15.SetStateJsonResponse\x12;\n\x0c\x43reateEntity\x12\x14.CreateEntityRequest\x1a\x15.CreateEntityResponse\x12>\n\rDestroyEntity\x12\x15.DestroyEntityRequest\x1a\x16.DestroyEntityResponse\x12@\n\x0eGetAllEntities\x12\x15.GetAllEntitesRequest\x1a\x17.GetAllEntitiesResponse\x12\x44\n\x0fStartSimulation\x12\x17.StartSimulationRequest\x1a\x18.StartSimulationResponse\x12\x41\n\x0eStopSimulation\x12\x16.StopSimulationRequest\x1a\x17.StopSimulationResponse\x12\x32\n\tIsRunning\x12\x11.IsRunningRequest\x1a\x12.IsRunningResponse\x12\x44\n\x0f\x41ssignComponent\x12\x17.AssignComponentRequest\x1a\x18.AssignComponentResponse\x12G\n\x10GetComponentJson\x12\x18.GetComponentJsonRequest\x1a\x19.GetComponentJsonResponse\x12\x44\n\x0fRemoveComponent\x12\x17.RemoveComponentRequest\x1a\x18.RemoveComponentResponse\x12G\n\x10ReplaceComponent\x12\x18.ReplaceComponentRequest\x1a\x19.ReplaceComponentResponse\x12J\n\x11GetComponentNames\x12\x19.GetComponentNamesRequest\x1a\x1a.GetComponentNamesResponse\x12\\\n\x17GetEntityComponentNames\x12\x1f.GetEntityComponentNamesRequest\x1a .GetEntityComponentNamesResponse\x12G\n\x10GetSingletonJson\x12\x18.GetSingletonJsonRequest\x1a\x19.GetSingletonJsonResponse\x12G\n\x10SetSingletonJson\x12\x18.SetSingletonJsonRequest\x1a\x19.SetSingletonJsonResponse\x12J\n\x11GetSingletonNames\x12\x19.GetSingletonNamesRequest\x1a\x1a.GetSingletonNamesResponse\x12\x34\n\tGetEvents\x12\x11.GetEventsRequest\x1a\x12.GetEventsResponse0\x01\x12\x41\n\x0eGetStateBinary\x12\x16.GetStateBinaryRequest\x1a\x17.GetStateBinaryResponse\x12\x41\n\x0eSetStateBinary\x12\x16.SetStateBinaryRequest\x1a\x17.SetStateBinaryResponseb\x06proto3')
 )
 
 
+
+_EVENTMESSAGE_TYPE = _descriptor.EnumDescriptor(
+  name='Type',
+  full_name='EventMessage.Type',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='UNKNOWN', index=0, number=0,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SIM', index=1, number=1,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='META', index=2, number=2,
+      serialized_options=None,
+      type=None),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=1506,
+  serialized_end=1544,
+)
+_sym_db.RegisterEnumDescriptor(_EVENTMESSAGE_TYPE)
 
 
 _GETTICKREQUEST = _descriptor.Descriptor(
@@ -1088,6 +1114,62 @@ _GETEVENTSREQUEST = _descriptor.Descriptor(
 )
 
 
+_EVENTMESSAGE = _descriptor.Descriptor(
+  name='EventMessage',
+  full_name='EventMessage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='EventMessage.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='type', full_name='EventMessage.type', index=1,
+      number=2, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='json', full_name='EventMessage.json', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='bin', full_name='EventMessage.bin', index=3,
+      number=4, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+    _EVENTMESSAGE_TYPE,
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='data', full_name='EventMessage.data',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=1411,
+  serialized_end=1552,
+)
+
+
 _GETEVENTSRESPONSE = _descriptor.Descriptor(
   name='GetEventsResponse',
   full_name='GetEventsResponse',
@@ -1103,16 +1185,9 @@ _GETEVENTSRESPONSE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='events_json', full_name='GetEventsResponse.events_json', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='state_bin', full_name='GetEventsResponse.state_bin', index=2,
-      number=3, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b(""),
+      name='events', full_name='GetEventsResponse.events', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -1128,8 +1203,8 @@ _GETEVENTSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1410,
-  serialized_end=1483,
+  serialized_start=1554,
+  serialized_end=1618,
 )
 
 
@@ -1152,8 +1227,8 @@ _GETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1485,
-  serialized_end=1508,
+  serialized_start=1620,
+  serialized_end=1643,
 )
 
 
@@ -1183,8 +1258,8 @@ _GETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1510,
-  serialized_end=1550,
+  serialized_start=1645,
+  serialized_end=1685,
 )
 
 
@@ -1214,8 +1289,8 @@ _SETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1552,
-  serialized_end=1591,
+  serialized_start=1687,
+  serialized_end=1726,
 )
 
 
@@ -1238,10 +1313,19 @@ _SETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1593,
-  serialized_end=1617,
+  serialized_start=1728,
+  serialized_end=1752,
 )
 
+_EVENTMESSAGE.fields_by_name['type'].enum_type = _EVENTMESSAGE_TYPE
+_EVENTMESSAGE_TYPE.containing_type = _EVENTMESSAGE
+_EVENTMESSAGE.oneofs_by_name['data'].fields.append(
+  _EVENTMESSAGE.fields_by_name['json'])
+_EVENTMESSAGE.fields_by_name['json'].containing_oneof = _EVENTMESSAGE.oneofs_by_name['data']
+_EVENTMESSAGE.oneofs_by_name['data'].fields.append(
+  _EVENTMESSAGE.fields_by_name['bin'])
+_EVENTMESSAGE.fields_by_name['bin'].containing_oneof = _EVENTMESSAGE.oneofs_by_name['data']
+_GETEVENTSRESPONSE.fields_by_name['events'].message_type = _EVENTMESSAGE
 DESCRIPTOR.message_types_by_name['GetTickRequest'] = _GETTICKREQUEST
 DESCRIPTOR.message_types_by_name['GetTickResponse'] = _GETTICKRESPONSE
 DESCRIPTOR.message_types_by_name['GetStateJsonRequest'] = _GETSTATEJSONREQUEST
@@ -1279,6 +1363,7 @@ DESCRIPTOR.message_types_by_name['SetSingletonJsonResponse'] = _SETSINGLETONJSON
 DESCRIPTOR.message_types_by_name['GetSingletonNamesRequest'] = _GETSINGLETONNAMESREQUEST
 DESCRIPTOR.message_types_by_name['GetSingletonNamesResponse'] = _GETSINGLETONNAMESRESPONSE
 DESCRIPTOR.message_types_by_name['GetEventsRequest'] = _GETEVENTSREQUEST
+DESCRIPTOR.message_types_by_name['EventMessage'] = _EVENTMESSAGE
 DESCRIPTOR.message_types_by_name['GetEventsResponse'] = _GETEVENTSRESPONSE
 DESCRIPTOR.message_types_by_name['GetStateBinaryRequest'] = _GETSTATEBINARYREQUEST
 DESCRIPTOR.message_types_by_name['GetStateBinaryResponse'] = _GETSTATEBINARYRESPONSE
@@ -1545,6 +1630,13 @@ GetEventsRequest = _reflection.GeneratedProtocolMessageType('GetEventsRequest', 
   ))
 _sym_db.RegisterMessage(GetEventsRequest)
 
+EventMessage = _reflection.GeneratedProtocolMessageType('EventMessage', (_message.Message,), dict(
+  DESCRIPTOR = _EVENTMESSAGE,
+  __module__ = 'simulation_pb2'
+  # @@protoc_insertion_point(class_scope:EventMessage)
+  ))
+_sym_db.RegisterMessage(EventMessage)
+
 GetEventsResponse = _reflection.GeneratedProtocolMessageType('GetEventsResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETEVENTSRESPONSE,
   __module__ = 'simulation_pb2'
@@ -1588,8 +1680,8 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1620,
-  serialized_end=3046,
+  serialized_start=1755,
+  serialized_end=3181,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTick',

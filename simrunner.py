@@ -144,8 +144,8 @@ class SimulationProcess:
         return SimulationClient(self.get_server_address())
 
     def _event_handler(self):
-        for (tick, event_json, state_bin) in self._stream_context:
-            self._event_state_writer(tick, event_json, state_bin)
+        for (tick, events) in self._stream_context:
+            self._event_state_writer(tick, events)
 
 
 class SimulationClient:
@@ -260,6 +260,24 @@ class SimulationClient:
         response = stub.GetSingletonNames(request)
         return response.singleton_names
 
+    class Event:
+        def __init__(self, message):
+            self.name = message.name
+
+            if message.type == sim.EventMessage.Type.SIM:
+                self.type = "SIM"
+            elif message.type == sim.EventMessage.Type.META:
+                self.type = "META"
+            else:
+                self.type = "UNKNOWN"
+
+            if message.WhichOneof('data') == 'json':
+                self.json = message.json
+                self.data = None
+            else:
+                self.json = None
+                self.data = message.data
+
     class EventStreamContext:
         def __init__(self, responses):
             self.responses = responses
@@ -275,7 +293,7 @@ class SimulationClient:
                     # for now, assuming cancellation. Should maybe handle other cases.
                     raise StopIteration()
                 raise
-            return response.tick, response.events_json, response.state_bin
+            return response.tick, [SimulationClient.Event(e) for e in response.events]
 
         def cancel(self):
             self.responses.cancel()

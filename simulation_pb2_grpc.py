@@ -5,8 +5,9 @@ import simulation_pb2 as simulation__pb2
 
 
 class SimulationStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
+
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -122,8 +123,9 @@ class SimulationStub(object):
 
 
 class SimulationServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
+
+  """
 
   def GetTick(self, request, context):
     # missing associated documentation comment in .proto file

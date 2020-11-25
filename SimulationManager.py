@@ -15,6 +15,7 @@ from uuid import uuid4, UUID
 import shutil
 import subprocess
 import os
+import sqlite3
 
 
 class Timeline:
@@ -45,8 +46,25 @@ class Timeline:
 
         self.refresh_tick_list()
 
+        db_conn = self.get_db_conn()
+
+        db_conn.execute('''
+            CREATE TABLE IF NOT EXISTS events (
+                tick INTEGER NOT NULL,
+                event_name TEXT,
+                event_json TEXT,
+                PRIMARY KEY(tick, event_name)
+            )''')
+        db_conn.commit()
+
     def get_point_file_path(self, tick):
         return self.path / Timeline.point_file_name(tick)
+
+    def get_db_path(self):
+        return self.path / 'timeline.db'
+
+    def get_db_conn(self):
+        return sqlite3.connect(self.get_db_path())
 
     def head(self):
         return self.tick_list[0]
@@ -232,12 +250,26 @@ class TimelineSimulation:
         if self._is_editing:
             self._simulation_process.get_client().set_state_binary(state_binary)
 
-    def _handle_event(self, tick, event_json, state_bin):
-        if tick not in self.timeline.tick_list:
-            state_file_path = self.timeline.get_point_file_path(tick)
-            with state_file_path.open('bw') as state_file:
-                state_file.write(state_bin)
-            self.timeline.tick_list.append(tick)
+    def _handle_event(self, tick, events):
+        db_conn = self.timeline.get_db_conn()
+
+        db_events_generator = ((tick, e.name, e.json) for e in events if e.type == "SIM")
+
+        # Since many events can occur quite rapidly, enforcing sync with the disk can result
+        # in excessive disk activity, and might cause writes to disk becoming a bottleneck.
+        # Thus, we disable requiring a disk sync on every commit with this pragma.
+        # This CAN cause the database to become corrupted in the event of a power loss,
+        # but since the database can be easily reconstructed just by running the simulation,
+        # this is not an important factor when compared to speed of handling events.
+        db_conn.execute('PRAGMA synchronous = OFF')
+
+        db_conn.executemany('''
+                    INSERT OR IGNORE INTO
+                    events(tick, event_name, event_json)
+                    VALUES(?,?,?)
+                    ''', db_events_generator)
+
+        db_conn.commit()
 
 
 class TimelineNode:
