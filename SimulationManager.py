@@ -253,7 +253,7 @@ class TimelineSimulation:
     def _handle_event(self, tick, events):
         db_conn = self.timeline.get_db_conn()
 
-        db_events_generator = ((tick, e.name, e.json) for e in events if e.type == "SIM")
+        db_events_generator = ((tick, e.name, e.json) for e in events if e.in_namespace("sim."))
 
         # Since many events can occur quite rapidly, enforcing sync with the disk can result
         # in excessive disk activity, and might cause writes to disk becoming a bottleneck.

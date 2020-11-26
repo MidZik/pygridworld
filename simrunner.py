@@ -264,19 +264,18 @@ class SimulationClient:
         def __init__(self, message):
             self.name = message.name
 
-            if message.type == sim.EventMessage.Type.SIM:
-                self.type = "SIM"
-            elif message.type == sim.EventMessage.Type.META:
-                self.type = "META"
-            else:
-                self.type = "UNKNOWN"
-
             if message.WhichOneof('data') == 'json':
                 self.json = message.json
-                self.data = None
+                self.bin = None
             else:
                 self.json = None
-                self.data = message.data
+                self.bin = message.bin
+
+        def in_namespace(self, namespace: str):
+            if not namespace[-1] == '.':
+                namespace = namespace + '.'
+
+            return self.name.startswith(namespace)
 
     class EventStreamContext:
         def __init__(self, responses):

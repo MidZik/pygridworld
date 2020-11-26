@@ -23,7 +23,8 @@ namespace SimulationServer
         {
             if (!string.IsNullOrEmpty(name))
             {
-                event_messages.Add(new EventMessage() { Name = name, Type = EventMessage.Types.Type.Sim, Json = data });
+                name = "sim." + name;
+                event_messages.Add(new EventMessage() { Name = name, Json = data });
             }
             else
             {

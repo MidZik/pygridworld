@@ -164,16 +164,10 @@ message GetEventsRequest {
 
 message EventMessage {
     string name = 1;
-    enum Type {
-     UNKNOWN = 0;
-     SIM = 1;
-     META = 2;
-	}
-    Type type = 2;
     oneof data
     {
-        string json = 3;
-        bytes bin = 4;
+        string json = 2;
+        bytes bin = 3;
     }
 }
 
