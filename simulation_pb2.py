@@ -16,44 +16,18 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='simulation.proto',
-  package='',
+  package='PyGridWorld.SimulationServer',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x10simulation.proto\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"\x8d\x01\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12 \n\x04type\x18\x02 \x01(\x0e\x32\x12.EventMessage.Type\x12\x0e\n\x04json\x18\x03 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x04 \x01(\x0cH\x00\"&\n\x04Type\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x07\n\x03SIM\x10\x01\x12\x08\n\x04META\x10\x02\x42\x06\n\x04\x64\x61ta\"@\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12\x1d\n\x06\x65vents\x18\x02 \x03(\x0b\x32\r.EventMessage\"\x17\n\x15GetStateBinaryRequest\"(\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse2\x92\x0b\n\nSimulation\x12,\n\x07GetTick\x12\x0f.GetTickRequest\x1a\x10.GetTickResponse\x12;\n\x0cGetStateJson\x12\x14.GetStateJsonRequest\x1a\x15.GetStateJsonResponse\x12;\n\x0cSetStateJson\x12\x14.SetStateJsonRequest\x1a\x15.SetStateJsonResponse\x12;\n\x0c\x43reateEntity\x12\x14.CreateEntityRequest\x1a\x15.CreateEntityResponse\x12>\n\rDestroyEntity\x12\x15.DestroyEntityRequest\x1a\x16.DestroyEntityResponse\x12@\n\x0eGetAllEntities\x12\x15.GetAllEntitesRequest\x1a\x17.GetAllEntitiesResponse\x12\x44\n\x0fStartSimulation\x12\x17.StartSimulationRequest\x1a\x18.StartSimulationResponse\x12\x41\n\x0eStopSimulation\x12\x16.StopSimulationRequest\x1a\x17.StopSimulationResponse\x12\x32\n\tIsRunning\x12\x11.IsRunningRequest\x1a\x12.IsRunningResponse\x12\x44\n\x0f\x41ssignComponent\x12\x17.AssignComponentRequest\x1a\x18.AssignComponentResponse\x12G\n\x10GetComponentJson\x12\x18.GetComponentJsonRequest\x1a\x19.GetComponentJsonResponse\x12\x44\n\x0fRemoveComponent\x12\x17.RemoveComponentRequest\x1a\x18.RemoveComponentResponse\x12G\n\x10ReplaceComponent\x12\x18.ReplaceComponentRequest\x1a\x19.ReplaceComponentResponse\x12J\n\x11GetComponentNames\x12\x19.GetComponentNamesRequest\x1a\x1a.GetComponentNamesResponse\x12\\\n\x17GetEntityComponentNames\x12\x1f.GetEntityComponentNamesRequest\x1a .GetEntityComponentNamesResponse\x12G\n\x10GetSingletonJson\x12\x18.GetSingletonJsonRequest\x1a\x19.GetSingletonJsonResponse\x12G\n\x10SetSingletonJson\x12\x18.SetSingletonJsonRequest\x1a\x19.SetSingletonJsonResponse\x12J\n\x11GetSingletonNames\x12\x19.GetSingletonNamesRequest\x1a\x1a.GetSingletonNamesResponse\x12\x34\n\tGetEvents\x12\x11.GetEventsRequest\x1a\x12.GetEventsResponse0\x01\x12\x41\n\x0eGetStateBinary\x12\x16.GetStateBinaryRequest\x1a\x17.GetStateBinaryResponse\x12\x41\n\x0eSetStateBinary\x12\x16.SetStateBinaryRequest\x1a\x17.SetStateBinaryResponseb\x06proto3')
+  serialized_pb=_b('\n\x10simulation.proto\x12\x1cPyGridWorld.SimulationServer\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"C\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x04json\x18\x02 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"]\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12:\n\x06\x65vents\x18\x02 \x03(\x0b\x32*.PyGridWorld.SimulationServer.EventMessage\"\x17\n\x15GetStateBinaryRequest\"(\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse2\xdb\x14\n\nSimulation\x12\x66\n\x07GetTick\x12,.PyGridWorld.SimulationServer.GetTickRequest\x1a-.PyGridWorld.SimulationServer.GetTickResponse\x12u\n\x0cGetStateJson\x12\x31.PyGridWorld.SimulationServer.GetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.GetStateJsonResponse\x12u\n\x0cSetStateJson\x12\x31.PyGridWorld.SimulationServer.SetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.SetStateJsonResponse\x12u\n\x0c\x43reateEntity\x12\x31.PyGridWorld.SimulationServer.CreateEntityRequest\x1a\x32.PyGridWorld.SimulationServer.CreateEntityResponse\x12x\n\rDestroyEntity\x12\x32.PyGridWorld.SimulationServer.DestroyEntityRequest\x1a\x33.PyGridWorld.SimulationServer.DestroyEntityResponse\x12z\n\x0eGetAllEntities\x12\x32.PyGridWorld.SimulationServer.GetAllEntitesRequest\x1a\x34.PyGridWorld.SimulationServer.GetAllEntitiesResponse\x12~\n\x0fStartSimulation\x12\x34.PyGridWorld.SimulationServer.StartSimulationRequest\x1a\x35.PyGridWorld.SimulationServer.StartSimulationResponse\x12{\n\x0eStopSimulation\x12\x33.PyGridWorld.SimulationServer.StopSimulationRequest\x1a\x34.PyGridWorld.SimulationServer.StopSimulationResponse\x12l\n\tIsRunning\x12..PyGridWorld.SimulationServer.IsRunningRequest\x1a/.PyGridWorld.SimulationServer.IsRunningResponse\x12~\n\x0f\x41ssignComponent\x12\x34.PyGridWorld.SimulationServer.AssignComponentRequest\x1a\x35.PyGridWorld.SimulationServer.AssignComponentResponse\x12\x81\x01\n\x10GetComponentJson\x12\x35.PyGridWorld.SimulationServer.GetComponentJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetComponentJsonResponse\x12~\n\x0fRemoveComponent\x12\x34.PyGridWorld.SimulationServer.RemoveComponentRequest\x1a\x35.PyGridWorld.SimulationServer.RemoveComponentResponse\x12\x81\x01\n\x10ReplaceComponent\x12\x35.PyGridWorld.SimulationServer.ReplaceComponentRequest\x1a\x36.PyGridWorld.SimulationServer.ReplaceComponentResponse\x12\x84\x01\n\x11GetComponentNames\x12\x36.PyGridWorld.SimulationServer.GetComponentNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetComponentNamesResponse\x12\x96\x01\n\x17GetEntityComponentNames\x12<.PyGridWorld.SimulationServer.GetEntityComponentNamesRequest\x1a=.PyGridWorld.SimulationServer.GetEntityComponentNamesResponse\x12\x81\x01\n\x10GetSingletonJson\x12\x35.PyGridWorld.SimulationServer.GetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetSingletonJsonResponse\x12\x81\x01\n\x10SetSingletonJson\x12\x35.PyGridWorld.SimulationServer.SetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.SetSingletonJsonResponse\x12\x84\x01\n\x11GetSingletonNames\x12\x36.PyGridWorld.SimulationServer.GetSingletonNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetSingletonNamesResponse\x12n\n\tGetEvents\x12..PyGridWorld.SimulationServer.GetEventsRequest\x1a/.PyGridWorld.SimulationServer.GetEventsResponse0\x01\x12{\n\x0eGetStateBinary\x12\x33.PyGridWorld.SimulationServer.GetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.GetStateBinaryResponse\x12{\n\x0eSetStateBinary\x12\x33.PyGridWorld.SimulationServer.SetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.SetStateBinaryResponseb\x06proto3')
 )
 
 
-
-_EVENTMESSAGE_TYPE = _descriptor.EnumDescriptor(
-  name='Type',
-  full_name='EventMessage.Type',
-  filename=None,
-  file=DESCRIPTOR,
-  values=[
-    _descriptor.EnumValueDescriptor(
-      name='UNKNOWN', index=0, number=0,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='SIM', index=1, number=1,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='META', index=2, number=2,
-      serialized_options=None,
-      type=None),
-  ],
-  containing_type=None,
-  serialized_options=None,
-  serialized_start=1506,
-  serialized_end=1544,
-)
-_sym_db.RegisterEnumDescriptor(_EVENTMESSAGE_TYPE)
 
 
 _GETTICKREQUEST = _descriptor.Descriptor(
   name='GetTickRequest',
-  full_name='GetTickRequest',
+  full_name='PyGridWorld.SimulationServer.GetTickRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -70,20 +44,20 @@ _GETTICKREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=20,
-  serialized_end=36,
+  serialized_start=50,
+  serialized_end=66,
 )
 
 
 _GETTICKRESPONSE = _descriptor.Descriptor(
   name='GetTickResponse',
-  full_name='GetTickResponse',
+  full_name='PyGridWorld.SimulationServer.GetTickResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tick', full_name='GetTickResponse.tick', index=0,
+      name='tick', full_name='PyGridWorld.SimulationServer.GetTickResponse.tick', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -101,14 +75,14 @@ _GETTICKRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=38,
-  serialized_end=69,
+  serialized_start=68,
+  serialized_end=99,
 )
 
 
 _GETSTATEJSONREQUEST = _descriptor.Descriptor(
   name='GetStateJsonRequest',
-  full_name='GetStateJsonRequest',
+  full_name='PyGridWorld.SimulationServer.GetStateJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -125,20 +99,20 @@ _GETSTATEJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=71,
-  serialized_end=92,
+  serialized_start=101,
+  serialized_end=122,
 )
 
 
 _GETSTATEJSONRESPONSE = _descriptor.Descriptor(
   name='GetStateJsonResponse',
-  full_name='GetStateJsonResponse',
+  full_name='PyGridWorld.SimulationServer.GetStateJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='GetStateJsonResponse.json', index=0,
+      name='json', full_name='PyGridWorld.SimulationServer.GetStateJsonResponse.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -156,20 +130,20 @@ _GETSTATEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=94,
-  serialized_end=130,
+  serialized_start=124,
+  serialized_end=160,
 )
 
 
 _SETSTATEJSONREQUEST = _descriptor.Descriptor(
   name='SetStateJsonRequest',
-  full_name='SetStateJsonRequest',
+  full_name='PyGridWorld.SimulationServer.SetStateJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='SetStateJsonRequest.json', index=0,
+      name='json', full_name='PyGridWorld.SimulationServer.SetStateJsonRequest.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -187,14 +161,14 @@ _SETSTATEJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=132,
-  serialized_end=167,
+  serialized_start=162,
+  serialized_end=197,
 )
 
 
 _SETSTATEJSONRESPONSE = _descriptor.Descriptor(
   name='SetStateJsonResponse',
-  full_name='SetStateJsonResponse',
+  full_name='PyGridWorld.SimulationServer.SetStateJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -211,14 +185,14 @@ _SETSTATEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=169,
-  serialized_end=191,
+  serialized_start=199,
+  serialized_end=221,
 )
 
 
 _CREATEENTITYREQUEST = _descriptor.Descriptor(
   name='CreateEntityRequest',
-  full_name='CreateEntityRequest',
+  full_name='PyGridWorld.SimulationServer.CreateEntityRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -235,20 +209,20 @@ _CREATEENTITYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=193,
-  serialized_end=214,
+  serialized_start=223,
+  serialized_end=244,
 )
 
 
 _CREATEENTITYRESPONSE = _descriptor.Descriptor(
   name='CreateEntityResponse',
-  full_name='CreateEntityResponse',
+  full_name='PyGridWorld.SimulationServer.CreateEntityResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='CreateEntityResponse.eid', index=0,
+      name='eid', full_name='PyGridWorld.SimulationServer.CreateEntityResponse.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -266,20 +240,20 @@ _CREATEENTITYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=216,
-  serialized_end=251,
+  serialized_start=246,
+  serialized_end=281,
 )
 
 
 _DESTROYENTITYREQUEST = _descriptor.Descriptor(
   name='DestroyEntityRequest',
-  full_name='DestroyEntityRequest',
+  full_name='PyGridWorld.SimulationServer.DestroyEntityRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='DestroyEntityRequest.eid', index=0,
+      name='eid', full_name='PyGridWorld.SimulationServer.DestroyEntityRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -297,14 +271,14 @@ _DESTROYENTITYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=253,
-  serialized_end=288,
+  serialized_start=283,
+  serialized_end=318,
 )
 
 
 _DESTROYENTITYRESPONSE = _descriptor.Descriptor(
   name='DestroyEntityResponse',
-  full_name='DestroyEntityResponse',
+  full_name='PyGridWorld.SimulationServer.DestroyEntityResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -321,14 +295,14 @@ _DESTROYENTITYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=290,
-  serialized_end=313,
+  serialized_start=320,
+  serialized_end=343,
 )
 
 
 _GETALLENTITESREQUEST = _descriptor.Descriptor(
   name='GetAllEntitesRequest',
-  full_name='GetAllEntitesRequest',
+  full_name='PyGridWorld.SimulationServer.GetAllEntitesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -345,20 +319,20 @@ _GETALLENTITESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=315,
-  serialized_end=337,
+  serialized_start=345,
+  serialized_end=367,
 )
 
 
 _GETALLENTITIESRESPONSE = _descriptor.Descriptor(
   name='GetAllEntitiesResponse',
-  full_name='GetAllEntitiesResponse',
+  full_name='PyGridWorld.SimulationServer.GetAllEntitiesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eids', full_name='GetAllEntitiesResponse.eids', index=0,
+      name='eids', full_name='PyGridWorld.SimulationServer.GetAllEntitiesResponse.eids', index=0,
       number=1, type=4, cpp_type=4, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -376,14 +350,14 @@ _GETALLENTITIESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=339,
-  serialized_end=377,
+  serialized_start=369,
+  serialized_end=407,
 )
 
 
 _STARTSIMULATIONREQUEST = _descriptor.Descriptor(
   name='StartSimulationRequest',
-  full_name='StartSimulationRequest',
+  full_name='PyGridWorld.SimulationServer.StartSimulationRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -400,14 +374,14 @@ _STARTSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=379,
-  serialized_end=403,
+  serialized_start=409,
+  serialized_end=433,
 )
 
 
 _STARTSIMULATIONRESPONSE = _descriptor.Descriptor(
   name='StartSimulationResponse',
-  full_name='StartSimulationResponse',
+  full_name='PyGridWorld.SimulationServer.StartSimulationResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -424,14 +398,14 @@ _STARTSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=405,
-  serialized_end=430,
+  serialized_start=435,
+  serialized_end=460,
 )
 
 
 _STOPSIMULATIONREQUEST = _descriptor.Descriptor(
   name='StopSimulationRequest',
-  full_name='StopSimulationRequest',
+  full_name='PyGridWorld.SimulationServer.StopSimulationRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -448,14 +422,14 @@ _STOPSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=432,
-  serialized_end=455,
+  serialized_start=462,
+  serialized_end=485,
 )
 
 
 _STOPSIMULATIONRESPONSE = _descriptor.Descriptor(
   name='StopSimulationResponse',
-  full_name='StopSimulationResponse',
+  full_name='PyGridWorld.SimulationServer.StopSimulationResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -472,14 +446,14 @@ _STOPSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=457,
-  serialized_end=481,
+  serialized_start=487,
+  serialized_end=511,
 )
 
 
 _ISRUNNINGREQUEST = _descriptor.Descriptor(
   name='IsRunningRequest',
-  full_name='IsRunningRequest',
+  full_name='PyGridWorld.SimulationServer.IsRunningRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -496,20 +470,20 @@ _ISRUNNINGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=483,
-  serialized_end=501,
+  serialized_start=513,
+  serialized_end=531,
 )
 
 
 _ISRUNNINGRESPONSE = _descriptor.Descriptor(
   name='IsRunningResponse',
-  full_name='IsRunningResponse',
+  full_name='PyGridWorld.SimulationServer.IsRunningResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='running', full_name='IsRunningResponse.running', index=0,
+      name='running', full_name='PyGridWorld.SimulationServer.IsRunningResponse.running', index=0,
       number=1, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -527,27 +501,27 @@ _ISRUNNINGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=503,
-  serialized_end=539,
+  serialized_start=533,
+  serialized_end=569,
 )
 
 
 _ASSIGNCOMPONENTREQUEST = _descriptor.Descriptor(
   name='AssignComponentRequest',
-  full_name='AssignComponentRequest',
+  full_name='PyGridWorld.SimulationServer.AssignComponentRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='AssignComponentRequest.eid', index=0,
+      name='eid', full_name='PyGridWorld.SimulationServer.AssignComponentRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='AssignComponentRequest.component_name', index=1,
+      name='component_name', full_name='PyGridWorld.SimulationServer.AssignComponentRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -565,14 +539,14 @@ _ASSIGNCOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=541,
-  serialized_end=602,
+  serialized_start=571,
+  serialized_end=632,
 )
 
 
 _ASSIGNCOMPONENTRESPONSE = _descriptor.Descriptor(
   name='AssignComponentResponse',
-  full_name='AssignComponentResponse',
+  full_name='PyGridWorld.SimulationServer.AssignComponentResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -589,27 +563,27 @@ _ASSIGNCOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=604,
-  serialized_end=629,
+  serialized_start=634,
+  serialized_end=659,
 )
 
 
 _GETCOMPONENTJSONREQUEST = _descriptor.Descriptor(
   name='GetComponentJsonRequest',
-  full_name='GetComponentJsonRequest',
+  full_name='PyGridWorld.SimulationServer.GetComponentJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='GetComponentJsonRequest.eid', index=0,
+      name='eid', full_name='PyGridWorld.SimulationServer.GetComponentJsonRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='GetComponentJsonRequest.component_name', index=1,
+      name='component_name', full_name='PyGridWorld.SimulationServer.GetComponentJsonRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -627,20 +601,20 @@ _GETCOMPONENTJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=631,
-  serialized_end=693,
+  serialized_start=661,
+  serialized_end=723,
 )
 
 
 _GETCOMPONENTJSONRESPONSE = _descriptor.Descriptor(
   name='GetComponentJsonResponse',
-  full_name='GetComponentJsonResponse',
+  full_name='PyGridWorld.SimulationServer.GetComponentJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='GetComponentJsonResponse.json', index=0,
+      name='json', full_name='PyGridWorld.SimulationServer.GetComponentJsonResponse.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -658,27 +632,27 @@ _GETCOMPONENTJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=695,
-  serialized_end=735,
+  serialized_start=725,
+  serialized_end=765,
 )
 
 
 _REMOVECOMPONENTREQUEST = _descriptor.Descriptor(
   name='RemoveComponentRequest',
-  full_name='RemoveComponentRequest',
+  full_name='PyGridWorld.SimulationServer.RemoveComponentRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='RemoveComponentRequest.eid', index=0,
+      name='eid', full_name='PyGridWorld.SimulationServer.RemoveComponentRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='RemoveComponentRequest.component_name', index=1,
+      name='component_name', full_name='PyGridWorld.SimulationServer.RemoveComponentRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -696,14 +670,14 @@ _REMOVECOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=737,
-  serialized_end=798,
+  serialized_start=767,
+  serialized_end=828,
 )
 
 
 _REMOVECOMPONENTRESPONSE = _descriptor.Descriptor(
   name='RemoveComponentResponse',
-  full_name='RemoveComponentResponse',
+  full_name='PyGridWorld.SimulationServer.RemoveComponentResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -720,34 +694,34 @@ _REMOVECOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=800,
-  serialized_end=825,
+  serialized_start=830,
+  serialized_end=855,
 )
 
 
 _REPLACECOMPONENTREQUEST = _descriptor.Descriptor(
   name='ReplaceComponentRequest',
-  full_name='ReplaceComponentRequest',
+  full_name='PyGridWorld.SimulationServer.ReplaceComponentRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='ReplaceComponentRequest.eid', index=0,
+      name='eid', full_name='PyGridWorld.SimulationServer.ReplaceComponentRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='ReplaceComponentRequest.component_name', index=1,
+      name='component_name', full_name='PyGridWorld.SimulationServer.ReplaceComponentRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='json', full_name='ReplaceComponentRequest.json', index=2,
+      name='json', full_name='PyGridWorld.SimulationServer.ReplaceComponentRequest.json', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -765,14 +739,14 @@ _REPLACECOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=827,
-  serialized_end=903,
+  serialized_start=857,
+  serialized_end=933,
 )
 
 
 _REPLACECOMPONENTRESPONSE = _descriptor.Descriptor(
   name='ReplaceComponentResponse',
-  full_name='ReplaceComponentResponse',
+  full_name='PyGridWorld.SimulationServer.ReplaceComponentResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -789,14 +763,14 @@ _REPLACECOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=905,
-  serialized_end=931,
+  serialized_start=935,
+  serialized_end=961,
 )
 
 
 _GETCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   name='GetComponentNamesRequest',
-  full_name='GetComponentNamesRequest',
+  full_name='PyGridWorld.SimulationServer.GetComponentNamesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -813,20 +787,20 @@ _GETCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=933,
-  serialized_end=959,
+  serialized_start=963,
+  serialized_end=989,
 )
 
 
 _GETCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   name='GetComponentNamesResponse',
-  full_name='GetComponentNamesResponse',
+  full_name='PyGridWorld.SimulationServer.GetComponentNamesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='component_names', full_name='GetComponentNamesResponse.component_names', index=0,
+      name='component_names', full_name='PyGridWorld.SimulationServer.GetComponentNamesResponse.component_names', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -844,20 +818,20 @@ _GETCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=961,
-  serialized_end=1013,
+  serialized_start=991,
+  serialized_end=1043,
 )
 
 
 _GETENTITYCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   name='GetEntityComponentNamesRequest',
-  full_name='GetEntityComponentNamesRequest',
+  full_name='PyGridWorld.SimulationServer.GetEntityComponentNamesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='GetEntityComponentNamesRequest.eid', index=0,
+      name='eid', full_name='PyGridWorld.SimulationServer.GetEntityComponentNamesRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -875,20 +849,20 @@ _GETENTITYCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1015,
-  serialized_end=1060,
+  serialized_start=1045,
+  serialized_end=1090,
 )
 
 
 _GETENTITYCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   name='GetEntityComponentNamesResponse',
-  full_name='GetEntityComponentNamesResponse',
+  full_name='PyGridWorld.SimulationServer.GetEntityComponentNamesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='component_names', full_name='GetEntityComponentNamesResponse.component_names', index=0,
+      name='component_names', full_name='PyGridWorld.SimulationServer.GetEntityComponentNamesResponse.component_names', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -906,20 +880,20 @@ _GETENTITYCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1062,
-  serialized_end=1120,
+  serialized_start=1092,
+  serialized_end=1150,
 )
 
 
 _GETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   name='GetSingletonJsonRequest',
-  full_name='GetSingletonJsonRequest',
+  full_name='PyGridWorld.SimulationServer.GetSingletonJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='singleton_name', full_name='GetSingletonJsonRequest.singleton_name', index=0,
+      name='singleton_name', full_name='PyGridWorld.SimulationServer.GetSingletonJsonRequest.singleton_name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -937,20 +911,20 @@ _GETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1122,
-  serialized_end=1171,
+  serialized_start=1152,
+  serialized_end=1201,
 )
 
 
 _GETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   name='GetSingletonJsonResponse',
-  full_name='GetSingletonJsonResponse',
+  full_name='PyGridWorld.SimulationServer.GetSingletonJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='GetSingletonJsonResponse.json', index=0,
+      name='json', full_name='PyGridWorld.SimulationServer.GetSingletonJsonResponse.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -968,27 +942,27 @@ _GETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1173,
-  serialized_end=1213,
+  serialized_start=1203,
+  serialized_end=1243,
 )
 
 
 _SETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   name='SetSingletonJsonRequest',
-  full_name='SetSingletonJsonRequest',
+  full_name='PyGridWorld.SimulationServer.SetSingletonJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='singleton_name', full_name='SetSingletonJsonRequest.singleton_name', index=0,
+      name='singleton_name', full_name='PyGridWorld.SimulationServer.SetSingletonJsonRequest.singleton_name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='json', full_name='SetSingletonJsonRequest.json', index=1,
+      name='json', full_name='PyGridWorld.SimulationServer.SetSingletonJsonRequest.json', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -1006,14 +980,14 @@ _SETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1215,
-  serialized_end=1278,
+  serialized_start=1245,
+  serialized_end=1308,
 )
 
 
 _SETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   name='SetSingletonJsonResponse',
-  full_name='SetSingletonJsonResponse',
+  full_name='PyGridWorld.SimulationServer.SetSingletonJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1030,14 +1004,14 @@ _SETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1280,
-  serialized_end=1306,
+  serialized_start=1310,
+  serialized_end=1336,
 )
 
 
 _GETSINGLETONNAMESREQUEST = _descriptor.Descriptor(
   name='GetSingletonNamesRequest',
-  full_name='GetSingletonNamesRequest',
+  full_name='PyGridWorld.SimulationServer.GetSingletonNamesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1054,20 +1028,20 @@ _GETSINGLETONNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1308,
-  serialized_end=1334,
+  serialized_start=1338,
+  serialized_end=1364,
 )
 
 
 _GETSINGLETONNAMESRESPONSE = _descriptor.Descriptor(
   name='GetSingletonNamesResponse',
-  full_name='GetSingletonNamesResponse',
+  full_name='PyGridWorld.SimulationServer.GetSingletonNamesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='singleton_names', full_name='GetSingletonNamesResponse.singleton_names', index=0,
+      name='singleton_names', full_name='PyGridWorld.SimulationServer.GetSingletonNamesResponse.singleton_names', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1085,14 +1059,14 @@ _GETSINGLETONNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1336,
-  serialized_end=1388,
+  serialized_start=1366,
+  serialized_end=1418,
 )
 
 
 _GETEVENTSREQUEST = _descriptor.Descriptor(
   name='GetEventsRequest',
-  full_name='GetEventsRequest',
+  full_name='PyGridWorld.SimulationServer.GetEventsRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1109,42 +1083,35 @@ _GETEVENTSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1390,
-  serialized_end=1408,
+  serialized_start=1420,
+  serialized_end=1438,
 )
 
 
 _EVENTMESSAGE = _descriptor.Descriptor(
   name='EventMessage',
-  full_name='EventMessage',
+  full_name='PyGridWorld.SimulationServer.EventMessage',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='EventMessage.name', index=0,
+      name='name', full_name='PyGridWorld.SimulationServer.EventMessage.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='type', full_name='EventMessage.type', index=1,
-      number=2, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='json', full_name='EventMessage.json', index=2,
-      number=3, type=9, cpp_type=9, label=1,
+      name='json', full_name='PyGridWorld.SimulationServer.EventMessage.json', index=1,
+      number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='bin', full_name='EventMessage.bin', index=3,
-      number=4, type=12, cpp_type=9, label=1,
+      name='bin', full_name='PyGridWorld.SimulationServer.EventMessage.bin', index=2,
+      number=3, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -1154,7 +1121,6 @@ _EVENTMESSAGE = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
-    _EVENTMESSAGE_TYPE,
   ],
   serialized_options=None,
   is_extendable=False,
@@ -1162,30 +1128,30 @@ _EVENTMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='data', full_name='EventMessage.data',
+      name='data', full_name='PyGridWorld.SimulationServer.EventMessage.data',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1411,
-  serialized_end=1552,
+  serialized_start=1440,
+  serialized_end=1507,
 )
 
 
 _GETEVENTSRESPONSE = _descriptor.Descriptor(
   name='GetEventsResponse',
-  full_name='GetEventsResponse',
+  full_name='PyGridWorld.SimulationServer.GetEventsResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tick', full_name='GetEventsResponse.tick', index=0,
+      name='tick', full_name='PyGridWorld.SimulationServer.GetEventsResponse.tick', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='events', full_name='GetEventsResponse.events', index=1,
+      name='events', full_name='PyGridWorld.SimulationServer.GetEventsResponse.events', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1203,14 +1169,14 @@ _GETEVENTSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1554,
-  serialized_end=1618,
+  serialized_start=1509,
+  serialized_end=1602,
 )
 
 
 _GETSTATEBINARYREQUEST = _descriptor.Descriptor(
   name='GetStateBinaryRequest',
-  full_name='GetStateBinaryRequest',
+  full_name='PyGridWorld.SimulationServer.GetStateBinaryRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1227,20 +1193,20 @@ _GETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1620,
-  serialized_end=1643,
+  serialized_start=1604,
+  serialized_end=1627,
 )
 
 
 _GETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   name='GetStateBinaryResponse',
-  full_name='GetStateBinaryResponse',
+  full_name='PyGridWorld.SimulationServer.GetStateBinaryResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='binary', full_name='GetStateBinaryResponse.binary', index=0,
+      name='binary', full_name='PyGridWorld.SimulationServer.GetStateBinaryResponse.binary', index=0,
       number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
@@ -1258,20 +1224,20 @@ _GETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1645,
-  serialized_end=1685,
+  serialized_start=1629,
+  serialized_end=1669,
 )
 
 
 _SETSTATEBINARYREQUEST = _descriptor.Descriptor(
   name='SetStateBinaryRequest',
-  full_name='SetStateBinaryRequest',
+  full_name='PyGridWorld.SimulationServer.SetStateBinaryRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='binary', full_name='SetStateBinaryRequest.binary', index=0,
+      name='binary', full_name='PyGridWorld.SimulationServer.SetStateBinaryRequest.binary', index=0,
       number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
@@ -1289,14 +1255,14 @@ _SETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1687,
-  serialized_end=1726,
+  serialized_start=1671,
+  serialized_end=1710,
 )
 
 
 _SETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   name='SetStateBinaryResponse',
-  full_name='SetStateBinaryResponse',
+  full_name='PyGridWorld.SimulationServer.SetStateBinaryResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1313,12 +1279,10 @@ _SETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1728,
-  serialized_end=1752,
+  serialized_start=1712,
+  serialized_end=1736,
 )
 
-_EVENTMESSAGE.fields_by_name['type'].enum_type = _EVENTMESSAGE_TYPE
-_EVENTMESSAGE_TYPE.containing_type = _EVENTMESSAGE
 _EVENTMESSAGE.oneofs_by_name['data'].fields.append(
   _EVENTMESSAGE.fields_by_name['json'])
 _EVENTMESSAGE.fields_by_name['json'].containing_oneof = _EVENTMESSAGE.oneofs_by_name['data']
@@ -1374,301 +1338,301 @@ _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 GetTickRequest = _reflection.GeneratedProtocolMessageType('GetTickRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETTICKREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetTickRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetTickRequest)
   ))
 _sym_db.RegisterMessage(GetTickRequest)
 
 GetTickResponse = _reflection.GeneratedProtocolMessageType('GetTickResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETTICKRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetTickResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetTickResponse)
   ))
 _sym_db.RegisterMessage(GetTickResponse)
 
 GetStateJsonRequest = _reflection.GeneratedProtocolMessageType('GetStateJsonRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETSTATEJSONREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetStateJsonRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetStateJsonRequest)
   ))
 _sym_db.RegisterMessage(GetStateJsonRequest)
 
 GetStateJsonResponse = _reflection.GeneratedProtocolMessageType('GetStateJsonResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETSTATEJSONRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetStateJsonResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetStateJsonResponse)
   ))
 _sym_db.RegisterMessage(GetStateJsonResponse)
 
 SetStateJsonRequest = _reflection.GeneratedProtocolMessageType('SetStateJsonRequest', (_message.Message,), dict(
   DESCRIPTOR = _SETSTATEJSONREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:SetStateJsonRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.SetStateJsonRequest)
   ))
 _sym_db.RegisterMessage(SetStateJsonRequest)
 
 SetStateJsonResponse = _reflection.GeneratedProtocolMessageType('SetStateJsonResponse', (_message.Message,), dict(
   DESCRIPTOR = _SETSTATEJSONRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:SetStateJsonResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.SetStateJsonResponse)
   ))
 _sym_db.RegisterMessage(SetStateJsonResponse)
 
 CreateEntityRequest = _reflection.GeneratedProtocolMessageType('CreateEntityRequest', (_message.Message,), dict(
   DESCRIPTOR = _CREATEENTITYREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:CreateEntityRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.CreateEntityRequest)
   ))
 _sym_db.RegisterMessage(CreateEntityRequest)
 
 CreateEntityResponse = _reflection.GeneratedProtocolMessageType('CreateEntityResponse', (_message.Message,), dict(
   DESCRIPTOR = _CREATEENTITYRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:CreateEntityResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.CreateEntityResponse)
   ))
 _sym_db.RegisterMessage(CreateEntityResponse)
 
 DestroyEntityRequest = _reflection.GeneratedProtocolMessageType('DestroyEntityRequest', (_message.Message,), dict(
   DESCRIPTOR = _DESTROYENTITYREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:DestroyEntityRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.DestroyEntityRequest)
   ))
 _sym_db.RegisterMessage(DestroyEntityRequest)
 
 DestroyEntityResponse = _reflection.GeneratedProtocolMessageType('DestroyEntityResponse', (_message.Message,), dict(
   DESCRIPTOR = _DESTROYENTITYRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:DestroyEntityResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.DestroyEntityResponse)
   ))
 _sym_db.RegisterMessage(DestroyEntityResponse)
 
 GetAllEntitesRequest = _reflection.GeneratedProtocolMessageType('GetAllEntitesRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETALLENTITESREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetAllEntitesRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetAllEntitesRequest)
   ))
 _sym_db.RegisterMessage(GetAllEntitesRequest)
 
 GetAllEntitiesResponse = _reflection.GeneratedProtocolMessageType('GetAllEntitiesResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETALLENTITIESRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetAllEntitiesResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetAllEntitiesResponse)
   ))
 _sym_db.RegisterMessage(GetAllEntitiesResponse)
 
 StartSimulationRequest = _reflection.GeneratedProtocolMessageType('StartSimulationRequest', (_message.Message,), dict(
   DESCRIPTOR = _STARTSIMULATIONREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:StartSimulationRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.StartSimulationRequest)
   ))
 _sym_db.RegisterMessage(StartSimulationRequest)
 
 StartSimulationResponse = _reflection.GeneratedProtocolMessageType('StartSimulationResponse', (_message.Message,), dict(
   DESCRIPTOR = _STARTSIMULATIONRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:StartSimulationResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.StartSimulationResponse)
   ))
 _sym_db.RegisterMessage(StartSimulationResponse)
 
 StopSimulationRequest = _reflection.GeneratedProtocolMessageType('StopSimulationRequest', (_message.Message,), dict(
   DESCRIPTOR = _STOPSIMULATIONREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:StopSimulationRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.StopSimulationRequest)
   ))
 _sym_db.RegisterMessage(StopSimulationRequest)
 
 StopSimulationResponse = _reflection.GeneratedProtocolMessageType('StopSimulationResponse', (_message.Message,), dict(
   DESCRIPTOR = _STOPSIMULATIONRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:StopSimulationResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.StopSimulationResponse)
   ))
 _sym_db.RegisterMessage(StopSimulationResponse)
 
 IsRunningRequest = _reflection.GeneratedProtocolMessageType('IsRunningRequest', (_message.Message,), dict(
   DESCRIPTOR = _ISRUNNINGREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:IsRunningRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.IsRunningRequest)
   ))
 _sym_db.RegisterMessage(IsRunningRequest)
 
 IsRunningResponse = _reflection.GeneratedProtocolMessageType('IsRunningResponse', (_message.Message,), dict(
   DESCRIPTOR = _ISRUNNINGRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:IsRunningResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.IsRunningResponse)
   ))
 _sym_db.RegisterMessage(IsRunningResponse)
 
 AssignComponentRequest = _reflection.GeneratedProtocolMessageType('AssignComponentRequest', (_message.Message,), dict(
   DESCRIPTOR = _ASSIGNCOMPONENTREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:AssignComponentRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.AssignComponentRequest)
   ))
 _sym_db.RegisterMessage(AssignComponentRequest)
 
 AssignComponentResponse = _reflection.GeneratedProtocolMessageType('AssignComponentResponse', (_message.Message,), dict(
   DESCRIPTOR = _ASSIGNCOMPONENTRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:AssignComponentResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.AssignComponentResponse)
   ))
 _sym_db.RegisterMessage(AssignComponentResponse)
 
 GetComponentJsonRequest = _reflection.GeneratedProtocolMessageType('GetComponentJsonRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETCOMPONENTJSONREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetComponentJsonRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetComponentJsonRequest)
   ))
 _sym_db.RegisterMessage(GetComponentJsonRequest)
 
 GetComponentJsonResponse = _reflection.GeneratedProtocolMessageType('GetComponentJsonResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETCOMPONENTJSONRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetComponentJsonResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetComponentJsonResponse)
   ))
 _sym_db.RegisterMessage(GetComponentJsonResponse)
 
 RemoveComponentRequest = _reflection.GeneratedProtocolMessageType('RemoveComponentRequest', (_message.Message,), dict(
   DESCRIPTOR = _REMOVECOMPONENTREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:RemoveComponentRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.RemoveComponentRequest)
   ))
 _sym_db.RegisterMessage(RemoveComponentRequest)
 
 RemoveComponentResponse = _reflection.GeneratedProtocolMessageType('RemoveComponentResponse', (_message.Message,), dict(
   DESCRIPTOR = _REMOVECOMPONENTRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:RemoveComponentResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.RemoveComponentResponse)
   ))
 _sym_db.RegisterMessage(RemoveComponentResponse)
 
 ReplaceComponentRequest = _reflection.GeneratedProtocolMessageType('ReplaceComponentRequest', (_message.Message,), dict(
   DESCRIPTOR = _REPLACECOMPONENTREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:ReplaceComponentRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.ReplaceComponentRequest)
   ))
 _sym_db.RegisterMessage(ReplaceComponentRequest)
 
 ReplaceComponentResponse = _reflection.GeneratedProtocolMessageType('ReplaceComponentResponse', (_message.Message,), dict(
   DESCRIPTOR = _REPLACECOMPONENTRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:ReplaceComponentResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.ReplaceComponentResponse)
   ))
 _sym_db.RegisterMessage(ReplaceComponentResponse)
 
 GetComponentNamesRequest = _reflection.GeneratedProtocolMessageType('GetComponentNamesRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETCOMPONENTNAMESREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetComponentNamesRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetComponentNamesRequest)
   ))
 _sym_db.RegisterMessage(GetComponentNamesRequest)
 
 GetComponentNamesResponse = _reflection.GeneratedProtocolMessageType('GetComponentNamesResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETCOMPONENTNAMESRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetComponentNamesResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetComponentNamesResponse)
   ))
 _sym_db.RegisterMessage(GetComponentNamesResponse)
 
 GetEntityComponentNamesRequest = _reflection.GeneratedProtocolMessageType('GetEntityComponentNamesRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETENTITYCOMPONENTNAMESREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetEntityComponentNamesRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetEntityComponentNamesRequest)
   ))
 _sym_db.RegisterMessage(GetEntityComponentNamesRequest)
 
 GetEntityComponentNamesResponse = _reflection.GeneratedProtocolMessageType('GetEntityComponentNamesResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETENTITYCOMPONENTNAMESRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetEntityComponentNamesResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetEntityComponentNamesResponse)
   ))
 _sym_db.RegisterMessage(GetEntityComponentNamesResponse)
 
 GetSingletonJsonRequest = _reflection.GeneratedProtocolMessageType('GetSingletonJsonRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETSINGLETONJSONREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetSingletonJsonRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetSingletonJsonRequest)
   ))
 _sym_db.RegisterMessage(GetSingletonJsonRequest)
 
 GetSingletonJsonResponse = _reflection.GeneratedProtocolMessageType('GetSingletonJsonResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETSINGLETONJSONRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetSingletonJsonResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetSingletonJsonResponse)
   ))
 _sym_db.RegisterMessage(GetSingletonJsonResponse)
 
 SetSingletonJsonRequest = _reflection.GeneratedProtocolMessageType('SetSingletonJsonRequest', (_message.Message,), dict(
   DESCRIPTOR = _SETSINGLETONJSONREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:SetSingletonJsonRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.SetSingletonJsonRequest)
   ))
 _sym_db.RegisterMessage(SetSingletonJsonRequest)
 
 SetSingletonJsonResponse = _reflection.GeneratedProtocolMessageType('SetSingletonJsonResponse', (_message.Message,), dict(
   DESCRIPTOR = _SETSINGLETONJSONRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:SetSingletonJsonResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.SetSingletonJsonResponse)
   ))
 _sym_db.RegisterMessage(SetSingletonJsonResponse)
 
 GetSingletonNamesRequest = _reflection.GeneratedProtocolMessageType('GetSingletonNamesRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETSINGLETONNAMESREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetSingletonNamesRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetSingletonNamesRequest)
   ))
 _sym_db.RegisterMessage(GetSingletonNamesRequest)
 
 GetSingletonNamesResponse = _reflection.GeneratedProtocolMessageType('GetSingletonNamesResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETSINGLETONNAMESRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetSingletonNamesResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetSingletonNamesResponse)
   ))
 _sym_db.RegisterMessage(GetSingletonNamesResponse)
 
 GetEventsRequest = _reflection.GeneratedProtocolMessageType('GetEventsRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETEVENTSREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetEventsRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetEventsRequest)
   ))
 _sym_db.RegisterMessage(GetEventsRequest)
 
 EventMessage = _reflection.GeneratedProtocolMessageType('EventMessage', (_message.Message,), dict(
   DESCRIPTOR = _EVENTMESSAGE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:EventMessage)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.EventMessage)
   ))
 _sym_db.RegisterMessage(EventMessage)
 
 GetEventsResponse = _reflection.GeneratedProtocolMessageType('GetEventsResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETEVENTSRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetEventsResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetEventsResponse)
   ))
 _sym_db.RegisterMessage(GetEventsResponse)
 
 GetStateBinaryRequest = _reflection.GeneratedProtocolMessageType('GetStateBinaryRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETSTATEBINARYREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetStateBinaryRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetStateBinaryRequest)
   ))
 _sym_db.RegisterMessage(GetStateBinaryRequest)
 
 GetStateBinaryResponse = _reflection.GeneratedProtocolMessageType('GetStateBinaryResponse', (_message.Message,), dict(
   DESCRIPTOR = _GETSTATEBINARYRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:GetStateBinaryResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.GetStateBinaryResponse)
   ))
 _sym_db.RegisterMessage(GetStateBinaryResponse)
 
 SetStateBinaryRequest = _reflection.GeneratedProtocolMessageType('SetStateBinaryRequest', (_message.Message,), dict(
   DESCRIPTOR = _SETSTATEBINARYREQUEST,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:SetStateBinaryRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.SetStateBinaryRequest)
   ))
 _sym_db.RegisterMessage(SetStateBinaryRequest)
 
 SetStateBinaryResponse = _reflection.GeneratedProtocolMessageType('SetStateBinaryResponse', (_message.Message,), dict(
   DESCRIPTOR = _SETSTATEBINARYRESPONSE,
   __module__ = 'simulation_pb2'
-  # @@protoc_insertion_point(class_scope:SetStateBinaryResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.SetStateBinaryResponse)
   ))
 _sym_db.RegisterMessage(SetStateBinaryResponse)
 
@@ -1676,16 +1640,16 @@ _sym_db.RegisterMessage(SetStateBinaryResponse)
 
 _SIMULATION = _descriptor.ServiceDescriptor(
   name='Simulation',
-  full_name='Simulation',
+  full_name='PyGridWorld.SimulationServer.Simulation',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1755,
-  serialized_end=3181,
+  serialized_start=1739,
+  serialized_end=4390,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTick',
-    full_name='Simulation.GetTick',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetTick',
     index=0,
     containing_service=None,
     input_type=_GETTICKREQUEST,
@@ -1694,7 +1658,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetStateJson',
-    full_name='Simulation.GetStateJson',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetStateJson',
     index=1,
     containing_service=None,
     input_type=_GETSTATEJSONREQUEST,
@@ -1703,7 +1667,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetStateJson',
-    full_name='Simulation.SetStateJson',
+    full_name='PyGridWorld.SimulationServer.Simulation.SetStateJson',
     index=2,
     containing_service=None,
     input_type=_SETSTATEJSONREQUEST,
@@ -1712,7 +1676,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='CreateEntity',
-    full_name='Simulation.CreateEntity',
+    full_name='PyGridWorld.SimulationServer.Simulation.CreateEntity',
     index=3,
     containing_service=None,
     input_type=_CREATEENTITYREQUEST,
@@ -1721,7 +1685,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='DestroyEntity',
-    full_name='Simulation.DestroyEntity',
+    full_name='PyGridWorld.SimulationServer.Simulation.DestroyEntity',
     index=4,
     containing_service=None,
     input_type=_DESTROYENTITYREQUEST,
@@ -1730,7 +1694,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetAllEntities',
-    full_name='Simulation.GetAllEntities',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetAllEntities',
     index=5,
     containing_service=None,
     input_type=_GETALLENTITESREQUEST,
@@ -1739,7 +1703,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='StartSimulation',
-    full_name='Simulation.StartSimulation',
+    full_name='PyGridWorld.SimulationServer.Simulation.StartSimulation',
     index=6,
     containing_service=None,
     input_type=_STARTSIMULATIONREQUEST,
@@ -1748,7 +1712,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='StopSimulation',
-    full_name='Simulation.StopSimulation',
+    full_name='PyGridWorld.SimulationServer.Simulation.StopSimulation',
     index=7,
     containing_service=None,
     input_type=_STOPSIMULATIONREQUEST,
@@ -1757,7 +1721,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='IsRunning',
-    full_name='Simulation.IsRunning',
+    full_name='PyGridWorld.SimulationServer.Simulation.IsRunning',
     index=8,
     containing_service=None,
     input_type=_ISRUNNINGREQUEST,
@@ -1766,7 +1730,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='AssignComponent',
-    full_name='Simulation.AssignComponent',
+    full_name='PyGridWorld.SimulationServer.Simulation.AssignComponent',
     index=9,
     containing_service=None,
     input_type=_ASSIGNCOMPONENTREQUEST,
@@ -1775,7 +1739,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetComponentJson',
-    full_name='Simulation.GetComponentJson',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetComponentJson',
     index=10,
     containing_service=None,
     input_type=_GETCOMPONENTJSONREQUEST,
@@ -1784,7 +1748,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='RemoveComponent',
-    full_name='Simulation.RemoveComponent',
+    full_name='PyGridWorld.SimulationServer.Simulation.RemoveComponent',
     index=11,
     containing_service=None,
     input_type=_REMOVECOMPONENTREQUEST,
@@ -1793,7 +1757,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='ReplaceComponent',
-    full_name='Simulation.ReplaceComponent',
+    full_name='PyGridWorld.SimulationServer.Simulation.ReplaceComponent',
     index=12,
     containing_service=None,
     input_type=_REPLACECOMPONENTREQUEST,
@@ -1802,7 +1766,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetComponentNames',
-    full_name='Simulation.GetComponentNames',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetComponentNames',
     index=13,
     containing_service=None,
     input_type=_GETCOMPONENTNAMESREQUEST,
@@ -1811,7 +1775,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetEntityComponentNames',
-    full_name='Simulation.GetEntityComponentNames',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetEntityComponentNames',
     index=14,
     containing_service=None,
     input_type=_GETENTITYCOMPONENTNAMESREQUEST,
@@ -1820,7 +1784,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetSingletonJson',
-    full_name='Simulation.GetSingletonJson',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetSingletonJson',
     index=15,
     containing_service=None,
     input_type=_GETSINGLETONJSONREQUEST,
@@ -1829,7 +1793,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetSingletonJson',
-    full_name='Simulation.SetSingletonJson',
+    full_name='PyGridWorld.SimulationServer.Simulation.SetSingletonJson',
     index=16,
     containing_service=None,
     input_type=_SETSINGLETONJSONREQUEST,
@@ -1838,7 +1802,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetSingletonNames',
-    full_name='Simulation.GetSingletonNames',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetSingletonNames',
     index=17,
     containing_service=None,
     input_type=_GETSINGLETONNAMESREQUEST,
@@ -1847,7 +1811,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetEvents',
-    full_name='Simulation.GetEvents',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetEvents',
     index=18,
     containing_service=None,
     input_type=_GETEVENTSREQUEST,
@@ -1856,7 +1820,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetStateBinary',
-    full_name='Simulation.GetStateBinary',
+    full_name='PyGridWorld.SimulationServer.Simulation.GetStateBinary',
     index=19,
     containing_service=None,
     input_type=_GETSTATEBINARYREQUEST,
@@ -1865,7 +1829,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetStateBinary',
-    full_name='Simulation.SetStateBinary',
+    full_name='PyGridWorld.SimulationServer.Simulation.SetStateBinary',
     index=20,
     containing_service=None,
     input_type=_SETSTATEBINARYREQUEST,

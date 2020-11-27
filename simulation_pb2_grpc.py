@@ -16,107 +16,107 @@ class SimulationStub(object):
       channel: A grpc.Channel.
     """
     self.GetTick = channel.unary_unary(
-        '/Simulation/GetTick',
+        '/PyGridWorld.SimulationServer.Simulation/GetTick',
         request_serializer=simulation__pb2.GetTickRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetTickResponse.FromString,
         )
     self.GetStateJson = channel.unary_unary(
-        '/Simulation/GetStateJson',
+        '/PyGridWorld.SimulationServer.Simulation/GetStateJson',
         request_serializer=simulation__pb2.GetStateJsonRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetStateJsonResponse.FromString,
         )
     self.SetStateJson = channel.unary_unary(
-        '/Simulation/SetStateJson',
+        '/PyGridWorld.SimulationServer.Simulation/SetStateJson',
         request_serializer=simulation__pb2.SetStateJsonRequest.SerializeToString,
         response_deserializer=simulation__pb2.SetStateJsonResponse.FromString,
         )
     self.CreateEntity = channel.unary_unary(
-        '/Simulation/CreateEntity',
+        '/PyGridWorld.SimulationServer.Simulation/CreateEntity',
         request_serializer=simulation__pb2.CreateEntityRequest.SerializeToString,
         response_deserializer=simulation__pb2.CreateEntityResponse.FromString,
         )
     self.DestroyEntity = channel.unary_unary(
-        '/Simulation/DestroyEntity',
+        '/PyGridWorld.SimulationServer.Simulation/DestroyEntity',
         request_serializer=simulation__pb2.DestroyEntityRequest.SerializeToString,
         response_deserializer=simulation__pb2.DestroyEntityResponse.FromString,
         )
     self.GetAllEntities = channel.unary_unary(
-        '/Simulation/GetAllEntities',
+        '/PyGridWorld.SimulationServer.Simulation/GetAllEntities',
         request_serializer=simulation__pb2.GetAllEntitesRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetAllEntitiesResponse.FromString,
         )
     self.StartSimulation = channel.unary_unary(
-        '/Simulation/StartSimulation',
+        '/PyGridWorld.SimulationServer.Simulation/StartSimulation',
         request_serializer=simulation__pb2.StartSimulationRequest.SerializeToString,
         response_deserializer=simulation__pb2.StartSimulationResponse.FromString,
         )
     self.StopSimulation = channel.unary_unary(
-        '/Simulation/StopSimulation',
+        '/PyGridWorld.SimulationServer.Simulation/StopSimulation',
         request_serializer=simulation__pb2.StopSimulationRequest.SerializeToString,
         response_deserializer=simulation__pb2.StopSimulationResponse.FromString,
         )
     self.IsRunning = channel.unary_unary(
-        '/Simulation/IsRunning',
+        '/PyGridWorld.SimulationServer.Simulation/IsRunning',
         request_serializer=simulation__pb2.IsRunningRequest.SerializeToString,
         response_deserializer=simulation__pb2.IsRunningResponse.FromString,
         )
     self.AssignComponent = channel.unary_unary(
-        '/Simulation/AssignComponent',
+        '/PyGridWorld.SimulationServer.Simulation/AssignComponent',
         request_serializer=simulation__pb2.AssignComponentRequest.SerializeToString,
         response_deserializer=simulation__pb2.AssignComponentResponse.FromString,
         )
     self.GetComponentJson = channel.unary_unary(
-        '/Simulation/GetComponentJson',
+        '/PyGridWorld.SimulationServer.Simulation/GetComponentJson',
         request_serializer=simulation__pb2.GetComponentJsonRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetComponentJsonResponse.FromString,
         )
     self.RemoveComponent = channel.unary_unary(
-        '/Simulation/RemoveComponent',
+        '/PyGridWorld.SimulationServer.Simulation/RemoveComponent',
         request_serializer=simulation__pb2.RemoveComponentRequest.SerializeToString,
         response_deserializer=simulation__pb2.RemoveComponentResponse.FromString,
         )
     self.ReplaceComponent = channel.unary_unary(
-        '/Simulation/ReplaceComponent',
+        '/PyGridWorld.SimulationServer.Simulation/ReplaceComponent',
         request_serializer=simulation__pb2.ReplaceComponentRequest.SerializeToString,
         response_deserializer=simulation__pb2.ReplaceComponentResponse.FromString,
         )
     self.GetComponentNames = channel.unary_unary(
-        '/Simulation/GetComponentNames',
+        '/PyGridWorld.SimulationServer.Simulation/GetComponentNames',
         request_serializer=simulation__pb2.GetComponentNamesRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetComponentNamesResponse.FromString,
         )
     self.GetEntityComponentNames = channel.unary_unary(
-        '/Simulation/GetEntityComponentNames',
+        '/PyGridWorld.SimulationServer.Simulation/GetEntityComponentNames',
         request_serializer=simulation__pb2.GetEntityComponentNamesRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetEntityComponentNamesResponse.FromString,
         )
     self.GetSingletonJson = channel.unary_unary(
-        '/Simulation/GetSingletonJson',
+        '/PyGridWorld.SimulationServer.Simulation/GetSingletonJson',
         request_serializer=simulation__pb2.GetSingletonJsonRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetSingletonJsonResponse.FromString,
         )
     self.SetSingletonJson = channel.unary_unary(
-        '/Simulation/SetSingletonJson',
+        '/PyGridWorld.SimulationServer.Simulation/SetSingletonJson',
         request_serializer=simulation__pb2.SetSingletonJsonRequest.SerializeToString,
         response_deserializer=simulation__pb2.SetSingletonJsonResponse.FromString,
         )
     self.GetSingletonNames = channel.unary_unary(
-        '/Simulation/GetSingletonNames',
+        '/PyGridWorld.SimulationServer.Simulation/GetSingletonNames',
         request_serializer=simulation__pb2.GetSingletonNamesRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetSingletonNamesResponse.FromString,
         )
     self.GetEvents = channel.unary_stream(
-        '/Simulation/GetEvents',
+        '/PyGridWorld.SimulationServer.Simulation/GetEvents',
         request_serializer=simulation__pb2.GetEventsRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetEventsResponse.FromString,
         )
     self.GetStateBinary = channel.unary_unary(
-        '/Simulation/GetStateBinary',
+        '/PyGridWorld.SimulationServer.Simulation/GetStateBinary',
         request_serializer=simulation__pb2.GetStateBinaryRequest.SerializeToString,
         response_deserializer=simulation__pb2.GetStateBinaryResponse.FromString,
         )
     self.SetStateBinary = channel.unary_unary(
-        '/Simulation/SetStateBinary',
+        '/PyGridWorld.SimulationServer.Simulation/SetStateBinary',
         request_serializer=simulation__pb2.SetStateBinaryRequest.SerializeToString,
         response_deserializer=simulation__pb2.SetStateBinaryResponse.FromString,
         )
@@ -384,5 +384,5 @@ def add_SimulationServicer_to_server(servicer, server):
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'Simulation', rpc_method_handlers)
+      'PyGridWorld.SimulationServer.Simulation', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))

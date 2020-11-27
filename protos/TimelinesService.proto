@@ -1,11 +1,15 @@
 syntax = "proto3";
 
+package PyGridWorld;
+
 // python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
 
 service TimelineService {
+    rpc GetTimelines (TimelinesRequest) returns (TimelinesResponse) {}
     rpc GetTimelineTicks (TimelineTicksRequest) returns (TimelineTicksResponse) {}
     rpc GetTimelineData (TimelineDataRequest) returns (stream TimelineDataResponse) {}
     rpc GetTimelineJson (TimelineJsonRequest) returns (stream TimelineJsonResponse) {}
+    rpc GetTimelineEvents (TimelineEventsRequest) returns (stream TimelineEventsResponse) {}
 }
 
 message TickList {
@@ -15,6 +19,14 @@ message TickList {
 message TickRange {
     int64 start_tick = 1;
     int64 end_tick = 2;
+}
+
+message TimelinesRequest {
+
+}
+
+message TimelinesResponse {
+    repeated int64 timeline_ids = 1;
 }
 
 message TimelineTicksRequest {
@@ -49,4 +61,21 @@ message TimelineJsonRequest {
 message TimelineJsonResponse {
     int64 tick = 1;
     string json = 2;
+}
+
+message TimelineEventsRequest {
+    int32 timeline_id = 1;
+    TickRange tick_range = 2;
+    repeated string filters = 3;
+}
+
+message EventMessage {
+    string name = 1;
+    string json = 2;
+}
+
+message TimelineEventsResponse {
+    int32 timeline_id = 1;
+    int64 tick = 2;
+    repeated EventMessage events = 3;
 }

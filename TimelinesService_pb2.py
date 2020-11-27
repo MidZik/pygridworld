@@ -16,10 +16,10 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='TimelinesService.proto',
-  package='',
+  package='PyGridWorld',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x16TimelinesService.proto\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"5\n\x15TimelineTicksResponse\x12\x1c\n\ttick_list\x18\x01 \x01(\x0b\x32\t.TickList\"8\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"{\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x1e\n\ttick_list\x18\x02 \x01(\x0b\x32\t.TickListH\x00\x12 \n\ntick_range\x18\x03 \x01(\x0b\x32\n.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t2\xde\x01\n\x0fTimelineService\x12\x43\n\x10GetTimelineTicks\x12\x15.TimelineTicksRequest\x1a\x16.TimelineTicksResponse\"\x00\x12\x42\n\x0fGetTimelineData\x12\x14.TimelineDataRequest\x1a\x15.TimelineDataResponse\"\x00\x30\x01\x12\x42\n\x0fGetTimelineJson\x12\x14.TimelineJsonRequest\x1a\x15.TimelineJsonResponse\"\x00\x30\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x16TimelinesService.proto\x12\x0bPyGridWorld\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"\x12\n\x10TimelinesRequest\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"A\n\x15TimelineTicksResponse\x12(\n\ttick_list\x18\x01 \x01(\x0b\x32\x15.PyGridWorld.TickList\"\x93\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x93\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"i\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ntick_range\x18\x02 \x01(\x0b\x32\x16.PyGridWorld.TickRange\x12\x0f\n\x07\x66ilters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"f\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12)\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x19.PyGridWorld.EventMessage2\xd9\x03\n\x0fTimelineService\x12O\n\x0cGetTimelines\x12\x1d.PyGridWorld.TimelinesRequest\x1a\x1e.PyGridWorld.TimelinesResponse\"\x00\x12[\n\x10GetTimelineTicks\x12!.PyGridWorld.TimelineTicksRequest\x1a\".PyGridWorld.TimelineTicksResponse\"\x00\x12Z\n\x0fGetTimelineData\x12 .PyGridWorld.TimelineDataRequest\x1a!.PyGridWorld.TimelineDataResponse\"\x00\x30\x01\x12Z\n\x0fGetTimelineJson\x12 .PyGridWorld.TimelineJsonRequest\x1a!.PyGridWorld.TimelineJsonResponse\"\x00\x30\x01\x12`\n\x11GetTimelineEvents\x12\".PyGridWorld.TimelineEventsRequest\x1a#.PyGridWorld.TimelineEventsResponse\"\x00\x30\x01\x62\x06proto3')
 )
 
 
@@ -27,13 +27,13 @@ DESCRIPTOR = _descriptor.FileDescriptor(
 
 _TICKLIST = _descriptor.Descriptor(
   name='TickList',
-  full_name='TickList',
+  full_name='PyGridWorld.TickList',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='ticks', full_name='TickList.ticks', index=0,
+      name='ticks', full_name='PyGridWorld.TickList.ticks', index=0,
       number=1, type=3, cpp_type=2, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -51,27 +51,27 @@ _TICKLIST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=26,
-  serialized_end=51,
+  serialized_start=39,
+  serialized_end=64,
 )
 
 
 _TICKRANGE = _descriptor.Descriptor(
   name='TickRange',
-  full_name='TickRange',
+  full_name='PyGridWorld.TickRange',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='start_tick', full_name='TickRange.start_tick', index=0,
+      name='start_tick', full_name='PyGridWorld.TickRange.start_tick', index=0,
       number=1, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='end_tick', full_name='TickRange.end_tick', index=1,
+      name='end_tick', full_name='PyGridWorld.TickRange.end_tick', index=1,
       number=2, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -89,20 +89,75 @@ _TICKRANGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=53,
-  serialized_end=102,
+  serialized_start=66,
+  serialized_end=115,
 )
 
 
-_TIMELINETICKSREQUEST = _descriptor.Descriptor(
-  name='TimelineTicksRequest',
-  full_name='TimelineTicksRequest',
+_TIMELINESREQUEST = _descriptor.Descriptor(
+  name='TimelinesRequest',
+  full_name='PyGridWorld.TimelinesRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=117,
+  serialized_end=135,
+)
+
+
+_TIMELINESRESPONSE = _descriptor.Descriptor(
+  name='TimelinesResponse',
+  full_name='PyGridWorld.TimelinesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='timeline_id', full_name='TimelineTicksRequest.timeline_id', index=0,
+      name='timeline_ids', full_name='PyGridWorld.TimelinesResponse.timeline_ids', index=0,
+      number=1, type=3, cpp_type=2, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=137,
+  serialized_end=178,
+)
+
+
+_TIMELINETICKSREQUEST = _descriptor.Descriptor(
+  name='TimelineTicksRequest',
+  full_name='PyGridWorld.TimelineTicksRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='PyGridWorld.TimelineTicksRequest.timeline_id', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -120,20 +175,20 @@ _TIMELINETICKSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=104,
-  serialized_end=147,
+  serialized_start=180,
+  serialized_end=223,
 )
 
 
 _TIMELINETICKSRESPONSE = _descriptor.Descriptor(
   name='TimelineTicksResponse',
-  full_name='TimelineTicksResponse',
+  full_name='PyGridWorld.TimelineTicksResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tick_list', full_name='TimelineTicksResponse.tick_list', index=0,
+      name='tick_list', full_name='PyGridWorld.TimelineTicksResponse.tick_list', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -151,110 +206,34 @@ _TIMELINETICKSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=149,
-  serialized_end=202,
+  serialized_start=225,
+  serialized_end=290,
 )
 
 
 _TIMELINEDATAREQUEST = _descriptor.Descriptor(
   name='TimelineDataRequest',
-  full_name='TimelineDataRequest',
+  full_name='PyGridWorld.TimelineDataRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='timeline_id', full_name='TimelineDataRequest.timeline_id', index=0,
+      name='timeline_id', full_name='PyGridWorld.TimelineDataRequest.timeline_id', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='tick', full_name='TimelineDataRequest.tick', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=204,
-  serialized_end=260,
-)
-
-
-_TIMELINEDATARESPONSE = _descriptor.Descriptor(
-  name='TimelineDataResponse',
-  full_name='TimelineDataResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='tick', full_name='TimelineDataResponse.tick', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='data', full_name='TimelineDataResponse.data', index=1,
-      number=2, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b(""),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=262,
-  serialized_end=312,
-)
-
-
-_TIMELINEJSONREQUEST = _descriptor.Descriptor(
-  name='TimelineJsonRequest',
-  full_name='TimelineJsonRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='timeline_id', full_name='TimelineJsonRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='tick_list', full_name='TimelineJsonRequest.tick_list', index=1,
+      name='tick_list', full_name='PyGridWorld.TimelineDataRequest.tick_list', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='tick_range', full_name='TimelineJsonRequest.tick_range', index=2,
+      name='tick_range', full_name='PyGridWorld.TimelineDataRequest.tick_range', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -272,30 +251,116 @@ _TIMELINEJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='tick_option', full_name='TimelineJsonRequest.tick_option',
+      name='tick_option', full_name='PyGridWorld.TimelineDataRequest.tick_option',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=314,
-  serialized_end=437,
+  serialized_start=293,
+  serialized_end=440,
 )
 
 
-_TIMELINEJSONRESPONSE = _descriptor.Descriptor(
-  name='TimelineJsonResponse',
-  full_name='TimelineJsonResponse',
+_TIMELINEDATARESPONSE = _descriptor.Descriptor(
+  name='TimelineDataResponse',
+  full_name='PyGridWorld.TimelineDataResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tick', full_name='TimelineJsonResponse.tick', index=0,
+      name='tick', full_name='PyGridWorld.TimelineDataResponse.tick', index=0,
       number=1, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='json', full_name='TimelineJsonResponse.json', index=1,
+      name='data', full_name='PyGridWorld.TimelineDataResponse.data', index=1,
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=442,
+  serialized_end=492,
+)
+
+
+_TIMELINEJSONREQUEST = _descriptor.Descriptor(
+  name='TimelineJsonRequest',
+  full_name='PyGridWorld.TimelineJsonRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='PyGridWorld.TimelineJsonRequest.timeline_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tick_list', full_name='PyGridWorld.TimelineJsonRequest.tick_list', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tick_range', full_name='PyGridWorld.TimelineJsonRequest.tick_range', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='tick_option', full_name='PyGridWorld.TimelineJsonRequest.tick_option',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=495,
+  serialized_end=642,
+)
+
+
+_TIMELINEJSONRESPONSE = _descriptor.Descriptor(
+  name='TimelineJsonResponse',
+  full_name='PyGridWorld.TimelineJsonResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.TimelineJsonResponse.tick', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='json', full_name='PyGridWorld.TimelineJsonResponse.json', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -313,11 +378,147 @@ _TIMELINEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=439,
-  serialized_end=489,
+  serialized_start=644,
+  serialized_end=694,
+)
+
+
+_TIMELINEEVENTSREQUEST = _descriptor.Descriptor(
+  name='TimelineEventsRequest',
+  full_name='PyGridWorld.TimelineEventsRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='PyGridWorld.TimelineEventsRequest.timeline_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tick_range', full_name='PyGridWorld.TimelineEventsRequest.tick_range', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='filters', full_name='PyGridWorld.TimelineEventsRequest.filters', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=696,
+  serialized_end=801,
+)
+
+
+_EVENTMESSAGE = _descriptor.Descriptor(
+  name='EventMessage',
+  full_name='PyGridWorld.EventMessage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='PyGridWorld.EventMessage.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='json', full_name='PyGridWorld.EventMessage.json', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=803,
+  serialized_end=845,
+)
+
+
+_TIMELINEEVENTSRESPONSE = _descriptor.Descriptor(
+  name='TimelineEventsResponse',
+  full_name='PyGridWorld.TimelineEventsResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='PyGridWorld.TimelineEventsResponse.timeline_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.TimelineEventsResponse.tick', index=1,
+      number=2, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='events', full_name='PyGridWorld.TimelineEventsResponse.events', index=2,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=847,
+  serialized_end=949,
 )
 
 _TIMELINETICKSRESPONSE.fields_by_name['tick_list'].message_type = _TICKLIST
+_TIMELINEDATAREQUEST.fields_by_name['tick_list'].message_type = _TICKLIST
+_TIMELINEDATAREQUEST.fields_by_name['tick_range'].message_type = _TICKRANGE
+_TIMELINEDATAREQUEST.oneofs_by_name['tick_option'].fields.append(
+  _TIMELINEDATAREQUEST.fields_by_name['tick_list'])
+_TIMELINEDATAREQUEST.fields_by_name['tick_list'].containing_oneof = _TIMELINEDATAREQUEST.oneofs_by_name['tick_option']
+_TIMELINEDATAREQUEST.oneofs_by_name['tick_option'].fields.append(
+  _TIMELINEDATAREQUEST.fields_by_name['tick_range'])
+_TIMELINEDATAREQUEST.fields_by_name['tick_range'].containing_oneof = _TIMELINEDATAREQUEST.oneofs_by_name['tick_option']
 _TIMELINEJSONREQUEST.fields_by_name['tick_list'].message_type = _TICKLIST
 _TIMELINEJSONREQUEST.fields_by_name['tick_range'].message_type = _TICKRANGE
 _TIMELINEJSONREQUEST.oneofs_by_name['tick_option'].fields.append(
@@ -326,87 +527,138 @@ _TIMELINEJSONREQUEST.fields_by_name['tick_list'].containing_oneof = _TIMELINEJSO
 _TIMELINEJSONREQUEST.oneofs_by_name['tick_option'].fields.append(
   _TIMELINEJSONREQUEST.fields_by_name['tick_range'])
 _TIMELINEJSONREQUEST.fields_by_name['tick_range'].containing_oneof = _TIMELINEJSONREQUEST.oneofs_by_name['tick_option']
+_TIMELINEEVENTSREQUEST.fields_by_name['tick_range'].message_type = _TICKRANGE
+_TIMELINEEVENTSRESPONSE.fields_by_name['events'].message_type = _EVENTMESSAGE
 DESCRIPTOR.message_types_by_name['TickList'] = _TICKLIST
 DESCRIPTOR.message_types_by_name['TickRange'] = _TICKRANGE
+DESCRIPTOR.message_types_by_name['TimelinesRequest'] = _TIMELINESREQUEST
+DESCRIPTOR.message_types_by_name['TimelinesResponse'] = _TIMELINESRESPONSE
 DESCRIPTOR.message_types_by_name['TimelineTicksRequest'] = _TIMELINETICKSREQUEST
 DESCRIPTOR.message_types_by_name['TimelineTicksResponse'] = _TIMELINETICKSRESPONSE
 DESCRIPTOR.message_types_by_name['TimelineDataRequest'] = _TIMELINEDATAREQUEST
 DESCRIPTOR.message_types_by_name['TimelineDataResponse'] = _TIMELINEDATARESPONSE
 DESCRIPTOR.message_types_by_name['TimelineJsonRequest'] = _TIMELINEJSONREQUEST
 DESCRIPTOR.message_types_by_name['TimelineJsonResponse'] = _TIMELINEJSONRESPONSE
+DESCRIPTOR.message_types_by_name['TimelineEventsRequest'] = _TIMELINEEVENTSREQUEST
+DESCRIPTOR.message_types_by_name['EventMessage'] = _EVENTMESSAGE
+DESCRIPTOR.message_types_by_name['TimelineEventsResponse'] = _TIMELINEEVENTSRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 TickList = _reflection.GeneratedProtocolMessageType('TickList', (_message.Message,), dict(
   DESCRIPTOR = _TICKLIST,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TickList)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TickList)
   ))
 _sym_db.RegisterMessage(TickList)
 
 TickRange = _reflection.GeneratedProtocolMessageType('TickRange', (_message.Message,), dict(
   DESCRIPTOR = _TICKRANGE,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TickRange)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TickRange)
   ))
 _sym_db.RegisterMessage(TickRange)
+
+TimelinesRequest = _reflection.GeneratedProtocolMessageType('TimelinesRequest', (_message.Message,), dict(
+  DESCRIPTOR = _TIMELINESREQUEST,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelinesRequest)
+  ))
+_sym_db.RegisterMessage(TimelinesRequest)
+
+TimelinesResponse = _reflection.GeneratedProtocolMessageType('TimelinesResponse', (_message.Message,), dict(
+  DESCRIPTOR = _TIMELINESRESPONSE,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelinesResponse)
+  ))
+_sym_db.RegisterMessage(TimelinesResponse)
 
 TimelineTicksRequest = _reflection.GeneratedProtocolMessageType('TimelineTicksRequest', (_message.Message,), dict(
   DESCRIPTOR = _TIMELINETICKSREQUEST,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TimelineTicksRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineTicksRequest)
   ))
 _sym_db.RegisterMessage(TimelineTicksRequest)
 
 TimelineTicksResponse = _reflection.GeneratedProtocolMessageType('TimelineTicksResponse', (_message.Message,), dict(
   DESCRIPTOR = _TIMELINETICKSRESPONSE,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TimelineTicksResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineTicksResponse)
   ))
 _sym_db.RegisterMessage(TimelineTicksResponse)
 
 TimelineDataRequest = _reflection.GeneratedProtocolMessageType('TimelineDataRequest', (_message.Message,), dict(
   DESCRIPTOR = _TIMELINEDATAREQUEST,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TimelineDataRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineDataRequest)
   ))
 _sym_db.RegisterMessage(TimelineDataRequest)
 
 TimelineDataResponse = _reflection.GeneratedProtocolMessageType('TimelineDataResponse', (_message.Message,), dict(
   DESCRIPTOR = _TIMELINEDATARESPONSE,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TimelineDataResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineDataResponse)
   ))
 _sym_db.RegisterMessage(TimelineDataResponse)
 
 TimelineJsonRequest = _reflection.GeneratedProtocolMessageType('TimelineJsonRequest', (_message.Message,), dict(
   DESCRIPTOR = _TIMELINEJSONREQUEST,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TimelineJsonRequest)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineJsonRequest)
   ))
 _sym_db.RegisterMessage(TimelineJsonRequest)
 
 TimelineJsonResponse = _reflection.GeneratedProtocolMessageType('TimelineJsonResponse', (_message.Message,), dict(
   DESCRIPTOR = _TIMELINEJSONRESPONSE,
   __module__ = 'TimelinesService_pb2'
-  # @@protoc_insertion_point(class_scope:TimelineJsonResponse)
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineJsonResponse)
   ))
 _sym_db.RegisterMessage(TimelineJsonResponse)
+
+TimelineEventsRequest = _reflection.GeneratedProtocolMessageType('TimelineEventsRequest', (_message.Message,), dict(
+  DESCRIPTOR = _TIMELINEEVENTSREQUEST,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineEventsRequest)
+  ))
+_sym_db.RegisterMessage(TimelineEventsRequest)
+
+EventMessage = _reflection.GeneratedProtocolMessageType('EventMessage', (_message.Message,), dict(
+  DESCRIPTOR = _EVENTMESSAGE,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.EventMessage)
+  ))
+_sym_db.RegisterMessage(EventMessage)
+
+TimelineEventsResponse = _reflection.GeneratedProtocolMessageType('TimelineEventsResponse', (_message.Message,), dict(
+  DESCRIPTOR = _TIMELINEEVENTSRESPONSE,
+  __module__ = 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.TimelineEventsResponse)
+  ))
+_sym_db.RegisterMessage(TimelineEventsResponse)
 
 
 
 _TIMELINESERVICE = _descriptor.ServiceDescriptor(
   name='TimelineService',
-  full_name='TimelineService',
+  full_name='PyGridWorld.TimelineService',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=492,
-  serialized_end=714,
+  serialized_start=952,
+  serialized_end=1425,
   methods=[
   _descriptor.MethodDescriptor(
-    name='GetTimelineTicks',
-    full_name='TimelineService.GetTimelineTicks',
+    name='GetTimelines',
+    full_name='PyGridWorld.TimelineService.GetTimelines',
     index=0,
+    containing_service=None,
+    input_type=_TIMELINESREQUEST,
+    output_type=_TIMELINESRESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetTimelineTicks',
+    full_name='PyGridWorld.TimelineService.GetTimelineTicks',
+    index=1,
     containing_service=None,
     input_type=_TIMELINETICKSREQUEST,
     output_type=_TIMELINETICKSRESPONSE,
@@ -414,8 +666,8 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetTimelineData',
-    full_name='TimelineService.GetTimelineData',
-    index=1,
+    full_name='PyGridWorld.TimelineService.GetTimelineData',
+    index=2,
     containing_service=None,
     input_type=_TIMELINEDATAREQUEST,
     output_type=_TIMELINEDATARESPONSE,
@@ -423,11 +675,20 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetTimelineJson',
-    full_name='TimelineService.GetTimelineJson',
-    index=2,
+    full_name='PyGridWorld.TimelineService.GetTimelineJson',
+    index=3,
     containing_service=None,
     input_type=_TIMELINEJSONREQUEST,
     output_type=_TIMELINEJSONRESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetTimelineEvents',
+    full_name='PyGridWorld.TimelineService.GetTimelineEvents',
+    index=4,
+    containing_service=None,
+    input_type=_TIMELINEEVENTSREQUEST,
+    output_type=_TIMELINEEVENTSRESPONSE,
     serialized_options=None,
   ),
 ])

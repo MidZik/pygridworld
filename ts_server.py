@@ -11,6 +11,12 @@ class Service(ts_grpc.TimelineServiceServicer):
     def __init__(self, project: sm.TimelinesProject):
         self._project = project
 
+    def GetTimelines(self, request, context):
+        nodes = self._project.get_all_timeline_nodes()
+        message = ts.TimelinesResponse()
+        message.timeline_ids[:] = [node.timeline_id for node in nodes if node.timeline_id is not None]
+        return message
+
     def GetTimelineTicks(self, request, context):
         try:
             node = self._project.get_timeline_node(request.timeline_id)
@@ -93,6 +99,37 @@ class Service(ts_grpc.TimelineServiceServicer):
             converter_generator.send(None)
         except StopIteration:
             pass
+
+    def GetTimelineEvents(self, request, context):
+        timeline_id = request.timeline_id
+
+        try:
+            node = self._project.get_timeline_node(timeline_id)
+        except LookupError:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details('Timeline ID not found.')
+            raise ValueError('Timeline ID not found.')
+
+        start_tick = request.tick_range.start_tick
+        end_tick = request.tick_range.end_tick
+        if end_tick == -1:
+            end_tick = None
+
+        events = self._project.get_timeline_events(timeline_id,
+                                                   start_tick=start_tick,
+                                                   end_tick=end_tick,
+                                                   filters=request.filters)
+
+        cur_response = None
+        for (tick, name, json) in events:
+            if cur_response is None or cur_response.tick != tick:
+                if cur_response is not None:
+                    yield cur_response
+                cur_response = ts.TimelineEventsResponse(timeline_id=timeline_id, tick=tick)
+            cur_response.events.append(ts.EventMessage(name=name, json=json))
+
+        if cur_response is not None:
+            yield cur_response
 
 
 class Server:

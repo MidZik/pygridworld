@@ -82,7 +82,7 @@ namespace SimulationServer
 
                     Server server = new Server
                     {
-                        Services = { Simulation.BindService(new SimulationService(wrapper)) },
+                        Services = { PyGridWorld.SimulationServer.Simulation.BindService(new SimulationService(wrapper)) },
                         Ports = { new ServerPort("localhost", server_port, ServerCredentials.Insecure) }
                     };
 

@@ -771,6 +771,70 @@ class TimelinesProject:
             yield SimulationSource(source)
         yield from self.get_registered_simulations()
 
+    def get_all_timeline_nodes(self):
+        return self._timeline_nodes.values()
+
+    def get_timeline_events(self, timeline_id, *, start_tick=None, end_tick=None, filters=None):
+        """
+
+        :param timeline_id:
+        :param start_tick:
+        :param end_tick:
+        :param filters:
+        :return: A list of (tick, event_name, event_json) tuples, containing the requested event data.
+        Events will be returned in ascending tick order, with no guarantee that events within a single tick
+        will be consistently ordered
+        """
+        node = self.get_timeline_node(timeline_id)
+
+        query = "SELECT tick, event_name, event_json FROM events"
+        where_clauses = []
+        parameters = []
+
+        if start_tick is not None:
+            where_clauses.append("tick >= ?")
+            parameters.append(start_tick)
+
+        if end_tick is not None:
+            where_clauses.append("tick <= ?")
+            parameters.append(end_tick)
+
+        if filters:
+            filter_clauses = []
+            filter_parameters = []
+            for f in filters:
+                if f.contains('\\'):
+                    raise ValueError("Filters cannot contain backslashes (\\).")
+                filter_clauses += r"event_name LIKE ? ESCAPE '\'"
+                f = f.replace(r'%', r'\%').replace(r'_', r'\_')
+                if f.endswith('.'):
+                    filter_parameters.append(f + '%')
+                else:
+                    filter_parameters.append(f)
+
+            where_clauses.append(" OR ".join(filter_clauses))
+            parameters.extend(filter_parameters)
+
+        if where_clauses:
+            query += " WHERE ("
+            query += ") AND (".join(where_clauses)
+            query += ")"
+
+        query += " ORDER BY tick ASC"
+
+        db_conn = node.timeline.get_db_conn()
+
+        cursor = db_conn.execute(query, tuple(parameters))
+
+        row = cursor.fetchone()
+        events = []
+
+        while row is not None:
+            events.append(tuple(row))
+            row = cursor.fetchone()
+
+        return events
+
     def _save_timeline(self, timeline: Timeline):
         if timeline.path.parent != self.timelines_dir_path:
             raise ValueError("Provided timeline node has invalid path data")

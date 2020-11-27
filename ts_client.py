@@ -2,6 +2,11 @@ import grpc
 
 import TimelinesService_pb2 as ts
 import TimelinesService_pb2_grpc as ts_grpc
+from collections import namedtuple
+
+
+Event = namedtuple('Event', 'name json')
+
 
 class Client:
     def __init__(self, address):
@@ -21,6 +26,11 @@ class Client:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+    def get_timelines(self):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        response = stub.GetTimelines(ts.TimelinesRequest())
+        return response.timeline_ids
 
     def get_timeline_ticks(self, timeline_id):
         stub = ts_grpc.TimelineServiceStub(self._channel)
@@ -56,3 +66,19 @@ class Client:
         responses = stub.GetTimelineJson(request)
         for response in responses:
             yield response.tick, response.json
+
+    def get_timeline_events(self, timeline_id, *, start_tick=0, end_tick=-1, filters=None):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        tick_range = ts.TickRange(start_tick=start_tick, end_tick=end_tick)
+        request = ts.TimelineEventsRequest(timeline_id=timeline_id, tick_range=tick_range)
+        if filters is not None:
+            request.filters[:] = filters
+
+        responses = stub.GetTimelineEvents(request)
+        for response in responses:
+            tick = response.tick
+            events = []
+            for e in response.events:
+                events.append(Event(e.name, e.json))
+
+            yield tick, events

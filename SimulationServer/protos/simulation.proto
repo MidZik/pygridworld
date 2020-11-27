@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package PyGridWorld.SimulationServer;
+
 // python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
 
 service Simulation {

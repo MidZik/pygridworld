@@ -15,20 +15,30 @@ class TimelineServiceStub(object):
     Args:
       channel: A grpc.Channel.
     """
+    self.GetTimelines = channel.unary_unary(
+        '/PyGridWorld.TimelineService/GetTimelines',
+        request_serializer=TimelinesService__pb2.TimelinesRequest.SerializeToString,
+        response_deserializer=TimelinesService__pb2.TimelinesResponse.FromString,
+        )
     self.GetTimelineTicks = channel.unary_unary(
-        '/TimelineService/GetTimelineTicks',
+        '/PyGridWorld.TimelineService/GetTimelineTicks',
         request_serializer=TimelinesService__pb2.TimelineTicksRequest.SerializeToString,
         response_deserializer=TimelinesService__pb2.TimelineTicksResponse.FromString,
         )
     self.GetTimelineData = channel.unary_stream(
-        '/TimelineService/GetTimelineData',
+        '/PyGridWorld.TimelineService/GetTimelineData',
         request_serializer=TimelinesService__pb2.TimelineDataRequest.SerializeToString,
         response_deserializer=TimelinesService__pb2.TimelineDataResponse.FromString,
         )
     self.GetTimelineJson = channel.unary_stream(
-        '/TimelineService/GetTimelineJson',
+        '/PyGridWorld.TimelineService/GetTimelineJson',
         request_serializer=TimelinesService__pb2.TimelineJsonRequest.SerializeToString,
         response_deserializer=TimelinesService__pb2.TimelineJsonResponse.FromString,
+        )
+    self.GetTimelineEvents = channel.unary_stream(
+        '/PyGridWorld.TimelineService/GetTimelineEvents',
+        request_serializer=TimelinesService__pb2.TimelineEventsRequest.SerializeToString,
+        response_deserializer=TimelinesService__pb2.TimelineEventsResponse.FromString,
         )
 
 
@@ -36,6 +46,13 @@ class TimelineServiceServicer(object):
   """python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
 
   """
+
+  def GetTimelines(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
 
   def GetTimelineTicks(self, request, context):
     # missing associated documentation comment in .proto file
@@ -58,9 +75,21 @@ class TimelineServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def GetTimelineEvents(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_TimelineServiceServicer_to_server(servicer, server):
   rpc_method_handlers = {
+      'GetTimelines': grpc.unary_unary_rpc_method_handler(
+          servicer.GetTimelines,
+          request_deserializer=TimelinesService__pb2.TimelinesRequest.FromString,
+          response_serializer=TimelinesService__pb2.TimelinesResponse.SerializeToString,
+      ),
       'GetTimelineTicks': grpc.unary_unary_rpc_method_handler(
           servicer.GetTimelineTicks,
           request_deserializer=TimelinesService__pb2.TimelineTicksRequest.FromString,
@@ -76,7 +105,12 @@ def add_TimelineServiceServicer_to_server(servicer, server):
           request_deserializer=TimelinesService__pb2.TimelineJsonRequest.FromString,
           response_serializer=TimelinesService__pb2.TimelineJsonResponse.SerializeToString,
       ),
+      'GetTimelineEvents': grpc.unary_stream_rpc_method_handler(
+          servicer.GetTimelineEvents,
+          request_deserializer=TimelinesService__pb2.TimelineEventsRequest.FromString,
+          response_serializer=TimelinesService__pb2.TimelineEventsResponse.SerializeToString,
+      ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'TimelineService', rpc_method_handlers)
+      'PyGridWorld.TimelineService', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))
