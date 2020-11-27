@@ -1,60 +1,34 @@
 import matplotlib.pyplot as plt
-import json
-import ts_client
+import sqlite3
 
 
-class ScoresFigure:
-    def __init__(self, timeline_id):
-        fig, ax = plt.subplots(num=f"Scores for {timeline_id}")
-        self._fig = fig
-        self._ax = ax
-
-        self.ticks = []
-        self.scores = []
-
+def create_scores_figure(db):
+    with sqlite3.Connection(db) as conn:
+        fig, ax = plt.subplots(num=f"Scores")
         ax.clear()
         ax.set_title('Scores')
 
-        self.plot = ax.plot([], [])[0]
+        cur_id = None
+        cur_x = []
+        cur_y = []
 
-    def add_file(self, state_file_path):
-        with state_file_path.open('r') as state_file:
-            state = json.load(state_file)
-            self.add_state_data(state)
+        c = conn.cursor()
 
-    def add_json_data(self, json_data):
-        self.add_state_data(json.loads(json_data))
+        c.execute('SELECT timeline_id, tick, score FROM scores ORDER BY timeline_id ASC, tick ASC')
 
-    def add_state_data(self, state):
-        tick = state["singletons"]["STickCounter"]
-        evo_data = next((e["data"] for e in state["singletons"]["SEventsLog"]["events_last_tick"]
-                        if e["name"] == "evolution"), None)
+        row = c.fetchone()
 
-        if evo_data is None:
-            print("Provided state has no evolution data; skipping")
-            return
+        while row is not None:
+            timeline_id, tick, score = row
+            if cur_id != timeline_id:
+                if cur_id is not None:
+                    ax.plot(cur_x, cur_y, label=cur_id)
+                cur_id = timeline_id
+                cur_x = []
+                cur_y = []
+            cur_x.append(tick)
+            cur_y.append(score)
+            row = c.fetchone()
 
-        scores = []
-        for log in evo_data["scored_entities"].values():
-            scores.append(log["score"])
-
-        if len(scores) < 6:
-            print("Provided state has less than 6 scored entities; skipping")
-            return
-
-        state_score = sum(sorted(scores, reverse=True)[:6]) / 6
-
-        self.ticks.append(tick)
-        self.scores.append(state_score)
-
-        self.plot.set_data(self.ticks, self.scores)
-
-        self._ax.relim()
-        self._ax.autoscale_view()
-
-
-def make_score_plotter(timeline_id, address='127.0.0.1:4969'):
-    with ts_client.Client(address) as client:
-        pop_plotter = ScoresFigure(timeline_id)
-        for tick, state in client.get_timeline_json(timeline_id, start_tick=0):
-            pop_plotter.add_json_data(state)
+        ax.relim()
+        ax.autoscale_view()
