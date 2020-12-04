@@ -1,9 +1,10 @@
 import sqlite3
 import json
+from collections import defaultdict
 import ts_client
 
 
-class EvoEventScoreProcessor:
+class ScoresProcessor:
     @staticmethod
     def prepare_db(db_conn: sqlite3.Connection):
         cursor = db_conn.cursor()
@@ -41,8 +42,55 @@ class EvoEventScoreProcessor:
             cursor.close()
 
 
+class PopulationsProcessor:
+    @staticmethod
+    def prepare_db(db_conn: sqlite3.Connection):
+        cursor = db_conn.cursor()
+        cursor.execute('''
+                CREATE TABLE IF NOT EXISTS populations (
+                    timeline_id INTEGER NOT NULL,
+                    tick INTEGER NOT NULL,
+                    major_name STRING NOT NULL,
+                    count INTEGER,
+                    average_score REAL,
+                    PRIMARY KEY(timeline_id, tick, major_name)
+                )''')
+        cursor.close()
+
+    @staticmethod
+    def process_state(db_conn: sqlite3.Connection, timeline_id, tick, events):
+        cursor = db_conn.cursor()
+        try:
+            evo_data = events.get('sim.evolution')
+
+            if evo_data is None:
+                return
+
+            counts = defaultdict(lambda: 0)
+            score_sums = defaultdict(lambda: 0)
+
+            for eid, scored_entity in evo_data['scored_entities'].items():
+                major_name = scored_entity.get('major_name', "UNNAMED")
+                counts[major_name] += 1
+                score_sums[major_name] += scored_entity['score']
+
+            for major_name, score_sum in score_sums.items():
+                count = counts[major_name]
+                average_score = score_sum / count
+
+                cursor.execute('''
+                            INSERT OR REPLACE INTO populations
+                                (timeline_id, tick, major_name, count, average_score)
+                                VALUES (?, ?, ?, ?, ?)
+                                ''',
+                               (timeline_id, tick, major_name, count, average_score))
+        finally:
+            cursor.close()
+
+
 processors = [
-    EvoEventScoreProcessor
+    ScoresProcessor,
+    PopulationsProcessor
 ]
 
 
