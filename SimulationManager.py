@@ -748,23 +748,30 @@ class TimelinesProject:
         head_point = node.head_point()
         timeline = node.timeline
 
-        head_point_path = head_point.point_file_path().resolve(True)
-        backup_path = head_point_path.with_suffix('.tmp')
-
-        try:
-            shutil.copy2(str(head_point_path), str(backup_path))
-            old_sim_path = str(timeline.get_simulation_binary_path())
+        if timeline.simulation_binary_provider is None:
+            head_point_path = head_point.point_file_path().resolve(False)
             new_sim_path = str(new_simulation_provider.get_simulation_binary_path())
-            SimulationProcess.simple_convert(str(backup_path), "binary", old_sim_path,
-                                             str(head_point_path), "binary", new_sim_path)
-
+            SimulationProcess.create_default(str(head_point_path), "binary", new_sim_path)
             timeline.simulation_binary_provider = new_simulation_provider
             self._save_timeline(timeline)
-        except Exception:
-            shutil.copy2(str(backup_path), str(head_point_path))
-            raise
-        finally:
-            Path(backup_path).unlink()
+        else:
+            head_point_path = head_point.point_file_path().resolve(True)
+            backup_path = head_point_path.with_suffix('.tmp')
+
+            try:
+                shutil.copy2(str(head_point_path), str(backup_path))
+                old_sim_path = str(timeline.get_simulation_binary_path())
+                new_sim_path = str(new_simulation_provider.get_simulation_binary_path())
+                SimulationProcess.simple_convert(str(backup_path), "binary", old_sim_path,
+                                                 str(head_point_path), "binary", new_sim_path)
+
+                timeline.simulation_binary_provider = new_simulation_provider
+                self._save_timeline(timeline)
+            except Exception:
+                shutil.copy2(str(backup_path), str(head_point_path))
+                raise
+            finally:
+                Path(backup_path).unlink()
 
     def get_all_simulation_providers(self):
         for source in self.get_simulation_source_paths():

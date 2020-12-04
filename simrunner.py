@@ -94,6 +94,21 @@ class SimulationProcess:
         if result != 0:
             raise RuntimeError("File conversions failed.")
 
+    @staticmethod
+    def create_default(output_file: str,
+                       output_format: str,
+                       output_sim_path: str):
+        args = []
+        args.append(SimulationProcess._simulation_server_path)
+        args.append('create-default')
+        args.extend(('-o', output_file))
+        args.extend(('-of', output_format))
+        args.extend(('-os', output_sim_path))
+        process = Popen(args)
+        result = process.wait()
+        if result != 0:
+            raise RuntimeError("Creating default state file failed.")
+
     def __init__(self, simulation_library_path, event_state_writer):
         self._simulation_library_path = simulation_library_path
         self._event_state_writer = event_state_writer
@@ -108,7 +123,8 @@ class SimulationProcess:
         self.stop()
 
     def start(self):
-        process = Popen([SimulationProcess._simulation_server_path, 'serve', str(self._simulation_library_path)], stdout=PIPE, stdin=PIPE)
+        process = Popen([SimulationProcess._simulation_server_path, 'serve', str(self._simulation_library_path)],
+                        stdout=PIPE, stdin=PIPE)
         self._process = process
 
         process.stdin.write(b"port\n")

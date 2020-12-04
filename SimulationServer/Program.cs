@@ -245,6 +245,66 @@ namespace SimulationServer
                 });
             });
 
+            app.Command("create-default", defaultCmd =>
+            {
+                defaultCmd.Description = "Creates a default state file for the given simulation.";
+
+                var output = defaultCmd.Option("-o|--output <FILE>", "The file to put the default state into", CommandOptionType.SingleValue)
+                    .Accepts(v => v.LegalFilePath());
+
+                var output_format = defaultCmd.Option("-of|--output_format <FORMAT>", "The output file format", CommandOptionType.SingleValue)
+                    .IsRequired()
+                    .Accepts(v => v.Values("json", "binary"));
+
+                var output_sim = defaultCmd.Option("-os|--output_sim <SIMULATION>", "The simulation to create a default state for", CommandOptionType.SingleValue)
+                    .IsRequired()
+                    .Accepts(v => v.ExistingFile());
+
+                defaultCmd.OnExecute(() =>
+                {
+                    string simulation_path = Path.GetFullPath(output_sim.Value());
+                    SimulationWrapper simulation_wrapper = new SimulationWrapper(simulation_path);
+
+                    Stream out_stream;
+
+                    string output_file = output.Value();
+                    if (!string.IsNullOrWhiteSpace(output_file))
+                    {
+                        string out_value = output_file;
+                        if (!string.IsNullOrWhiteSpace(out_value))
+                        {
+                            out_stream = new FileStream(out_value, FileMode.Create, FileAccess.Write);
+                        }
+                        else
+                        {
+                            out_stream = Console.OpenStandardOutput();
+                        }
+                    }
+                    else
+                    {
+                        out_stream = Console.OpenStandardOutput();
+                    }
+
+                    switch (output_format.Value())
+                    {
+                        case "json":
+                            out_stream.Write(Encoding.UTF8.GetBytes(simulation_wrapper.GetStateJson()));
+                            out_stream.Write(Encoding.UTF8.GetBytes("\r\n"));
+                            break;
+                        case "binary":
+                            out_stream.Write(simulation_wrapper.GetStateBinary());
+                            break;
+                        default:
+                            return 1;
+                    }
+
+                    out_stream.Flush();
+
+                    return 0;
+                });
+            }
+            );
+
             try
             {
                 return app.Execute(args);
