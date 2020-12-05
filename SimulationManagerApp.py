@@ -686,9 +686,8 @@ class App:
 
     def _refresh_registered_sim_section(self):
         ui = self._ui
-        uuid = self.get_selected_simulation_registration()
-        if uuid:
-            selected_reg = self._project.get_registered_simulation(uuid)
+        selected_reg = self.get_selected_simulation_registration()
+        if selected_reg is not None:
             ui.registeredSimDescriptionTextEdit.setPlainText(selected_reg.get_description())
             ui.registeredSimMetadataTextEdit.setPlainText(selected_reg.get_metadata_json())
         else:
@@ -733,15 +732,13 @@ class App:
         self._refresh_registered_sim_section()
 
     def _save_registered_sim_description(self):
-        uuid = self.get_selected_simulation_registration()
-        if uuid:
-            selected_reg = self._project.get_registered_simulation(uuid)
+        selected_reg = self.get_selected_simulation_registration()
+        if selected_reg is not None:
             selected_reg.set_description(self._ui.registeredSimDescriptionTextEdit.toPlainText())
 
     def _discard_registered_sim_description(self):
-        uuid = self.get_selected_simulation_registration()
-        if uuid:
-            selected_reg = self._project.get_registered_simulation(uuid)
+        selected_reg = self.get_selected_simulation_registration()
+        if selected_reg is not None:
             self._ui.registeredSimDescriptionTextEdit.setPlainText(selected_reg.get_description())
 
     def _unregister_selected_sim_registration(self):
