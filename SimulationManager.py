@@ -275,10 +275,21 @@ class TimelineSimulation:
 class TimelineNode:
     @staticmethod
     def traverse(root_node: 'TimelineNode', callback):
+        """
+        Traverses a node tree, calling the callback for each node in the tree.
+        If callback returns a non-None value, traversal will stop immediately and its return value
+        will be returned as the result of the traversal call
+        :param root_node:
+        :param callback:
+        :return: If callback returns a non-None value for any node, it returns that value.
+        Otherwise, it returns None after visiting every node.
+        """
         traversal_deque = deque([root_node])
         while traversal_deque:
             cur_node = traversal_deque.pop()
-            callback(cur_node)
+            result = callback(cur_node)
+            if result is not None:
+                return result
             for child in cur_node.child_nodes:
                 traversal_deque.append(child)
 
@@ -736,6 +747,17 @@ class TimelinesProject:
         registration = self._simulation_registry[uuid]
         if registration.path.parent != self.simulation_registry_path:
             raise RuntimeError("Cannot unregister: registration path is not within simulation registry.")
+
+        def node_has_registry(node: TimelineNode):
+            if node.timeline is not None and node.timeline.simulation_binary_provider is registration:
+                return True
+            else:
+                return None
+
+        timeline_has_registration = TimelineNode.traverse(self.root_node, node_has_registry)
+        if timeline_has_registration:
+            raise RuntimeError("Cannot unregister: a timeline is currently using this registration.")
+
         shutil.rmtree(registration.path)
         del self._simulation_registry[uuid]
 
