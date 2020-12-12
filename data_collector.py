@@ -2,6 +2,7 @@ import sqlite3
 import json
 from collections import defaultdict
 import ts_client
+import time
 
 
 class ScoresProcessor:
@@ -111,3 +112,25 @@ def one_time_collection(db_file, server_address='127.0.0.1:4969'):
 
     db_conn.commit()
     db_conn.close()
+
+
+def periodic_collection(db_file, server_address='127.0.0.1:4969', time_between_refreshes=10):
+    db_conn = sqlite3.connect(db_file)
+
+    for p in processors:
+        p.prepare_db(db_conn)
+
+    try:
+        while True:
+            with ts_client.Client(server_address) as client:
+                timeline_ids = client.get_timelines()
+
+                for timeline_id in timeline_ids:
+                    for tick, events_list in client.get_timeline_events(timeline_id):
+                        events = {event.name: json.loads(event.json) for event in events_list}
+                        for p in processors:
+                            p.process_state(db_conn, timeline_id, tick, events)
+            db_conn.commit()
+            time.sleep(time_between_refreshes)
+    finally:
+        db_conn.close()
