@@ -3,11 +3,6 @@ import matplotlib.animation as animation
 from collections import defaultdict
 import sqlite3
 import argparse
-import subprocess
-
-
-def create_populations_figure(db, timeline_id, min_pop_length_to_plot=4, time_between_refresh=10):
-    subprocess.Popen(['python', __file__, str(db), str(timeline_id), str(min_pop_length_to_plot), str(time_between_refresh)])
 
 
 def _show_figure(db, timeline_id, min_pop_length_to_plot, time_between_refresh):
@@ -50,7 +45,7 @@ def _show_figure(db, timeline_id, min_pop_length_to_plot, time_between_refresh):
             ax.autoscale_view()
 
     ani = animation.FuncAnimation(fig, update, interval=time_between_refresh * 1000)
-    plt.show(block=True)
+    plt.show()
 
 
 if __name__ == "__main__":
