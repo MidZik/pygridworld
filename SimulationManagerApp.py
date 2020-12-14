@@ -756,8 +756,9 @@ class App:
             return False
 
         has_multiple_points = len(node.timeline.tick_list) > 1
+        has_child_nodes = len(node.child_nodes) > 0
         simulation_running = node.timeline_id in self._simulations
-        return not (has_multiple_points or simulation_running)
+        return not (has_multiple_points or has_child_nodes or simulation_running)
 
     def _on_convert_to_sim_combo_box_changed(self, index):
         self._refresh_convert_to_selected_sim_button()
