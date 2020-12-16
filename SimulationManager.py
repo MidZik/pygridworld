@@ -22,6 +22,7 @@ class Timeline:
     """
     Represents a timeline stored on disk
     """
+
     @staticmethod
     def point_file_name(tick):
         return f'tick-{tick}.point'
@@ -90,6 +91,7 @@ class TimelineSimulation:
     """
     Manages a SimulationRunnerProcess associated with a timeline.
     """
+
     def __init__(self, timeline):
         self.timeline: Timeline = timeline
 
@@ -335,9 +337,10 @@ class TimelineNode:
         other_id = other.timeline_id
         return (self_head < other_head
                 or (
-                    self_head == other_head
-                    and self_id < other_id
+                        self_head == other_head
+                        and self_id < other_id
                 ))
+
     __le__ = __lt__
 
     def __gt__(self, other):
@@ -350,6 +353,7 @@ class TimelineNode:
                         self_head == other_head
                         and self_id > other_id
                 ))
+
     __ge__ = __gt__
 
 
@@ -405,7 +409,8 @@ class SimulationSource:
 
 class SimulationRegistration:
     @staticmethod
-    def create_registration(parent_folder: Path, uuid: UUID, name: str, binary_name: str, created_from: str, description: str):
+    def create_registration(parent_folder: Path, uuid: UUID, name: str, binary_name: str, created_from: str,
+                            description: str):
         registration_folder = parent_folder / str(uuid)
         registration_folder.mkdir()
 
@@ -528,40 +533,56 @@ class TimelinesProject:
         self._simulation_source_paths = []
         self._simulation_registry = {}
 
-    def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
+    def _create_timeline(self,
+                         parent_node: TimelineNode,
+                         sim_binary_provider=None,
+                         initial_tick=0,
+                         source_tick_data_path=None):
         new_timeline_id = self._next_new_timeline_id
 
-        if derive_from is None:
-            parent_id = None
-            derive_from_node = self.root_node
-        else:
-            parent_id = derive_from.timeline_id()
-            derive_from_node = derive_from.timeline_node
-
-        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, parent_id)
+        timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, parent_node.timeline_id)
         timeline_folder_path = self.timelines_dir_path / timeline_folder_name
 
         try:
             timeline_folder_path.mkdir()
 
-            if derive_from is not None:
-                new_timeline = Timeline(timeline_folder_path, derive_from.timeline().simulation_binary_provider)
-                self._save_timeline(new_timeline)
-                shutil.copy(str(derive_from.point_file_path()), str(new_timeline.get_point_file_path(derive_from.tick)))
-                new_timeline.refresh_tick_list()
+            new_timeline = Timeline(timeline_folder_path, sim_binary_provider)
+            self._save_timeline(new_timeline)
+
+            initial_point_path = new_timeline.get_point_file_path(initial_tick)
+
+            if source_tick_data_path is not None:
+                shutil.copy(str(source_tick_data_path), str(initial_point_path))
+            elif sim_binary_provider is not None:
+                sim_path = str(sim_binary_provider.get_simulation_binary_path())
+                SimulationProcess.create_default(str(initial_point_path), "binary", sim_path)
             else:
-                new_timeline = Timeline(timeline_folder_path, None)
-                self._save_timeline(new_timeline)
-                new_timeline.get_point_file_path(0).touch(exist_ok=False)
-                new_timeline.refresh_tick_list()
+                initial_point_path.touch(exist_ok=False)
+
+            new_timeline.refresh_tick_list()
         except Exception:
             shutil.rmtree(timeline_folder_path)
             raise
 
-        new_timeline_node = TimelineNode(derive_from_node, new_timeline_id, new_timeline)
+        new_timeline_node = TimelineNode(parent_node, new_timeline_id, new_timeline)
         self._timeline_nodes[new_timeline_id] = new_timeline_node
         self._next_new_timeline_id += 1
         return new_timeline_node
+
+    def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
+        if derive_from is None:
+            return self._create_timeline(self.root_node)
+        else:
+            return self._create_timeline(derive_from.timeline_node,
+                                         derive_from.timeline().simulation_binary_provider,
+                                         derive_from.tick,
+                                         derive_from.point_file_path())
+
+    def clone_timeline(self, node_to_clone: TimelineNode):
+        return self._create_timeline(node_to_clone.parent_node,
+                                     node_to_clone.timeline.simulation_binary_provider,
+                                     node_to_clone.head_point().tick,
+                                     node_to_clone.head_point().point_file_path())
 
     def delete_timeline(self, node_to_delete: TimelineNode):
         """
