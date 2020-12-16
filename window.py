@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Thu Aug 20 05:27:29 2020
+# Created: Tue Dec 15 06:03:39 2020
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -199,6 +199,9 @@ class Ui_MainWindow(object):
         self.createTimelineAtSelectionButton = QtWidgets.QPushButton(self.timelineTab)
         self.createTimelineAtSelectionButton.setObjectName("createTimelineAtSelectionButton")
         self.horizontalLayout_4.addWidget(self.createTimelineAtSelectionButton)
+        self.createSiblingTimelineButton = QtWidgets.QPushButton(self.timelineTab)
+        self.createSiblingTimelineButton.setObjectName("createSiblingTimelineButton")
+        self.horizontalLayout_4.addWidget(self.createSiblingTimelineButton)
         self.deleteSelectedTimelineButton = QtWidgets.QPushButton(self.timelineTab)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(170, 0, 0))
@@ -410,6 +413,7 @@ class Ui_MainWindow(object):
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.singletonsTab), QtWidgets.QApplication.translate("MainWindow", "Singletons", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.simulationTab), QtWidgets.QApplication.translate("MainWindow", "Simulation", None, -1))
         self.createTimelineAtSelectionButton.setText(QtWidgets.QApplication.translate("MainWindow", "Create Timeline at Selection", None, -1))
+        self.createSiblingTimelineButton.setText(QtWidgets.QApplication.translate("MainWindow", "Create Sibling Timeline", None, -1))
         self.deleteSelectedTimelineButton.setText(QtWidgets.QApplication.translate("MainWindow", "Delete Selected Timeline", None, -1))
         self.label_7.setText(QtWidgets.QApplication.translate("MainWindow", "Current simulation:", None, -1))
         self.currentTimelineSimLabel.setText(QtWidgets.QApplication.translate("MainWindow", "<current sim>", None, -1))
@@ -429,14 +433,4 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.simRegistryTab), QtWidgets.QApplication.translate("MainWindow", "Simulation Registry", None, -1))
         self.menuProject.setTitle(QtWidgets.QApplication.translate("MainWindow", "Project", None, -1))
         self.actionOpen_Project.setText(QtWidgets.QApplication.translate("MainWindow", "Open Project", None, -1))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 

@@ -102,6 +102,7 @@ class App:
 
         # Timeline Tab
         ui.createTimelineAtSelectionButton.clicked.connect(self._create_timeline_at_selection)
+        ui.createSiblingTimelineButton.clicked.connect(self._create_sibling_timeline)
         ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
         ui.convertToSimComboBox.currentIndexChanged.connect(self._on_convert_to_sim_combo_box_changed)
         ui.convertToSimButton.clicked.connect(self._convert_to_selected_sim)
@@ -589,6 +590,7 @@ class App:
 
         new_timeline_node = self._project.create_timeline(point)
 
+        # TODO: remove duplicated code (see _create_sibling_timeline)
         previous_sibling = new_timeline_node.previous_sibling()
         if previous_sibling is not None:
             preceding_item = self._timeline_tree_widget_map[previous_sibling]
@@ -596,6 +598,21 @@ class App:
             preceding_item = None
 
         self._make_timeline_item(new_timeline_node, preceding_item)
+
+    def _create_sibling_timeline(self):
+        timeline_node = self.get_selected_timeline_node()
+
+        if timeline_node is not None:
+            new_timeline_node = self._project.clone_timeline(timeline_node)
+
+            # TODO: remove duplicated code (see _create_timeline_at_selection)
+            previous_sibling = new_timeline_node.previous_sibling()
+            if previous_sibling is not None:
+                preceding_item = self._timeline_tree_widget_map[previous_sibling]
+            else:
+                preceding_item = None
+
+            self._make_timeline_item(new_timeline_node, preceding_item)
 
     def _delete_selected_timeline(self):
         from PySide2.QtWidgets import QMessageBox

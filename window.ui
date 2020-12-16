@@ -385,6 +385,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="createSiblingTimelineButton">
+            <property name="text">
+             <string>Create Sibling Timeline</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="deleteSelectedTimelineButton">
             <property name="palette">
              <palette>
