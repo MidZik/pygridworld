@@ -218,9 +218,15 @@ class App:
         for sim in self._simulations.values():
             sim.stop_process()
 
-    def _make_timeline_item(self, timeline_node: sm.TimelineNode, preceding_item):
+    def _make_timeline_item(self, timeline_node: sm.TimelineNode):
         if timeline_node in self._timeline_tree_widget_map:
             raise ValueError('Timeline node already has an item associated with it.')
+
+        previous_sibling = timeline_node.previous_sibling()
+        if previous_sibling is not None:
+            preceding_item = self._timeline_tree_widget_map[previous_sibling]
+        else:
+            preceding_item = None
 
         parent_item = self._timeline_tree_widget_map[timeline_node.parent_node]
         result_item = QtWidgets.QTreeWidgetItem(parent_item, preceding_item)
@@ -252,9 +258,8 @@ class App:
 
         while node_deque:
             cur_node = node_deque.pop()
-            child_item = None
             for child_node in cur_node.child_nodes:
-                child_item = self._make_timeline_item(child_node, child_item)
+                self._make_timeline_item(child_node)
                 node_deque.append(child_node)
 
         # TODO: Temp?
@@ -590,14 +595,7 @@ class App:
 
         new_timeline_node = self._project.create_timeline(point)
 
-        # TODO: remove duplicated code (see _create_sibling_timeline)
-        previous_sibling = new_timeline_node.previous_sibling()
-        if previous_sibling is not None:
-            preceding_item = self._timeline_tree_widget_map[previous_sibling]
-        else:
-            preceding_item = None
-
-        self._make_timeline_item(new_timeline_node, preceding_item)
+        self._make_timeline_item(new_timeline_node)
 
     def _create_sibling_timeline(self):
         timeline_node = self.get_selected_timeline_node()
@@ -605,14 +603,7 @@ class App:
         if timeline_node is not None:
             new_timeline_node = self._project.clone_timeline(timeline_node)
 
-            # TODO: remove duplicated code (see _create_timeline_at_selection)
-            previous_sibling = new_timeline_node.previous_sibling()
-            if previous_sibling is not None:
-                preceding_item = self._timeline_tree_widget_map[previous_sibling]
-            else:
-                preceding_item = None
-
-            self._make_timeline_item(new_timeline_node, preceding_item)
+            self._make_timeline_item(new_timeline_node)
 
     def _delete_selected_timeline(self):
         from PySide2.QtWidgets import QMessageBox
