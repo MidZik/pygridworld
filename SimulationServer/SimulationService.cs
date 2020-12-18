@@ -8,6 +8,12 @@ namespace SimulationServer
 {
     class SimulationService : Simulation.SimulationBase
     {
+        [Flags] private enum TickEventFlags
+        {
+            None = 0,
+            EventsOccurred = 1,
+        }
+
         private SimulationWrapper simulation;
         private delegate void CommitEventsDelegate(ulong tick, List<EventMessage> event_messages);
         private event CommitEventsDelegate events_committed;
@@ -17,21 +23,23 @@ namespace SimulationServer
         public SimulationService(SimulationWrapper simulation)
         {
             this.simulation = simulation;
-            simulation.SetEventCallback(EventCallback);
+            simulation.SetTickEventCallback(TickEventCallback);
         }
 
-        private void EventCallback(string name, string data)
+        private void TickEventCallback(ulong tick, ulong raw_flags)
         {
-            if (!string.IsNullOrEmpty(name))
+            TickEventFlags flags = (TickEventFlags)raw_flags;
+            if (flags.HasFlag(TickEventFlags.EventsOccurred))
             {
-                name = "sim." + name;
-                event_messages.Add(new EventMessage() { Name = name, Json = data });
-            }
-            else
-            {
-                // byte[] state_bin = simulation.GetStateBinary();
-                // event_messages.Add(new EventMessage() { Name = "state", Type = EventMessage.Types.Type.Meta, Bin = Google.Protobuf.ByteString.CopyFrom(state_bin) });
-                events_committed(simulation.GetTick(), event_messages);
+                SimulationWrapper.SimEventHandler sim_event_handler = (string name, string json) =>
+                {
+                    name = "sim." + name;
+                    event_messages.Add(new EventMessage() { Name = name, Json = json });
+                };
+
+                simulation.GetEventsLastTick(sim_event_handler);
+
+                events_committed(tick, event_messages);
                 event_messages = new List<EventMessage>();
             }
         }

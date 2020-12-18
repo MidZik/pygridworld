@@ -11,6 +11,7 @@ namespace SimulationServer
         public delegate void ULongResultHandler(ulong l);
         public delegate void BufferResultHandler(IntPtr buffer, ulong size);
         public delegate void SimEventHandler(string name, string data);
+        public delegate void TickEventHandler(ulong tick, ulong flags);
 
         delegate IntPtr CreateSimulationDelegate();
         CreateSimulationDelegate create_simulation;
@@ -52,17 +53,18 @@ namespace SimulationServer
         SetSingletonJsonDelegate set_singleton_json;
         delegate void GetSingletonNamesDelegate(IntPtr sim, IntPtr string_result_handler);
         GetSingletonNamesDelegate get_singleton_names;
-        delegate void SetEventCallbackDelegate(IntPtr sim, IntPtr string_result_handler);
-        SetEventCallbackDelegate set_event_callback;
+        delegate void SetTickEventCallbackDelegate(IntPtr sim, IntPtr tick_event_result_handler);
+        SetTickEventCallbackDelegate set_tick_event_callback;
         delegate void GetStateBinaryDelegate(IntPtr sim, IntPtr buffer_result_handler);
         GetStateBinaryDelegate get_state_binary;
         delegate void SetStateBinaryDelegate(IntPtr sim, IntPtr binary, ulong size);
         SetStateBinaryDelegate set_state_binary;
+        delegate void GetEventsLastTickDelegate(IntPtr sim, IntPtr sim_event_handler);
+        GetEventsLastTickDelegate get_events_last_tick;
 
         IntPtr simulation_library_handle;
         IntPtr simulation_handle;
-
-        SimEventHandler current_event_callback = null;
+        TickEventHandler tick_event_handler = null;
 
         public SimulationWrapper(string simulation_library_path)
         {
@@ -88,9 +90,10 @@ namespace SimulationServer
             get_singleton_json = Marshal.GetDelegateForFunctionPointer<GetSingletonJsonDelegate>(GetExport("get_singleton_json"));
             set_singleton_json = Marshal.GetDelegateForFunctionPointer<SetSingletonJsonDelegate>(GetExport("set_singleton_json"));
             get_singleton_names = Marshal.GetDelegateForFunctionPointer<GetSingletonNamesDelegate>(GetExport("get_singleton_names"));
-            set_event_callback = Marshal.GetDelegateForFunctionPointer<SetEventCallbackDelegate>(GetExport("set_event_callback"));
+            set_tick_event_callback = Marshal.GetDelegateForFunctionPointer<SetTickEventCallbackDelegate>(GetExport("set_tick_event_callback"));
             get_state_binary = Marshal.GetDelegateForFunctionPointer<GetStateBinaryDelegate>(GetExport("get_state_binary"));
             set_state_binary = Marshal.GetDelegateForFunctionPointer<SetStateBinaryDelegate>(GetExport("set_state_binary"));
+            get_events_last_tick = Marshal.GetDelegateForFunctionPointer<GetEventsLastTickDelegate>(GetExport("get_events_last_tick"));
 
             simulation_handle = create_simulation();
         }
@@ -257,17 +260,17 @@ namespace SimulationServer
             return names;
         }
 
-        public void SetEventCallback(SimEventHandler callback)
+        public void SetTickEventCallback(TickEventHandler callback)
         {
-            current_event_callback = callback;
+            tick_event_handler = callback;
             IntPtr handler_ptr = IntPtr.Zero;
 
-            if (current_event_callback != null)
+            if (tick_event_handler != null)
             {
-                handler_ptr = DelegateToUnmanaged<SimEventHandler>(current_event_callback);
+                handler_ptr = DelegateToUnmanaged<TickEventHandler>(tick_event_handler);
             }
 
-            set_event_callback(simulation_handle, handler_ptr);
+            set_tick_event_callback(simulation_handle, handler_ptr);
         }
 
         public byte[] GetStateBinary()
@@ -289,6 +292,13 @@ namespace SimulationServer
             IntPtr ptr = bin_handle.AddrOfPinnedObject();
             set_state_binary(simulation_handle, ptr, (ulong)bin.Length);
             bin_handle.Free();
+        }
+
+        public void GetEventsLastTick(SimEventHandler callback)
+        {
+            get_events_last_tick(simulation_handle, DelegateToUnmanaged(callback));
+
+            GC.KeepAlive(callback);
         }
     }
 }
