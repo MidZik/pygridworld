@@ -255,8 +255,6 @@ class TimelineSimulation:
     def _handle_event(self, tick, events):
         db_conn = self.timeline.get_db_conn()
 
-        db_events_generator = ((tick, e.name, e.json) for e in events if e.in_namespace("sim."))
-
         # Since many events can occur quite rapidly, enforcing sync with the disk can result
         # in excessive disk activity, and might cause writes to disk becoming a bottleneck.
         # Thus, we disable requiring a disk sync on every commit with this pragma.
@@ -265,11 +263,21 @@ class TimelineSimulation:
         # this is not an important factor when compared to speed of handling events.
         db_conn.execute('PRAGMA synchronous = OFF')
 
-        db_conn.executemany('''
-                    INSERT OR IGNORE INTO
-                    events(tick, event_name, event_json)
-                    VALUES(?,?,?)
-                    ''', db_events_generator)
+        for e in events:
+            if e.in_namespace("sim."):
+                db_conn.execute('''
+                INSERT OR IGNORE INTO
+                events(tick, event_name, event_json)
+                VALUES(?,?,?)
+                ''', (tick, e.name, e.json))
+            elif e.name == "meta.state_bin":
+                if tick in self.timeline.tick_list:
+                    continue
+                else:
+                    state_file_path = self.timeline.get_point_file_path(tick)
+                    with state_file_path.open('bw') as state_file:
+                        state_file.write(e.bin)
+                    insort(self.timeline.tick_list, tick)
 
         db_conn.commit()
 

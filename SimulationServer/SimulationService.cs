@@ -33,12 +33,27 @@ namespace SimulationServer
             {
                 SimulationWrapper.SimEventHandler sim_event_handler = (string name, string json) =>
                 {
-                    name = "sim." + name;
-                    event_messages.Add(new EventMessage() { Name = name, Json = json });
+                    event_messages.Add(new EventMessage() {
+                        Name = "sim." + name,
+                        Json = json
+                    });
                 };
 
                 simulation.GetEventsLastTick(sim_event_handler);
+            }
 
+            // TEMP/TODO: this value will be configurable
+            if (tick % 500000 == 0)
+            {
+                byte[] state_binary = simulation.GetStateBinary();
+                event_messages.Add(new EventMessage() {
+                    Name = "meta.state_bin",
+                    Bin = Google.Protobuf.ByteString.CopyFrom(state_binary)
+                });
+            }
+
+            if (event_messages.Count > 0)
+            {
                 events_committed(tick, event_messages);
                 event_messages = new List<EventMessage>();
             }
