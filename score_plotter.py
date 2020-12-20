@@ -28,12 +28,16 @@ def _show_figure(db, time_between_refresh):
                 if cur_id != timeline_id:
                     if cur_id is not None:
                         ax.plot(cur_x, cur_y, label=cur_id)
+                        ax.legend()
                     cur_id = timeline_id
                     cur_x = []
                     cur_y = []
                 cur_x.append(tick)
                 cur_y.append(score)
                 row = c.fetchone()
+
+            ax.plot(cur_x, cur_y, label=cur_id)
+            ax.legend()
 
         ax.relim()
         ax.autoscale_view()

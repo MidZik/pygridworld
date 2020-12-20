@@ -35,7 +35,10 @@ class ScoresProcessor:
                 print(f"[{timeline_id}, {tick}] sim.evolution event has less than 6 scored entities; skipping")
                 return
 
-            state_score = sum(sorted(scores, reverse=True)[:6]) / 6
+            evo_period_length_in_thousands = evo_data["evo_period_length"] / 1000
+
+            state_score = sum(sorted(scores, reverse=True)[:6]) / 6  # raw score over the evolution period
+            state_score = state_score / evo_period_length_in_thousands  # score per thousand ticks
 
             cursor.execute('INSERT OR REPLACE INTO scores (timeline_id, tick, score) VALUES (?, ?, ?)',
                            (timeline_id, tick, state_score))
