@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='PyGridWorld.SimulationServer',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x10simulation.proto\x12\x1cPyGridWorld.SimulationServer\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"C\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x04json\x18\x02 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"]\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12:\n\x06\x65vents\x18\x02 \x03(\x0b\x32*.PyGridWorld.SimulationServer.EventMessage\"\x17\n\x15GetStateBinaryRequest\"(\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse2\xdb\x14\n\nSimulation\x12\x66\n\x07GetTick\x12,.PyGridWorld.SimulationServer.GetTickRequest\x1a-.PyGridWorld.SimulationServer.GetTickResponse\x12u\n\x0cGetStateJson\x12\x31.PyGridWorld.SimulationServer.GetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.GetStateJsonResponse\x12u\n\x0cSetStateJson\x12\x31.PyGridWorld.SimulationServer.SetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.SetStateJsonResponse\x12u\n\x0c\x43reateEntity\x12\x31.PyGridWorld.SimulationServer.CreateEntityRequest\x1a\x32.PyGridWorld.SimulationServer.CreateEntityResponse\x12x\n\rDestroyEntity\x12\x32.PyGridWorld.SimulationServer.DestroyEntityRequest\x1a\x33.PyGridWorld.SimulationServer.DestroyEntityResponse\x12z\n\x0eGetAllEntities\x12\x32.PyGridWorld.SimulationServer.GetAllEntitesRequest\x1a\x34.PyGridWorld.SimulationServer.GetAllEntitiesResponse\x12~\n\x0fStartSimulation\x12\x34.PyGridWorld.SimulationServer.StartSimulationRequest\x1a\x35.PyGridWorld.SimulationServer.StartSimulationResponse\x12{\n\x0eStopSimulation\x12\x33.PyGridWorld.SimulationServer.StopSimulationRequest\x1a\x34.PyGridWorld.SimulationServer.StopSimulationResponse\x12l\n\tIsRunning\x12..PyGridWorld.SimulationServer.IsRunningRequest\x1a/.PyGridWorld.SimulationServer.IsRunningResponse\x12~\n\x0f\x41ssignComponent\x12\x34.PyGridWorld.SimulationServer.AssignComponentRequest\x1a\x35.PyGridWorld.SimulationServer.AssignComponentResponse\x12\x81\x01\n\x10GetComponentJson\x12\x35.PyGridWorld.SimulationServer.GetComponentJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetComponentJsonResponse\x12~\n\x0fRemoveComponent\x12\x34.PyGridWorld.SimulationServer.RemoveComponentRequest\x1a\x35.PyGridWorld.SimulationServer.RemoveComponentResponse\x12\x81\x01\n\x10ReplaceComponent\x12\x35.PyGridWorld.SimulationServer.ReplaceComponentRequest\x1a\x36.PyGridWorld.SimulationServer.ReplaceComponentResponse\x12\x84\x01\n\x11GetComponentNames\x12\x36.PyGridWorld.SimulationServer.GetComponentNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetComponentNamesResponse\x12\x96\x01\n\x17GetEntityComponentNames\x12<.PyGridWorld.SimulationServer.GetEntityComponentNamesRequest\x1a=.PyGridWorld.SimulationServer.GetEntityComponentNamesResponse\x12\x81\x01\n\x10GetSingletonJson\x12\x35.PyGridWorld.SimulationServer.GetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetSingletonJsonResponse\x12\x81\x01\n\x10SetSingletonJson\x12\x35.PyGridWorld.SimulationServer.SetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.SetSingletonJsonResponse\x12\x84\x01\n\x11GetSingletonNames\x12\x36.PyGridWorld.SimulationServer.GetSingletonNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetSingletonNamesResponse\x12n\n\tGetEvents\x12..PyGridWorld.SimulationServer.GetEventsRequest\x1a/.PyGridWorld.SimulationServer.GetEventsResponse0\x01\x12{\n\x0eGetStateBinary\x12\x33.PyGridWorld.SimulationServer.GetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.GetStateBinaryResponse\x12{\n\x0eSetStateBinary\x12\x33.PyGridWorld.SimulationServer.SetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.SetStateBinaryResponseb\x06proto3')
+  serialized_pb=_b('\n\x10simulation.proto\x12\x1cPyGridWorld.SimulationServer\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"C\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x04json\x18\x02 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"]\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12:\n\x06\x65vents\x18\x02 \x03(\x0b\x32*.PyGridWorld.SimulationServer.EventMessage\"\x17\n\x15GetStateBinaryRequest\"(\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse\"!\n\x11RunCommandRequest\x12\x0c\n\x04\x61rgs\x18\x01 \x03(\t\"1\n\x12RunCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0e\n\x06output\x18\x02 \x01(\t2\xcc\x15\n\nSimulation\x12\x66\n\x07GetTick\x12,.PyGridWorld.SimulationServer.GetTickRequest\x1a-.PyGridWorld.SimulationServer.GetTickResponse\x12u\n\x0cGetStateJson\x12\x31.PyGridWorld.SimulationServer.GetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.GetStateJsonResponse\x12u\n\x0cSetStateJson\x12\x31.PyGridWorld.SimulationServer.SetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.SetStateJsonResponse\x12u\n\x0c\x43reateEntity\x12\x31.PyGridWorld.SimulationServer.CreateEntityRequest\x1a\x32.PyGridWorld.SimulationServer.CreateEntityResponse\x12x\n\rDestroyEntity\x12\x32.PyGridWorld.SimulationServer.DestroyEntityRequest\x1a\x33.PyGridWorld.SimulationServer.DestroyEntityResponse\x12z\n\x0eGetAllEntities\x12\x32.PyGridWorld.SimulationServer.GetAllEntitesRequest\x1a\x34.PyGridWorld.SimulationServer.GetAllEntitiesResponse\x12~\n\x0fStartSimulation\x12\x34.PyGridWorld.SimulationServer.StartSimulationRequest\x1a\x35.PyGridWorld.SimulationServer.StartSimulationResponse\x12{\n\x0eStopSimulation\x12\x33.PyGridWorld.SimulationServer.StopSimulationRequest\x1a\x34.PyGridWorld.SimulationServer.StopSimulationResponse\x12l\n\tIsRunning\x12..PyGridWorld.SimulationServer.IsRunningRequest\x1a/.PyGridWorld.SimulationServer.IsRunningResponse\x12~\n\x0f\x41ssignComponent\x12\x34.PyGridWorld.SimulationServer.AssignComponentRequest\x1a\x35.PyGridWorld.SimulationServer.AssignComponentResponse\x12\x81\x01\n\x10GetComponentJson\x12\x35.PyGridWorld.SimulationServer.GetComponentJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetComponentJsonResponse\x12~\n\x0fRemoveComponent\x12\x34.PyGridWorld.SimulationServer.RemoveComponentRequest\x1a\x35.PyGridWorld.SimulationServer.RemoveComponentResponse\x12\x81\x01\n\x10ReplaceComponent\x12\x35.PyGridWorld.SimulationServer.ReplaceComponentRequest\x1a\x36.PyGridWorld.SimulationServer.ReplaceComponentResponse\x12\x84\x01\n\x11GetComponentNames\x12\x36.PyGridWorld.SimulationServer.GetComponentNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetComponentNamesResponse\x12\x96\x01\n\x17GetEntityComponentNames\x12<.PyGridWorld.SimulationServer.GetEntityComponentNamesRequest\x1a=.PyGridWorld.SimulationServer.GetEntityComponentNamesResponse\x12\x81\x01\n\x10GetSingletonJson\x12\x35.PyGridWorld.SimulationServer.GetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetSingletonJsonResponse\x12\x81\x01\n\x10SetSingletonJson\x12\x35.PyGridWorld.SimulationServer.SetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.SetSingletonJsonResponse\x12\x84\x01\n\x11GetSingletonNames\x12\x36.PyGridWorld.SimulationServer.GetSingletonNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetSingletonNamesResponse\x12n\n\tGetEvents\x12..PyGridWorld.SimulationServer.GetEventsRequest\x1a/.PyGridWorld.SimulationServer.GetEventsResponse0\x01\x12{\n\x0eGetStateBinary\x12\x33.PyGridWorld.SimulationServer.GetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.GetStateBinaryResponse\x12{\n\x0eSetStateBinary\x12\x33.PyGridWorld.SimulationServer.SetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.SetStateBinaryResponse\x12o\n\nRunCommand\x12/.PyGridWorld.SimulationServer.RunCommandRequest\x1a\x30.PyGridWorld.SimulationServer.RunCommandResponseb\x06proto3')
 )
 
 
@@ -1283,6 +1283,75 @@ _SETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   serialized_end=1736,
 )
 
+
+_RUNCOMMANDREQUEST = _descriptor.Descriptor(
+  name='RunCommandRequest',
+  full_name='PyGridWorld.SimulationServer.RunCommandRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='args', full_name='PyGridWorld.SimulationServer.RunCommandRequest.args', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1738,
+  serialized_end=1771,
+)
+
+
+_RUNCOMMANDRESPONSE = _descriptor.Descriptor(
+  name='RunCommandResponse',
+  full_name='PyGridWorld.SimulationServer.RunCommandResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='err', full_name='PyGridWorld.SimulationServer.RunCommandResponse.err', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='output', full_name='PyGridWorld.SimulationServer.RunCommandResponse.output', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1773,
+  serialized_end=1822,
+)
+
 _EVENTMESSAGE.oneofs_by_name['data'].fields.append(
   _EVENTMESSAGE.fields_by_name['json'])
 _EVENTMESSAGE.fields_by_name['json'].containing_oneof = _EVENTMESSAGE.oneofs_by_name['data']
@@ -1333,6 +1402,8 @@ DESCRIPTOR.message_types_by_name['GetStateBinaryRequest'] = _GETSTATEBINARYREQUE
 DESCRIPTOR.message_types_by_name['GetStateBinaryResponse'] = _GETSTATEBINARYRESPONSE
 DESCRIPTOR.message_types_by_name['SetStateBinaryRequest'] = _SETSTATEBINARYREQUEST
 DESCRIPTOR.message_types_by_name['SetStateBinaryResponse'] = _SETSTATEBINARYRESPONSE
+DESCRIPTOR.message_types_by_name['RunCommandRequest'] = _RUNCOMMANDREQUEST
+DESCRIPTOR.message_types_by_name['RunCommandResponse'] = _RUNCOMMANDRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 GetTickRequest = _reflection.GeneratedProtocolMessageType('GetTickRequest', (_message.Message,), dict(
@@ -1636,6 +1707,20 @@ SetStateBinaryResponse = _reflection.GeneratedProtocolMessageType('SetStateBinar
   ))
 _sym_db.RegisterMessage(SetStateBinaryResponse)
 
+RunCommandRequest = _reflection.GeneratedProtocolMessageType('RunCommandRequest', (_message.Message,), dict(
+  DESCRIPTOR = _RUNCOMMANDREQUEST,
+  __module__ = 'simulation_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.RunCommandRequest)
+  ))
+_sym_db.RegisterMessage(RunCommandRequest)
+
+RunCommandResponse = _reflection.GeneratedProtocolMessageType('RunCommandResponse', (_message.Message,), dict(
+  DESCRIPTOR = _RUNCOMMANDRESPONSE,
+  __module__ = 'simulation_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.SimulationServer.RunCommandResponse)
+  ))
+_sym_db.RegisterMessage(RunCommandResponse)
+
 
 
 _SIMULATION = _descriptor.ServiceDescriptor(
@@ -1644,8 +1729,8 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1739,
-  serialized_end=4390,
+  serialized_start=1825,
+  serialized_end=4589,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTick',
@@ -1834,6 +1919,15 @@ _SIMULATION = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_SETSTATEBINARYREQUEST,
     output_type=_SETSTATEBINARYRESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='RunCommand',
+    full_name='PyGridWorld.SimulationServer.Simulation.RunCommand',
+    index=21,
+    containing_service=None,
+    input_type=_RUNCOMMANDREQUEST,
+    output_type=_RUNCOMMANDRESPONSE,
     serialized_options=None,
   ),
 ])

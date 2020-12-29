@@ -26,6 +26,7 @@ service Simulation {
     rpc GetEvents(GetEventsRequest) returns (stream GetEventsResponse);
     rpc GetStateBinary(GetStateBinaryRequest) returns (GetStateBinaryResponse);
     rpc SetStateBinary(SetStateBinaryRequest) returns (SetStateBinaryResponse);
+    rpc RunCommand(RunCommandRequest) returns (RunCommandResponse);
 }
 
 message GetTickRequest {
@@ -190,4 +191,13 @@ message SetStateBinaryRequest {
 }
 
 message SetStateBinaryResponse {
+}
+
+message RunCommandRequest {
+    repeated string args = 1;
+}
+
+message RunCommandResponse {
+    string err = 1;
+    string output = 2;
 }

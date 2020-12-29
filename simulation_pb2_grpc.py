@@ -120,6 +120,11 @@ class SimulationStub(object):
         request_serializer=simulation__pb2.SetStateBinaryRequest.SerializeToString,
         response_deserializer=simulation__pb2.SetStateBinaryResponse.FromString,
         )
+    self.RunCommand = channel.unary_unary(
+        '/PyGridWorld.SimulationServer.Simulation/RunCommand',
+        request_serializer=simulation__pb2.RunCommandRequest.SerializeToString,
+        response_deserializer=simulation__pb2.RunCommandResponse.FromString,
+        )
 
 
 class SimulationServicer(object):
@@ -274,6 +279,13 @@ class SimulationServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def RunCommand(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_SimulationServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -381,6 +393,11 @@ def add_SimulationServicer_to_server(servicer, server):
           servicer.SetStateBinary,
           request_deserializer=simulation__pb2.SetStateBinaryRequest.FromString,
           response_serializer=simulation__pb2.SetStateBinaryResponse.SerializeToString,
+      ),
+      'RunCommand': grpc.unary_unary_rpc_method_handler(
+          servicer.RunCommand,
+          request_deserializer=simulation__pb2.RunCommandRequest.FromString,
+          response_serializer=simulation__pb2.RunCommandResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

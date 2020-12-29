@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PyGridWorld.SimulationServer;
+using System.Linq;
 
 namespace SimulationServer
 {
@@ -199,6 +200,70 @@ namespace SimulationServer
         {
             simulation.SetStateBinary(request.Binary.ToByteArray());
             return Task.FromResult(new SetStateBinaryResponse { });
+        }
+
+        public override Task<RunCommandResponse> RunCommand(RunCommandRequest request, ServerCallContext context)
+        {
+            string err = null;
+            string output = null;
+
+            var args = request.Args;
+
+            if (args.Count == 0)
+            {
+                err = "No command provided.";
+            }
+            else
+            {
+                switch (args[0])
+                {
+                    case "sim":
+                        {
+                            // "sim ..."
+                            (err, output) = simulation.RunCommand(args.Skip(1).ToArray());
+                            break;
+                        }
+                    case "run":
+                        {
+                            if (args.Count == 1)
+                            {
+                                // "run"
+                                simulation.StartSimulation();
+                            }
+                            else
+                            {
+                                // "run ..."
+                                switch (args[1])
+                                {
+                                    case "until":
+                                        {
+                                            // "run until x"
+                                            break;
+                                        }
+                                    case "for":
+                                        {
+                                            // "run for x"
+                                            break;
+                                        }
+                                    default:
+                                        {
+                                            err = $"'run' was provided unknown subcommand {args[1]}.";
+                                            break;
+                                        }
+                                }
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            err = $"Unknown command '{args[0]}'";
+                            break;
+                        }
+                }
+            }
+
+            return Task.FromResult(new RunCommandResponse { Err = err ?? string.Empty, Output = output ?? string.Empty });
+
         }
     }
 

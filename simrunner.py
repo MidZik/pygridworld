@@ -328,3 +328,9 @@ class SimulationClient:
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.SetStateBinaryRequest(binary=state_bin)
         stub.SetStateBinary(request)
+
+    def run_command(self, args):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.RunCommandRequest(args=args)
+        response = stub.RunCommand(request)
+        return response.err, response.output

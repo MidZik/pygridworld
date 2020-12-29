@@ -252,6 +252,11 @@ class TimelineSimulation:
         if self._is_editing:
             self._simulation_process.get_client().set_state_binary(state_binary)
 
+    def run_command(self, args):
+        if args[0] == "sim" and not self._is_editing:
+            return "'sim' command only allowed while in edit mode.", None
+        return self._simulation_process.get_client().run_command(args)
+
     def _handle_event(self, tick, events):
         db_conn = self.timeline.get_db_conn()
 

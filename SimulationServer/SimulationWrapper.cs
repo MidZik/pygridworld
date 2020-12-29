@@ -12,6 +12,7 @@ namespace SimulationServer
         public delegate void BufferResultHandler(IntPtr buffer, ulong size);
         public delegate void SimEventHandler(string name, string data);
         public delegate void TickEventHandler(ulong tick, ulong flags);
+        public delegate void CommandResultHandler([MarshalAs(UnmanagedType.LPUTF8Str)] string err, [MarshalAs(UnmanagedType.LPUTF8Str)] string output);
 
         delegate IntPtr CreateSimulationDelegate();
         CreateSimulationDelegate create_simulation;
@@ -61,6 +62,8 @@ namespace SimulationServer
         SetStateBinaryDelegate set_state_binary;
         delegate void GetEventsLastTickDelegate(IntPtr sim, IntPtr sim_event_handler);
         GetEventsLastTickDelegate get_events_last_tick;
+        delegate void RunCommandDelegate(IntPtr sim, long argc, [In, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr)] string[] argv, IntPtr command_result_handler);
+        RunCommandDelegate run_command;
 
         IntPtr simulation_library_handle;
         IntPtr simulation_handle;
@@ -94,6 +97,7 @@ namespace SimulationServer
             get_state_binary = Marshal.GetDelegateForFunctionPointer<GetStateBinaryDelegate>(GetExport("get_state_binary"));
             set_state_binary = Marshal.GetDelegateForFunctionPointer<SetStateBinaryDelegate>(GetExport("set_state_binary"));
             get_events_last_tick = Marshal.GetDelegateForFunctionPointer<GetEventsLastTickDelegate>(GetExport("get_events_last_tick"));
+            run_command = Marshal.GetDelegateForFunctionPointer<RunCommandDelegate>(GetExport("run_command"));
 
             simulation_handle = create_simulation();
         }
@@ -299,6 +303,24 @@ namespace SimulationServer
             get_events_last_tick(simulation_handle, DelegateToUnmanaged(callback));
 
             GC.KeepAlive(callback);
+        }
+
+        public (string, string) RunCommand(string[] args)
+        {
+            string err = null;
+            string output = null;
+
+            CommandResultHandler handler = (string _err, string _output) =>
+            {
+                err = _err;
+                output = _output;
+            };
+
+            run_command(simulation_handle, args.Length, args, DelegateToUnmanaged(handler));
+
+            GC.KeepAlive(handler);
+
+            return (err, output);
         }
     }
 }
