@@ -477,6 +477,10 @@ class SimulationRegistration:
         with open(str(self.get_description_file_path())) as f:
             return f.read()
 
+    def get_description_summary(self):
+        with open(str(self.get_description_file_path())) as f:
+            return f.readline(50).strip()
+
     def set_description(self, description):
         with open(str(self.get_description_file_path()), "w") as f:
             f.write(description)

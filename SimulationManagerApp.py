@@ -260,6 +260,14 @@ class App:
         else:
             return None
 
+    def get_selected_simulation_registration_list_item(self):
+        items = self._ui.registeredSimList.selectedItems()
+
+        if items:
+            return items[0]
+        else:
+            return None
+
     def get_sim_bin_provider_to_convert_to(self):
         return self._ui.convertToSimComboBox.currentData(App._SimulationBinaryProvider)
 
@@ -748,12 +756,20 @@ class App:
             ui.simSourceFilePathLabel.setText("")
             ui.sourceFileContentsTextEdit.setPlainText("")
 
+    def _registered_sim_item_text(self, reg):
+        return f"{reg.get_description_summary()} ({reg.uuid})"
+
+    def _make_registered_sim_item(self, reg):
+        item_text = self._registered_sim_item_text(reg)
+        item = QtWidgets.QListWidgetItem(item_text)
+        item.setData(App._SimulationRegistration, reg)
+        return item
+
     def _refresh_registered_sim_list(self):
         ui = self._ui
         ui.registeredSimList.clear()
         for reg in self._project.get_registered_simulations():
-            item = QtWidgets.QListWidgetItem(str(reg.uuid))
-            item.setData(App._SimulationRegistration, reg)
+            item = self._make_registered_sim_item(reg)
             ui.registeredSimList.addItem(item)
 
     def _refresh_registered_sim_section(self):
@@ -787,8 +803,7 @@ class App:
         selected_source = self.get_selected_simulation_source()
         if selected_source:
             reg = self._project.register_simulation(selected_source)
-            item = QtWidgets.QListWidgetItem(str(reg.uuid))
-            item.setData(App._SimulationRegistration, reg)
+            item = self._make_registered_sim_item(reg)
             self._ui.registeredSimList.addItem(item)
 
             self._add_timeline_simulation_provider_to_combo_box(reg)
@@ -805,8 +820,10 @@ class App:
 
     def _save_registered_sim_description(self):
         selected_reg = self.get_selected_simulation_registration()
+        selected_reg_list_item = self.get_selected_simulation_registration_list_item()
         if selected_reg is not None:
             selected_reg.set_description(self._ui.registeredSimDescriptionTextEdit.toPlainText())
+            selected_reg_list_item.setText(self._registered_sim_item_text(selected_reg))
 
     def _discard_registered_sim_description(self):
         selected_reg = self.get_selected_simulation_registration()
