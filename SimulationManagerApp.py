@@ -287,6 +287,9 @@ class App:
     def _open_project(self):
         project_dir = QFileDialog.getExistingDirectory(self._main_window, options=QFileDialog.ShowDirsOnly)
 
+        if not project_dir:
+            return
+
         self._project = sm.TimelinesProject.load_project(project_dir)
         if self._server is not None:
             self._server.stop()

@@ -506,11 +506,11 @@ class TimelinesProject:
     def load_project(project_root_dir):
         project = TimelinesProject(project_root_dir)
 
+        project._project_file_handle = project.project_file_path.open('r+')
+
         project.load_all_simulation_sources()
         project.load_simulation_registry()
         project.load_all_timelines()
-
-        project._project_file_handle = project.project_file_path.open('r+')
 
         return project
 
