@@ -793,7 +793,6 @@ class App:
         item.setData(App._SimIdentifierRole, source.source_file_path)
         self._ui.simSourceList.addItem(item)
 
-        combo_box = self._ui.convertToSimComboBox
         self._add_timeline_simulation_provider_to_combo_box(source)
 
     def _on_selected_sim_source_changed(self):
@@ -824,6 +823,8 @@ class App:
         if selected_reg is not None:
             selected_reg.set_description(self._ui.registeredSimDescriptionTextEdit.toPlainText())
             selected_reg_list_item.setText(self._registered_sim_item_text(selected_reg))
+            index = self._ui.convertToSimComboBox.findData(selected_reg, App._SimulationBinaryProvider)
+            self._ui.convertToSimComboBox.setItemText(index, str(selected_reg))
 
     def _discard_registered_sim_description(self):
         selected_reg = self.get_selected_simulation_registration()

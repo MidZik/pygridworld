@@ -453,7 +453,7 @@ class SimulationRegistration:
         self._description_summary = None
 
     def __str__(self):
-        return f"Registration: {self.uuid}"
+        return f"Registration: {self.get_description_summary()} ({self.uuid})"
 
     def get_metadata_file_path(self):
         return self.path / "metadata.json"
