@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import os
 import sqlite3
+import gwsignal
 
 
 class Timeline:
@@ -442,14 +443,14 @@ class SimulationRegistration:
         with open(str(registration.get_metadata_file_path()), "w") as mf:
             json.dump(meta, mf)
 
-        with open(str(registration.get_description_file_path()), "w") as df:
-            df.write(description)
+        registration.set_description(description)
 
         return registration
 
     def __init__(self, path):
         self.path: Path = Path(path).resolve(True)
         self.uuid = UUID(self.path.name)
+        self._description_summary = None
 
     def __str__(self):
         return f"Registration: {self.uuid}"
@@ -478,12 +479,19 @@ class SimulationRegistration:
             return f.read()
 
     def get_description_summary(self):
-        with open(str(self.get_description_file_path())) as f:
-            return f.readline(50).strip()
+        if self._description_summary is None:
+            with open(str(self.get_description_file_path())) as f:
+                self._description_summary = f.readline(50).strip()
+
+        return self._description_summary
 
     def set_description(self, description):
         with open(str(self.get_description_file_path()), "w") as f:
             f.write(description)
+
+        new_summary = description[:50].partition('\n')[0].strip()
+        if new_summary != self._description_summary:
+            self._description_summary = new_summary
 
     def get_simulation_binary_path(self):
         metadata = self.get_metadata()
