@@ -518,7 +518,6 @@ class App:
             del self._simulations[timeline_node.timeline_id]
             sim.remove_dock()
             sim.timeline_simulation.stop_process()
-            # self._refresh_simulation_tab()
             self._refresh_convert_to_selected_sim_button()
 
     def _create_entity_on_selected_sim(self):
@@ -562,7 +561,6 @@ class App:
         new_timeline_sim.start_process()
 
         self._simulations[timeline_id] = new_sim
-        self._refresh_simulation_tab()
 
     def _on_selected_entity_changed(self):
         ui = self._ui
@@ -625,16 +623,12 @@ class App:
 
         if selected_sim is not None:
             selected_sim.timeline_simulation.start_simulation()
-            # TODO: temp?
-            self._refresh_simulation_start_stop_buttons()
 
     def _stop_selected_simulation(self):
         selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None:
             selected_sim.timeline_simulation.stop_simulation()
-            # TODO: temp?
-            self._refresh_simulation_start_stop_buttons()
 
     def _start_editing_selected_sim(self):
         selected_sim = self.get_selected_timeline_simulation()
@@ -642,23 +636,17 @@ class App:
         if selected_sim is not None and selected_sim.timeline_simulation.can_start_editing():
             selected_sim.timeline_simulation.start_editing()
 
-        self._refresh_simulation_tab()
-
     def _commit_edits_to_selected_sim(self):
         selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None and selected_sim.timeline_simulation.is_editing():
             selected_sim.timeline_simulation.commit_edits()
 
-        self._refresh_simulation_tab()
-
     def _discard_edits_to_selected_sim(self):
         selected_sim = self.get_selected_timeline_simulation()
 
         if selected_sim is not None and selected_sim.timeline_simulation.is_editing():
             selected_sim.timeline_simulation.discard_edits()
-
-        self._refresh_simulation_tab()
 
     def _revert_selected_com_state(self):
         self._on_selected_component_changed()
