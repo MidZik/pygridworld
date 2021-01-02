@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 import json
 import re
+from threading import Thread
 from typing import Optional, List
 from bisect import insort
 from simrunner import SimulationProcess
@@ -100,6 +101,10 @@ class TimelineSimulation:
 
         self._is_editing = False
 
+        self._event_stream_context = None
+        self._event_thread = None
+        self._client = None
+
     def is_editing(self):
         return self._is_editing
 
@@ -110,10 +115,9 @@ class TimelineSimulation:
         # 3. Simulation is not currently running.
         # 4. Not currently in edit mode.
         timeline = self.timeline
-        client = self._simulation_process.get_client()
         return (timeline.head() == timeline.tail() and
-                client.get_tick() == timeline.head() and
-                not client.is_running() and
+                self._client.get_tick() == timeline.head() and
+                not self._client.is_running() and
                 not self._is_editing)
 
     def start_editing(self):
@@ -163,7 +167,7 @@ class TimelineSimulation:
             raise RuntimeError('Cannot move to point while simulation is running.')
 
         with self.timeline.get_point_file_path(tick).open('br') as f:
-            self._simulation_process.get_client().set_state_binary(f.read())
+            self._client.set_state_binary(f.read())
 
     def start_process(self, initial_tick=None):
         if initial_tick is None:
@@ -171,96 +175,104 @@ class TimelineSimulation:
         elif initial_tick not in self.timeline.tick_list:
             raise ValueError('Attempted to start timeline simulation at an invalid tick.')
 
-        self._simulation_process = SimulationProcess(
-            self.timeline.get_simulation_binary_path(),
-            self._handle_event)
+        self._simulation_process = SimulationProcess(self.timeline.get_simulation_binary_path())
         self._simulation_process.start()
+
+        self._client = self._simulation_process.make_new_client()
+        self._client.open()
+
+        self._event_stream_context = self._client.get_event_stream()
+        self._event_thread = Thread(target=self._event_stream_handler)
+        self._event_thread.start()
 
         self.move_to_tick(initial_tick)
 
     def stop_process(self):
+        self._event_stream_context.cancel()
+        self._event_thread.join()
         self._simulation_process.stop()
+        self._client = None
 
     def start_simulation(self):
         if not self._is_editing:
-            self._simulation_process.get_client().start_simulation()
+            self._client.start_simulation()
 
     def stop_simulation(self):
-        self._simulation_process.get_client().stop_simulation()
+        self._client.stop_simulation()
 
     def is_running(self):
-        return self._simulation_process.get_client().is_running()
+        return self._client.is_running()
 
     def get_tick(self):
-        return self._simulation_process.get_client().get_tick()
+        return self._client.get_tick()
 
     def get_state_json(self):
-        return self._simulation_process.get_client().get_state_json()
+        return self._client.get_state_json()
 
     def set_state_json(self, state_json):
         if self._is_editing:
-            self._simulation_process.get_client().set_state_json(state_json)
+            self._client.set_state_json(state_json)
 
     def create_entity(self):
         if self._is_editing:
-            return self._simulation_process.get_client().create_entity()
+            return self._client.create_entity()
 
     def destroy_entity(self, eid):
         if self._is_editing:
-            self._simulation_process.get_client().destroy_entity(eid)
+            self._client.destroy_entity(eid)
 
     def get_all_entities(self):
-        return self._simulation_process.get_client().get_all_entities()
+        return self._client.get_all_entities()
 
     def assign_component(self, eid, com_name):
         if self._is_editing:
-            self._simulation_process.get_client().assign_component(eid, com_name)
+            self._client.assign_component(eid, com_name)
 
     def get_component_json(self, eid, com_name):
-        return self._simulation_process.get_client().get_component_json(eid, com_name)
+        return self._client.get_component_json(eid, com_name)
 
     def remove_component(self, eid, com_name):
         if self._is_editing:
-            self._simulation_process.get_client().remove_component(eid, com_name)
+            self._client.remove_component(eid, com_name)
 
     def replace_component(self, eid, com_name, state_json):
         if self._is_editing:
-            self._simulation_process.get_client().replace_component(eid, com_name, state_json)
+            self._client.replace_component(eid, com_name, state_json)
 
     def get_component_names(self):
-        return self._simulation_process.get_client().get_component_names()
+        return self._client.get_component_names()
 
     def get_entity_component_names(self, eid):
-        return self._simulation_process.get_client().get_entity_component_names(eid)
+        return self._client.get_entity_component_names(eid)
 
     def get_singleton_json(self, singleton_name):
-        return self._simulation_process.get_client().get_singleton_json(singleton_name)
+        return self._client.get_singleton_json(singleton_name)
 
     def set_singleton_json(self, singleton_name, singleton_json):
         if self._is_editing:
-            self._simulation_process.get_client().set_singleton_json(singleton_name, singleton_json)
+            self._client.set_singleton_json(singleton_name, singleton_json)
 
     def get_singleton_names(self):
-        return self._simulation_process.get_client().get_singleton_names()
+        return self._client.get_singleton_names()
 
     def get_new_client(self):
         return self._simulation_process.make_new_client()
 
     def get_state_binary(self):
-        return self._simulation_process.get_client().get_state_binary()
+        return self._client.get_state_binary()
 
     def set_state_binary(self, state_binary):
         if self._is_editing:
-            self._simulation_process.get_client().set_state_binary(state_binary)
+            self._client.set_state_binary(state_binary)
 
     def run_command(self, args):
         if args[0] == "sim" and not self._is_editing:
             return "'sim' command only allowed while in edit mode.", None
         elif args[0] != "sim" and self._is_editing:
             return "Only 'sim' command is allowed while in edit mode.", None
-        return self._simulation_process.get_client().run_command(args)
+        return self._client.run_command(args)
 
-    def _handle_event(self, tick, events):
+    def _event_stream_handler(self):
         db_conn = self.timeline.get_db_conn()
 
         # Since many events can occur quite rapidly, enforcing sync with the disk can result
@@ -271,23 +283,24 @@ class TimelineSimulation:
         # this is not an important factor when compared to speed of handling events.
         db_conn.execute('PRAGMA synchronous = OFF')
 
-        for e in events:
-            if e.in_namespace("sim."):
-                db_conn.execute('''
-                INSERT OR IGNORE INTO
-                events(tick, event_name, event_json)
-                VALUES(?,?,?)
-                ''', (tick, e.name, e.json))
-            elif e.name == "meta.state_bin":
-                if tick in self.timeline.tick_list:
-                    continue
-                else:
-                    state_file_path = self.timeline.get_point_file_path(tick)
-                    with state_file_path.open('bw') as state_file:
-                        state_file.write(e.bin)
-                    insort(self.timeline.tick_list, tick)
+        for (tick, events) in self._event_stream_context:
+            for e in events:
+                if e.in_namespace("sim."):
+                    db_conn.execute('''
+                    INSERT OR IGNORE INTO
+                    events(tick, event_name, event_json)
+                    VALUES(?,?,?)
+                    ''', (tick, e.name, e.json))
+                elif e.name == "meta.state_bin":
+                    if tick in self.timeline.tick_list:
+                        continue
+                    else:
+                        state_file_path = self.timeline.get_point_file_path(tick)
+                        with state_file_path.open('bw') as state_file:
+                            state_file.write(e.bin)
+                        insort(self.timeline.tick_list, tick)
 
-        db_conn.commit()
+            db_conn.commit()
 
 
 class TimelineNode:

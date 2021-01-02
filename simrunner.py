@@ -2,8 +2,6 @@
 @author: Matt Idzik (MidZik)
 """
 from subprocess import Popen, PIPE
-from threading import Thread
-from typing import Optional
 from pathlib import Path
 
 import grpc
@@ -109,15 +107,11 @@ class SimulationProcess:
         if result != 0:
             raise RuntimeError("Creating default state file failed.")
 
-    def __init__(self, simulation_library_path, event_state_writer):
+    def __init__(self, simulation_library_path):
         self._simulation_library_path = simulation_library_path
-        self._event_state_writer = event_state_writer
 
         self._process = None
         self._port = None
-        self._client: Optional[SimulationClient] = None
-        self._event_thread = None
-        self._stream_context = None
 
     def __del__(self):
         self.stop()
@@ -130,19 +124,9 @@ class SimulationProcess:
         process.stdin.write(b"port\n")
         process.stdin.flush()
         self._port = int(process.stdout.readline())
-        self._client = self.make_new_client()
-        self._client.open()
-
-        if self._event_state_writer:
-            self._stream_context = self._client.get_event_stream()
-            self._event_thread = Thread(target=self._event_handler)
-            self._event_thread.start()
 
     def stop(self):
         if self._process.poll() is None:
-            if self._event_state_writer:
-                self._stream_context.cancel()
-                self._event_thread.join()
             self._process.stdin.write(b"exit\n")
             self._process.stdin.flush()
             self._process.wait()
@@ -153,15 +137,8 @@ class SimulationProcess:
     def get_server_address(self):
         return f'localhost:{self._port}'
 
-    def get_client(self):
-        return self._client
-
     def make_new_client(self):
         return SimulationClient(self.get_server_address())
-
-    def _event_handler(self):
-        for (tick, events) in self._stream_context:
-            self._event_state_writer(tick, events)
 
 
 class SimulationClient:
