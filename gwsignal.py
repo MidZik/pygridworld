@@ -1,4 +1,5 @@
 from inspect import ismethod
+from types import MethodType
 import weakref
 
 
@@ -26,6 +27,12 @@ class Signal:
         else:
             # Function/callable case
             self._callbacks.append((None, callback, binds))
+
+    def connect_func_as_method(self, func, func_self, *binds):
+        if ismethod(func):
+            raise ValueError("func is already a method")
+        else:
+            self.connect(MethodType(func, func_self))
 
     def disconnect(self, callback):
         """
