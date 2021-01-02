@@ -19,8 +19,6 @@ namespace SimulationServer
         private delegate void CommitEventsDelegate(ulong tick, List<EventMessage> event_messages);
         private event CommitEventsDelegate events_committed;
 
-        private List<EventMessage> event_messages = new List<EventMessage>();
-
         public SimulationService(SimulationWrapper simulation)
         {
             this.simulation = simulation;
@@ -29,6 +27,7 @@ namespace SimulationServer
 
         private void TickEventCallback(ulong tick, ulong raw_flags)
         {
+            List<EventMessage> event_messages = new List<EventMessage>();
             TickEventFlags flags = (TickEventFlags)raw_flags;
             if (flags.HasFlag(TickEventFlags.EventsOccurred))
             {
@@ -56,7 +55,6 @@ namespace SimulationServer
             if (event_messages.Count > 0)
             {
                 events_committed(tick, event_messages);
-                event_messages = new List<EventMessage>();
             }
         }
 
