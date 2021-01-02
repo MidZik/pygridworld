@@ -256,6 +256,8 @@ class TimelineSimulation:
     def run_command(self, args):
         if args[0] == "sim" and not self._is_editing:
             return "'sim' command only allowed while in edit mode.", None
+        elif args[0] != "sim" and self._is_editing:
+            return "Only 'sim' command is allowed while in edit mode.", None
         return self._simulation_process.get_client().run_command(args)
 
     def _handle_event(self, tick, events):
