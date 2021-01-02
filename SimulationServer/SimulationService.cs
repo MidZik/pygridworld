@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PyGridWorld.SimulationServer;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 namespace SimulationServer
 {
@@ -178,13 +181,16 @@ namespace SimulationServer
 
         public override Task<StartSimulationResponse> StartSimulation(StartSimulationRequest request, ServerCallContext context)
         {
+            ulong start_tick = simulation.GetTick();
             simulation.StartSimulation();
+            SendRunnerUpdateEvent(start_tick, true);
             return Task.FromResult(new StartSimulationResponse { });
         }
 
         public override Task<StopSimulationResponse> StopSimulation(StopSimulationRequest request, ServerCallContext context)
         {
             simulation.StopSimulation();
+            SendRunnerUpdateEvent(simulation.GetTick(), false);
             return Task.FromResult(new StopSimulationResponse { });
         }
 
@@ -226,7 +232,9 @@ namespace SimulationServer
                             if (args.Count == 1)
                             {
                                 // "run"
+                                ulong start_tick = simulation.GetTick();
                                 simulation.StartSimulation();
+                                SendRunnerUpdateEvent(start_tick, true);
                             }
                             else
                             {
@@ -262,6 +270,21 @@ namespace SimulationServer
 
             return Task.FromResult(new RunCommandResponse { Err = err ?? string.Empty, Output = output ?? string.Empty });
 
+        }
+
+        private void SendRunnerUpdateEvent(ulong tick, bool sim_running)
+        {
+            List<EventMessage> event_messages = new List<EventMessage>();
+
+            event_messages.Add(new EventMessage
+            {
+                Name = "runner.update",
+                Json = JsonSerializer.Serialize(new {
+                    sim_running = sim_running,
+                })
+            });
+
+            events_committed(tick, event_messages);
         }
     }
 

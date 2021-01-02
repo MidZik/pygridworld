@@ -105,6 +105,8 @@ class TimelineSimulation:
         self._event_thread = None
         self._client = None
 
+        self.runner_updated = gwsignal.Signal()
+
     def is_editing(self):
         return self._is_editing
 
@@ -129,6 +131,8 @@ class TimelineSimulation:
 
         self._is_editing = True
 
+        self.runner_updated.emit()
+
     def commit_edits(self):
         """
         Save the current simulation state as the new head point and exit edit mode.
@@ -143,6 +147,8 @@ class TimelineSimulation:
 
         self._is_editing = False
 
+        self.runner_updated.emit()
+
     def discard_edits(self):
         """
         Revert the simulation state to the head point and exit edit mode.
@@ -156,6 +162,8 @@ class TimelineSimulation:
 
         self._is_editing = False
 
+        self.runner_updated.emit()
+
     def move_to_tick(self, tick: int):
         if tick not in self.timeline.tick_list:
             raise ValueError('Point tick is not part of simulation timeline.')
@@ -168,6 +176,8 @@ class TimelineSimulation:
 
         with self.timeline.get_point_file_path(tick).open('br') as f:
             self._client.set_state_binary(f.read())
+
+        self.runner_updated.emit()
 
     def start_process(self, initial_tick=None):
         if initial_tick is None:
@@ -187,11 +197,15 @@ class TimelineSimulation:
 
         self.move_to_tick(initial_tick)
 
+        self.runner_updated.emit()
+
     def stop_process(self):
         self._event_stream_context.cancel()
         self._event_thread.join()
         self._simulation_process.stop()
         self._client = None
+
+        self.runner_updated.emit()
 
     def start_simulation(self):
         if not self._is_editing:
@@ -299,6 +313,8 @@ class TimelineSimulation:
                         with state_file_path.open('bw') as state_file:
                             state_file.write(e.bin)
                         insort(self.timeline.tick_list, tick)
+                elif e.name == "runner.update":
+                    self.runner_updated.emit()
 
             db_conn.commit()
 

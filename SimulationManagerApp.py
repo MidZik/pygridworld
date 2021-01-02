@@ -14,6 +14,7 @@ from weakref import WeakKeyDictionary
 from ts_server import Server
 from PySide2.QtWidgets import QFileDialog
 import shlex
+from functools import wraps
 
 
 class _TaskRunner(QtCore.QRunnable):
@@ -272,7 +273,9 @@ class App:
         return self._ui.convertToSimComboBox.currentData(App._SimulationBinaryProvider)
 
     def _on_application_quitting(self):
-        for sim in self._simulations.values():
+        sims_to_close = [sim for sim in self._simulations.values()]
+        self._simulations.clear()
+        for sim in sims_to_close:
             sim.timeline_simulation.stop_process()
 
     def _make_timeline_item(self, timeline_node: sm.TimelineNode):
@@ -512,10 +515,10 @@ class App:
         sim = self.get_selected_timeline_simulation()
 
         if sim is not None:
-            sim.timeline_simulation.stop_process()
-            sim.remove_dock()
             del self._simulations[timeline_node.timeline_id]
-            self._refresh_simulation_tab()
+            sim.remove_dock()
+            sim.timeline_simulation.stop_process()
+            # self._refresh_simulation_tab()
             self._refresh_convert_to_selected_sim_button()
 
     def _create_entity_on_selected_sim(self):
@@ -536,10 +539,19 @@ class App:
         self._refresh_simulation_entity_list()
 
     def start_simulation_process(self, point):
-        if point.timeline_id() in self._simulations:
+        timeline_id = point.timeline_id()
+        if timeline_id in self._simulations:
             return
 
         new_timeline_sim = self._project.create_timeline_simulation(point.timeline_id())
+
+        @QtCore.Slot()
+        def refresh_sim_tab_if_necessary(_self: App):
+            selected_timeline_node = _self.get_selected_timeline_node()
+            if selected_timeline_node.timeline_id == timeline_id:
+                _self._refresh_simulation_tab()
+
+        new_timeline_sim.runner_updated.connect_func_as_method(refresh_sim_tab_if_necessary, self)
 
         new_sim = Simulation(self._main_window, point.timeline_node, new_timeline_sim)
 
@@ -549,7 +561,7 @@ class App:
 
         new_timeline_sim.start_process()
 
-        self._simulations[point.timeline_id()] = new_sim
+        self._simulations[timeline_id] = new_sim
         self._refresh_simulation_tab()
 
     def _on_selected_entity_changed(self):
