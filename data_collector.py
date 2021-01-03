@@ -123,13 +123,16 @@ def periodic_collection(db_file, server_address='127.0.0.1:4969', time_between_r
     for p in processors:
         p.prepare_db(db_conn)
 
+    next_tick = defaultdict(lambda: 0)
+
     try:
         while True:
             with ts_client.Client(server_address) as client:
                 timeline_ids = client.get_timelines()
 
                 for timeline_id in timeline_ids:
-                    for tick, events_list in client.get_timeline_events(timeline_id):
+                    for tick, events_list in client.get_timeline_events(timeline_id, start_tick=next_tick[timeline_id]):
+                        next_tick[timeline_id] = tick + 1
                         events = {event.name: json.loads(event.json) for event in events_list}
                         for p in processors:
                             p.process_state(db_conn, timeline_id, tick, events)
