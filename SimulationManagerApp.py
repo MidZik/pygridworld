@@ -557,9 +557,9 @@ class App:
             already_existing_sim = next(iter(self._simulations.values()))
             self._main_window.tabifyDockWidget(already_existing_sim.dock, new_sim.dock)
 
-        new_timeline_sim.start_process()
-
         self._simulations[timeline_id] = new_sim
+
+        new_timeline_sim.start_process()
 
     def _on_selected_entity_changed(self):
         ui = self._ui
