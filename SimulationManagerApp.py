@@ -14,7 +14,6 @@ from weakref import WeakKeyDictionary
 from ts_server import Server
 from PySide2.QtWidgets import QFileDialog
 import shlex
-from functools import wraps
 
 
 class _TaskRunner(QtCore.QRunnable):
