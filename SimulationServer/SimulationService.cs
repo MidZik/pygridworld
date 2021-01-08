@@ -5,21 +5,30 @@ using System.Threading.Tasks;
 using PyGridWorld.SimulationServer;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Threading;
+using System.Collections.Concurrent;
+using System.Threading.Tasks.Dataflow;
 
 
 namespace SimulationServer
 {
     class SimulationService : Simulation.SimulationBase
     {
-        [Flags] private enum TickEventFlags
+        [Flags]
+        private enum TickEventFlags
         {
             None = 0,
             EventsOccurred = 1,
         }
 
+        private struct EventsData
+        {
+            public ulong tick;
+            public List<EventMessage> events;
+        }
+
         private SimulationWrapper simulation;
-        private delegate void CommitEventsDelegate(ulong tick, List<EventMessage> event_messages);
+        private delegate void CommitEventsDelegate(EventsData data);
         private event CommitEventsDelegate events_committed;
 
         public SimulationService(SimulationWrapper simulation)
@@ -36,7 +45,8 @@ namespace SimulationServer
             {
                 SimulationWrapper.SimEventHandler sim_event_handler = (string name, string json) =>
                 {
-                    event_messages.Add(new EventMessage() {
+                    event_messages.Add(new EventMessage()
+                    {
                         Name = "sim." + name,
                         Json = json
                     });
@@ -49,7 +59,8 @@ namespace SimulationServer
             if (tick % 500000 == 0)
             {
                 byte[] state_binary = simulation.GetStateBinary();
-                event_messages.Add(new EventMessage() {
+                event_messages.Add(new EventMessage()
+                {
                     Name = "meta.state_bin",
                     Bin = Google.Protobuf.ByteString.CopyFrom(state_binary)
                 });
@@ -57,7 +68,7 @@ namespace SimulationServer
 
             if (event_messages.Count > 0)
             {
-                events_committed(tick, event_messages);
+                events_committed(new EventsData { tick = tick, events = event_messages });
             }
         }
 
@@ -111,16 +122,30 @@ namespace SimulationServer
 
         public override async Task GetEvents(GetEventsRequest request, IServerStreamWriter<GetEventsResponse> responseStream, ServerCallContext context)
         {
-            CommitEventsDelegate handler = async (ulong tick, List<EventMessage> eventMessages) =>
+            var eventsDataQueue = new BufferBlock<EventsData>(new DataflowBlockOptions
             {
-                GetEventsResponse response = new GetEventsResponse();
-                response.Tick = tick;
-                response.Events.AddRange(eventMessages);
-                await responseStream.WriteAsync(response);
+                CancellationToken = context.CancellationToken,
+                EnsureOrdered = true,
+                BoundedCapacity = 100
+            });
+
+            CommitEventsDelegate addToQueueHandler = (EventsData data) =>
+            {
+                eventsDataQueue.SendAsync(data).Wait();
             };
-            events_committed += handler;
-            await Task.Delay(-1, context.CancellationToken);
-            events_committed -= handler;
+
+            events_committed += addToQueueHandler;
+
+            while (!context.CancellationToken.IsCancellationRequested)
+            {
+                EventsData data = await eventsDataQueue.ReceiveAsync(context.CancellationToken);
+                GetEventsResponse response = new GetEventsResponse();
+                response.Tick = data.tick;
+                response.Events.AddRange(data.events);
+                await responseStream.WriteAsync(response);
+            }
+
+            events_committed -= addToQueueHandler;
         }
 
         public override Task<GetSingletonJsonResponse> GetSingletonJson(GetSingletonJsonRequest request, ServerCallContext context)
@@ -197,7 +222,7 @@ namespace SimulationServer
         public override Task<GetStateBinaryResponse> GetStateBinary(GetStateBinaryRequest request, ServerCallContext context)
         {
             byte[] bin = simulation.GetStateBinary();
-            return Task.FromResult(new GetStateBinaryResponse { Binary = Google.Protobuf.ByteString.CopyFrom(bin) }) ;
+            return Task.FromResult(new GetStateBinaryResponse { Binary = Google.Protobuf.ByteString.CopyFrom(bin) });
         }
 
         public override Task<SetStateBinaryResponse> SetStateBinary(SetStateBinaryRequest request, ServerCallContext context)
@@ -279,12 +304,13 @@ namespace SimulationServer
             event_messages.Add(new EventMessage
             {
                 Name = "runner.update",
-                Json = JsonSerializer.Serialize(new {
+                Json = JsonSerializer.Serialize(new
+                {
                     sim_running = sim_running,
                 })
             });
 
-            events_committed(tick, event_messages);
+            events_committed(new EventsData { tick = tick, events = event_messages });
         }
     }
 
