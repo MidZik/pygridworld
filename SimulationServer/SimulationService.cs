@@ -30,6 +30,8 @@ namespace SimulationServer
         private SimulationWrapper simulation;
         private delegate void CommitEventsDelegate(EventsData data);
         private event CommitEventsDelegate events_committed;
+        private System.Diagnostics.Stopwatch performanceStopwatch = new System.Diagnostics.Stopwatch();
+        private ulong performanceStartTick = 0, performanceStopTick = 0;
 
         public SimulationService(SimulationWrapper simulation)
         {
@@ -206,16 +208,13 @@ namespace SimulationServer
 
         public override Task<StartSimulationResponse> StartSimulation(StartSimulationRequest request, ServerCallContext context)
         {
-            ulong start_tick = simulation.GetTick();
-            simulation.StartSimulation();
-            SendRunnerUpdateEvent(start_tick, true);
+            StartSimulationImpl();
             return Task.FromResult(new StartSimulationResponse { });
         }
 
         public override Task<StopSimulationResponse> StopSimulation(StopSimulationRequest request, ServerCallContext context)
         {
-            simulation.StopSimulation();
-            SendRunnerUpdateEvent(simulation.GetTick(), false);
+            StopSimulationImpl();
             return Task.FromResult(new StopSimulationResponse { });
         }
 
@@ -257,9 +256,7 @@ namespace SimulationServer
                             if (args.Count == 1)
                             {
                                 // "run"
-                                ulong start_tick = simulation.GetTick();
-                                simulation.StartSimulation();
-                                SendRunnerUpdateEvent(start_tick, true);
+                                StartSimulationImpl();
                             }
                             else
                             {
@@ -282,6 +279,25 @@ namespace SimulationServer
                                             break;
                                         }
                                 }
+                            }
+                            break;
+                        }
+                    case "perf":
+                        {
+                            if (simulation.IsRunning())
+                            {
+                                err = "'perf' can only be used while the simulation isn't running.";
+                            }
+                            else if (performanceStartTick == performanceStopTick)
+                            {
+                                err = "'perf' requires that the simulation runs for at least one tick.";
+                            }
+                            else
+                            {
+                                ulong ticks = performanceStopTick - performanceStartTick;
+                                double timeInSec = performanceStopwatch.Elapsed.TotalSeconds;
+                                double timePerKilotick = (timeInSec * 1000 / ticks);
+                                output = $"Ticks: {ticks}\nTime(sec): {timeInSec}\nTime Per Kilotick: {timePerKilotick}";
                             }
                             break;
                         }
@@ -311,6 +327,28 @@ namespace SimulationServer
             });
 
             events_committed(new EventsData { tick = tick, events = event_messages });
+        }
+
+        private void StartSimulationImpl()
+        {
+            if (!simulation.IsRunning())
+            {
+                performanceStartTick = simulation.GetTick();
+                performanceStopwatch.Restart();
+                simulation.StartSimulation();
+                SendRunnerUpdateEvent(performanceStartTick, true);
+            }
+        }
+
+        private void StopSimulationImpl()
+        {
+            if (simulation.IsRunning())
+            {
+                simulation.StopSimulation();
+                performanceStopwatch.Stop();
+                performanceStopTick = simulation.GetTick();
+                SendRunnerUpdateEvent(performanceStopTick, false);
+            }
         }
     }
 
