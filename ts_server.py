@@ -21,7 +21,7 @@ class Service(ts_grpc.TimelineServiceServicer):
         try:
             node = self._project.get_timeline_node(request.timeline_id)
             message = ts.TimelineTicksResponse()
-            message.ticks[:] = node.timeline.tick_list
+            message.tick_list.ticks[:] = node.timeline.tick_list
             return message
         except LookupError:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
