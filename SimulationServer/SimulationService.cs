@@ -32,6 +32,7 @@ namespace SimulationServer
         private event CommitEventsDelegate events_committed;
         private System.Diagnostics.Stopwatch performanceStopwatch = new System.Diagnostics.Stopwatch();
         private ulong performanceStartTick = 0, performanceStopTick = 0;
+        private ulong stopAtTick = 0;
 
         public SimulationService(SimulationWrapper simulation)
         {
@@ -71,6 +72,12 @@ namespace SimulationServer
             if (event_messages.Count > 0)
             {
                 events_committed(new EventsData { tick = tick, events = event_messages });
+            }
+
+            if (stopAtTick > 0 && tick >= stopAtTick)
+            {
+                simulation.RequestStop();
+                Task.Factory.StartNew(StopSimulationImpl);
             }
         }
 
@@ -253,33 +260,38 @@ namespace SimulationServer
                         }
                     case "run":
                         {
-                            if (args.Count == 1)
+                            StartSimulationImpl();
+                            break;
+                        }
+                    case "run_until":
+                        {
+                            try
                             {
-                                // "run"
-                                StartSimulationImpl();
+                                ulong until_tick = ulong.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture);
+                                StartSimulationImpl(until_tick);
                             }
-                            else
+                            catch
                             {
-                                // "run ..."
-                                switch (args[1])
-                                {
-                                    case "until":
-                                        {
-                                            // "run until x"
-                                            break;
-                                        }
-                                    case "for":
-                                        {
-                                            // "run for x"
-                                            break;
-                                        }
-                                    default:
-                                        {
-                                            err = $"'run' was provided unknown subcommand {args[1]}.";
-                                            break;
-                                        }
-                                }
+                                err = "'run_until <tick>' format was incorrect";
                             }
+                            break;
+                        }
+                    case "run_for":
+                        {
+                            ulong for_tick_count;
+
+                            try
+                            {
+                                for_tick_count = ulong.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            catch
+                            {
+                                err = "'run for <tick_count>' format was incorrect";
+                                break;
+                            }
+
+                            ulong until_tick = simulation.GetTick() + for_tick_count;
+                            StartSimulationImpl(until_tick);
                             break;
                         }
                     case "perf":
@@ -299,6 +311,11 @@ namespace SimulationServer
                                 double timePerKilotick = (timeInSec * 1000 / ticks);
                                 output = $"Ticks: {ticks}\nTime(sec): {timeInSec}\nTime Per Kilotick: {timePerKilotick}";
                             }
+                            break;
+                        }
+                    case "tick":
+                        {
+                            output = simulation.GetTick().ToString();
                             break;
                         }
                     default:
@@ -329,9 +346,10 @@ namespace SimulationServer
             events_committed(new EventsData { tick = tick, events = event_messages });
         }
 
-        private void StartSimulationImpl()
+        private void StartSimulationImpl(ulong p_stopAtTick = 0)
         {
-            if (!simulation.IsRunning())
+            stopAtTick = p_stopAtTick;
+            if (!simulation.IsRunning() && (stopAtTick == 0 || simulation.GetTick() < stopAtTick))
             {
                 performanceStartTick = simulation.GetTick();
                 performanceStopwatch.Restart();
@@ -344,6 +362,7 @@ namespace SimulationServer
         {
             if (simulation.IsRunning())
             {
+                stopAtTick = 0;
                 simulation.StopSimulation();
                 performanceStopwatch.Stop();
                 performanceStopTick = simulation.GetTick();

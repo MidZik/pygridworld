@@ -62,8 +62,10 @@ namespace SimulationServer
         SetStateBinaryDelegate set_state_binary;
         delegate void GetEventsLastTickDelegate(IntPtr sim, IntPtr sim_event_handler);
         GetEventsLastTickDelegate get_events_last_tick;
-        delegate void RunCommandDelegate(IntPtr sim, long argc, [In, MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPStr)] string[] argv, IntPtr command_result_handler);
+        delegate void RunCommandDelegate(IntPtr sim, long argc, [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] argv, IntPtr command_result_handler);
         RunCommandDelegate run_command;
+        delegate void RequestStopDelegate(IntPtr sim);
+        RequestStopDelegate request_stop;
 
         IntPtr simulation_library_handle;
         IntPtr simulation_handle;
@@ -98,6 +100,7 @@ namespace SimulationServer
             set_state_binary = Marshal.GetDelegateForFunctionPointer<SetStateBinaryDelegate>(GetExport("set_state_binary"));
             get_events_last_tick = Marshal.GetDelegateForFunctionPointer<GetEventsLastTickDelegate>(GetExport("get_events_last_tick"));
             run_command = Marshal.GetDelegateForFunctionPointer<RunCommandDelegate>(GetExport("run_command"));
+            request_stop = Marshal.GetDelegateForFunctionPointer<RequestStopDelegate>(GetExport("request_stop"));
 
             simulation_handle = create_simulation();
         }
@@ -321,6 +324,11 @@ namespace SimulationServer
             GC.KeepAlive(handler);
 
             return (err, output);
+        }
+
+        public void RequestStop()
+        {
+            request_stop(simulation_handle);
         }
     }
 }
