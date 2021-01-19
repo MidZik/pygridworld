@@ -267,7 +267,7 @@ namespace SimulationServer
                         {
                             try
                             {
-                                ulong until_tick = ulong.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture);
+                                ulong until_tick = ulong.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture);
                                 StartSimulationImpl(until_tick);
                             }
                             catch
@@ -282,7 +282,7 @@ namespace SimulationServer
 
                             try
                             {
-                                for_tick_count = ulong.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture);
+                                for_tick_count = ulong.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture);
                             }
                             catch
                             {
@@ -309,7 +309,8 @@ namespace SimulationServer
                                 ulong ticks = performanceStopTick - performanceStartTick;
                                 double timeInSec = performanceStopwatch.Elapsed.TotalSeconds;
                                 double timePerKilotick = (timeInSec * 1000 / ticks);
-                                output = $"Ticks: {ticks}\nTime(sec): {timeInSec}\nTime Per Kilotick: {timePerKilotick}";
+                                double kiloticksPerSec = (ticks / timeInSec / 1000);
+                                output = $"Ticks: {ticks}\nTime(sec): {timeInSec}\nTime Per Kilotick: {timePerKilotick}\nKiloticks Per Second: {kiloticksPerSec}";
                             }
                             break;
                         }
