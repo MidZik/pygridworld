@@ -104,6 +104,7 @@ class TimelineSimulation:
         self._event_stream_context = None
         self._event_thread = None
         self._client = None
+        self._dead = False
 
         self.runner_updated = gwsignal.Signal()
 
@@ -180,6 +181,14 @@ class TimelineSimulation:
         self.runner_updated.emit()
 
     def start_process(self, initial_tick=None):
+        """
+        This method is used internally by the SimulationManager module, and should not be called outside of it.
+        :param initial_tick:
+        :return:
+        """
+        if self._dead:
+            raise RuntimeError("Unable to start simulation process, as it has already been stopped.")
+
         if initial_tick is None:
             initial_tick = self.timeline.head()
         elif initial_tick not in self.timeline.tick_list:
@@ -200,10 +209,16 @@ class TimelineSimulation:
         self.runner_updated.emit()
 
     def stop_process(self):
+        """
+        This method is used internally by the SimulationManager module, and should not be called outside of it.
+        :return:
+        """
         self._event_stream_context.cancel()
         self._event_thread.join()
         self._simulation_process.stop()
+        self._simulation_process = None
         self._client = None
+        self._dead = True
 
         self.runner_updated.emit()
 
@@ -285,6 +300,9 @@ class TimelineSimulation:
         elif args[0] != "sim" and self._is_editing:
             return "Only 'sim' command is allowed while in edit mode.", None
         return self._client.run_command(args)
+
+    def is_process_running(self):
+        return self._simulation_process is not None
 
     def _event_stream_handler(self):
         db_conn = self.timeline.get_db_conn()
@@ -588,6 +606,10 @@ class TimelinesProject:
         self._timeline_nodes = {}
         self._simulation_source_paths = []
         self._simulation_registry = {}
+        self._current_simulations = {}
+
+        self.simulation_started = gwsignal.Signal()
+        self.simulation_stopped = gwsignal.Signal()
 
     def _create_timeline(self,
                          parent_node: TimelineNode,
@@ -940,6 +962,42 @@ class TimelinesProject:
             row = cursor.fetchone()
 
         return events
+
+    def get_or_start_simulation(self, start_spec):
+        if isinstance(start_spec, TimelinePoint):
+            point = start_spec
+        elif isinstance(start_spec, int):
+            node = self.get_timeline_node(start_spec)
+            point = node.head_point()
+        elif isinstance(start_spec, TimelineNode):
+            point = start_spec.head_point()
+        else:
+            raise TypeError("'start_spec' must be one of a TimelinePoint, TimelineNode, or timeline id.")
+
+        sim = self._current_simulations.get(point.timeline_id(), None)
+        if sim is not None:
+            return sim
+        else:
+            new_sim = TimelineSimulation(point.timeline())
+            new_sim.start_process(point.tick)
+            self._current_simulations[point.timeline_id()] = new_sim
+            self.simulation_started.emit(new_sim, point.timeline_node)
+            return new_sim
+
+    def stop_simulation(self, stop_spec):
+        if isinstance(stop_spec, TimelinePoint):
+            timeline_node = stop_spec.timeline_node
+        elif isinstance(stop_spec, int):
+            timeline_node = self.get_timeline_node(stop_spec)
+        elif isinstance(stop_spec, TimelineNode):
+            timeline_node = stop_spec
+        else:
+            raise TypeError("'stop_spec' must be one of a TimelinePoint, TimelineNode, or timeline id.")
+
+        if timeline_node.timeline_id in self._current_simulations:
+            sim = self._current_simulations.pop(timeline_node.timeline_id)
+            sim.stop_process()
+            self.simulation_stopped.emit(sim, timeline_node)
 
     def _save_timeline(self, timeline: Timeline):
         if timeline.path.parent != self.timelines_dir_path:
