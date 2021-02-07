@@ -994,12 +994,12 @@ class TimelinesProject:
         if sim is not None:
             return sim
         else:
-            print(f"LOG: Starting simulation {start_spec}")
+            print(f"LOG: Starting simulation {point.timeline_id()}")
             new_sim = TimelineSimulation(point.timeline())
             new_sim.start_process(point.tick)
             self._current_simulations[point.timeline_id()] = new_sim
             self.simulation_started.emit(new_sim, point.timeline_node)
-            print(f"LOG: Started simulation {start_spec}")
+            print(f"LOG: Started simulation {point.timeline_id()}")
             return new_sim
 
     def stop_simulation(self, stop_spec):
