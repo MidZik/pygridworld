@@ -65,6 +65,8 @@ namespace SimulationServer
                 serveCmd.Description = "Run a server that runs the specified simulation and provides a GRPC interface to it";
                 var port = serveCmd.Option<int>("-p|--port <PORT>", "Port to run server on (automatically selected if not provided)", CommandOptionType.SingleValue)
                     .Accepts(v => v.Range(0, 65535));
+                var ownerToken = serveCmd.Option<string>("-o|--ownerToken <TOKEN>", "The token string that will be used by the 'owner' user. Some server operations can only be done by the owner.", CommandOptionType.SingleValue)
+                    .Accepts(s => s.MaxLength(128));
                 var simulation_library_path = serveCmd.Argument<string>("simulation", "The simulation library to serve")
                     .IsRequired()
                     .Accepts(v => v.ExistingFile());
@@ -82,7 +84,7 @@ namespace SimulationServer
 
                     Server server = new Server
                     {
-                        Services = { PyGridWorld.SimulationServer.Simulation.BindService(new SimulationService(wrapper)) },
+                        Services = { PyGridWorld.SimulationServer.Simulation.BindService(new SimulationService(wrapper, ownerToken.Value())) },
                         Ports = { new ServerPort("localhost", server_port, ServerCredentials.Insecure) }
                     };
 

@@ -112,12 +112,17 @@ class SimulationProcess:
 
         self._process = None
         self._port = None
+        self._channel = None
 
     def __del__(self):
         self.stop()
 
-    def start(self):
-        process = Popen([SimulationProcess._simulation_server_path, 'serve', str(self._simulation_library_path)],
+    def start(self, owner_token=""):
+        process = Popen([
+            SimulationProcess._simulation_server_path,
+            'serve',
+            '-o', owner_token,
+            str(self._simulation_library_path)],
                         stdout=PIPE, stdin=PIPE)
         self._process = process
 
@@ -125,8 +130,12 @@ class SimulationProcess:
         process.stdin.flush()
         self._port = int(process.stdout.readline())
 
+        self._channel = SimulationClient.make_channel(self.get_server_address())
+
     def stop(self):
         if self._process.poll() is None:
+            self._channel.close()
+            self._channel = None
             self._process.stdin.write(b"exit\n")
             self._process.stdin.flush()
             self._process.wait()
@@ -137,120 +146,120 @@ class SimulationProcess:
     def get_server_address(self):
         return f'localhost:{self._port}'
 
-    def make_new_client(self):
-        return SimulationClient(self.get_server_address())
+    def make_client(self, token=""):
+        return SimulationClient(self._channel, token)
 
 
 class SimulationClient:
-    def __init__(self, address):
-        self._address = address
-        self._channel = None
+    @staticmethod
+    def make_channel(address):
+        return grpc.insecure_channel(address)
 
-    def open(self):
-        self._channel = grpc.insecure_channel(self._address)
+    def __init__(self, channel, token):
+        self._channel = channel
+        self.token = token
 
-    def close(self):
-        self._channel.close()
-        self._channel = None
+    def _create_metadata(self, *items):
+        return (('x-user-token', self.token), *items)
 
     def start_simulation(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.StartSimulationRequest()
-        stub.StartSimulation(request)
+        stub.StartSimulation(request, metadata=self._create_metadata())
 
     def stop_simulation(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.StopSimulationRequest()
-        stub.StopSimulation(request)
+        stub.StopSimulation(request, metadata=self._create_metadata())
 
     def is_running(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.IsRunningRequest()
-        response = stub.IsRunning(request)
+        response = stub.IsRunning(request, metadata=self._create_metadata())
         return response.running
 
     def get_tick(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetTickRequest()
-        response = stub.GetTick(request)
+        response = stub.GetTick(request, metadata=self._create_metadata())
         return response.tick
 
     def get_state_json(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetStateJsonRequest()
-        response = stub.GetStateJson(request)
+        response = stub.GetStateJson(request, metadata=self._create_metadata())
         return response.json
 
     def set_state_json(self, state_json: str):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.SetStateJsonRequest(json=state_json)
-        stub.SetStateJson(request)
+        stub.SetStateJson(request, metadata=self._create_metadata())
 
     def create_entity(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.CreateEntityRequest()
-        response = stub.CreateEntity(request)
+        response = stub.CreateEntity(request, metadata=self._create_metadata())
         return response.eid
 
     def destroy_entity(self, eid):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.DestroyEntityRequest(eid=eid)
-        stub.DestroyEntity(request)
+        stub.DestroyEntity(request, metadata=self._create_metadata())
 
     def get_all_entities(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetAllEntitesRequest()
-        response = stub.GetAllEntities(request)
+        response = stub.GetAllEntities(request, metadata=self._create_metadata())
         return response.eids
 
     def assign_component(self, eid, com_name):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.AssignComponentRequest(eid=eid, component_name=com_name)
-        stub.AssignComponent(request)
+        stub.AssignComponent(request, metadata=self._create_metadata())
 
     def get_component_json(self, eid, com_name):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetComponentJsonRequest(eid=eid, component_name=com_name)
-        response = stub.GetComponentJson(request)
+        response = stub.GetComponentJson(request, metadata=self._create_metadata())
         return response.json
 
     def remove_component(self, eid, com_name):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.RemoveComponentRequest(eid=eid, component_name=com_name)
-        stub.RemoveComponent(request)
+        stub.RemoveComponent(request, metadata=self._create_metadata())
 
     def replace_component(self, eid, com_name, state_json):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.ReplaceComponentRequest(eid=eid, component_name=com_name, json=state_json)
-        stub.ReplaceComponent(request)
+        stub.ReplaceComponent(request, metadata=self._create_metadata())
 
     def get_component_names(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetComponentNamesRequest()
-        response = stub.GetComponentNames(request)
+        response = stub.GetComponentNames(request, metadata=self._create_metadata())
         return response.component_names
 
     def get_entity_component_names(self, eid):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetEntityComponentNamesRequest(eid=eid)
-        response = stub.GetEntityComponentNames(request)
+        response = stub.GetEntityComponentNames(request, metadata=self._create_metadata())
         return response.component_names
 
     def get_singleton_json(self, singleton_name):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetSingletonJsonRequest(singleton_name=singleton_name)
-        response = stub.GetSingletonJson(request)
+        response = stub.GetSingletonJson(request, metadata=self._create_metadata())
         return response.json
 
     def set_singleton_json(self, singleton_name, json):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.SetSingletonJsonRequest(singleton_name=singleton_name, json=json)
-        stub.SetSingletonJson(request)
+        stub.SetSingletonJson(request, metadata=self._create_metadata())
 
     def get_singleton_names(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetSingletonNamesRequest()
-        response = stub.GetSingletonNames(request)
+        response = stub.GetSingletonNames(request, metadata=self._create_metadata())
         return response.singleton_names
 
     class Event:
@@ -282,6 +291,7 @@ class SimulationClient:
                 response = self.responses.__next__()
             except Exception as e:
                 if e is self.responses:
+                    # TEMP / TODO
                     # for now, assuming cancellation. Should maybe handle other cases.
                     raise StopIteration()
                 raise
@@ -293,21 +303,32 @@ class SimulationClient:
     def get_event_stream(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetEventsRequest()
-        return self.EventStreamContext(stub.GetEvents(request))
+        return self.EventStreamContext(stub.GetEvents(request, metadata=self._create_metadata()))
 
     def get_state_binary(self):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetStateBinaryRequest()
-        response = stub.GetStateBinary(request)
+        response = stub.GetStateBinary(request, metadata=self._create_metadata())
         return response.binary
 
-    def set_state_binary(self, state_bin: str):
+    def set_state_binary(self, state_bin: bytes):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.SetStateBinaryRequest(binary=state_bin)
-        stub.SetStateBinary(request)
+        stub.SetStateBinary(request, metadata=self._create_metadata())
 
     def run_command(self, args):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.RunCommandRequest(args=args)
-        response = stub.RunCommand(request)
+        response = stub.RunCommand(request, metadata=self._create_metadata())
         return response.err, response.output
+
+    def set_editor_token(self, token):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.SetEditorTokenRequest(token=token)
+        stub.SetEditorToken(request, metadata=self._create_metadata())
+
+    def is_editing(self, check_self_only=False):
+        stub = sim_grpc.SimulationStub(self._channel)
+        request = sim.IsEditingRequest(check_self_only=check_self_only)
+        response = stub.IsEditing(request, metadata=self._create_metadata())
+        return response.is_editing

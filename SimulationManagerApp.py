@@ -5,12 +5,12 @@ import SimulationManager as sm
 from GUI import create_gui_process
 import window
 import command_prompt_dock_widget as cmd
-from typing import Optional
+from typing import Optional, Dict
 from PySide2 import QtCore, QtWidgets, QtGui
 from pathlib import Path
 import json
 from collections import deque
-from weakref import WeakKeyDictionary
+from weakref import WeakKeyDictionary, ref
 from ts_server import Server
 from PySide2.QtWidgets import QFileDialog
 import shlex
@@ -46,6 +46,7 @@ class _ReadFileTask(_Task):
             text = f.read()
             self.read_done.emit(text)
 
+
 class SimCommandPromptValidator(QtGui.QValidator):
     def validate(self, input, pos):
         if input.strip() != "":
@@ -55,9 +56,13 @@ class SimCommandPromptValidator(QtGui.QValidator):
 
 
 class Simulation:
-    def __init__(self, parent: QtWidgets.QMainWindow, timeline_node, timeline_simulation):
+    def __init__(self,
+                 parent: QtWidgets.QMainWindow,
+                 timeline_node: sm.TimelineNode,
+                 timeline_simulation: sm.TimelineSimulation):
         self.timeline_node = timeline_node
-        self.timeline_simulation = timeline_simulation
+        self.timeline_simulation: sm.TimelineSimulation = timeline_simulation
+        self.client = timeline_simulation.make_client()
 
         self.dock = QtWidgets.QDockWidget(parent)
         self.ui = cmd.Ui_commandPromptDock()
@@ -75,12 +80,15 @@ class Simulation:
     def remove_dock(self):
         self.dock.deleteLater()
 
+    def token(self):
+        return self.client.token
+
     def _command_prompt_return_pressed(self):
         ui = self.ui
 
         args = shlex.split(ui.cmdPromptInput.text())
 
-        err, output = self.timeline_simulation.run_command(args)
+        err, output = self.client.run_command(args)
         ui.cmdPromptOutput.appendPlainText(f"CMD[{self.timeline_node.timeline_id}]> " + ui.cmdPromptInput.text())
         if err:
             ui.cmdPromptOutput.appendPlainText("--- ERROR: " + err)
@@ -92,7 +100,25 @@ class Simulation:
         ui.cmdPromptInput.setText("")
 
 
-class App:
+class ProjectWrapper(QtCore.QObject):
+    simulation_started = QtCore.Signal(object, object)
+    simulation_stopped = QtCore.Signal(object, object)
+
+    def __init__(self, parent, project: sm.TimelinesProject):
+        super().__init__(parent)
+        project.simulation_started.connect(lambda *args: self.simulation_started.emit(*args), tie_lifetime_to=project)
+        project.simulation_stopped.connect(lambda *args: self.simulation_stopped.emit(*args), tie_lifetime_to=project)
+
+
+class TimelineSimulationWrapper(QtCore.QObject):
+    runner_updated = QtCore.Signal()
+
+    def __init__(self, parent, timeline_simulation: sm.TimelineSimulation):
+        super().__init__(parent)
+        timeline_simulation.runner_updated.connect(lambda *args: self.runner_updated.emit(*args), tie_lifetime_to=timeline_simulation)
+
+
+class App(QtCore.QObject):
     _PointRole = QtCore.Qt.UserRole + 0
     _TimelineTreeNodeRole = QtCore.Qt.UserRole + 1
     _SimIdentifierRole = QtCore.Qt.UserRole + 2
@@ -101,6 +127,8 @@ class App:
     _SimulationBinaryProvider = QtCore.Qt.UserRole + 1
 
     def __init__(self, argv):
+        super().__init__(None)
+
         self._app = QtWidgets.QApplication(argv)
         self._app.setQuitOnLastWindowClosed(True)
         self._main_window = QtWidgets.QMainWindow()
@@ -170,7 +198,7 @@ class App:
         self._project: Optional[sm.TimelinesProject] = None
         self._server = None
 
-        self._simulations = {}
+        self._simulations: Dict[Simulation] = {}
         self._visualizations = {}
 
         self._sim_command_prompts = {}
@@ -338,8 +366,10 @@ class App:
             self._add_timeline_simulation_provider_to_combo_box(config)
         self._refresh_convert_to_selected_sim_button()
 
-        self._project.simulation_started.connect(self._on_project_simulation_started)
-        self._project.simulation_stopped.connect(self._on_project_simulation_stopped)
+        wrapper = ProjectWrapper(self, self._project)
+
+        wrapper.simulation_started.connect(self._on_project_simulation_started)
+        wrapper.simulation_stopped.connect(self._on_project_simulation_stopped)
 
     def _on_timeline_tree_selected_item_changed(self):
         ui = self._ui
@@ -391,8 +421,8 @@ class App:
         ui.startSimButton.setEnabled(False)
         ui.stopSimButton.setEnabled(False)
 
-        if sim is not None and not sim.timeline_simulation.is_editing():
-            is_running = sim.timeline_simulation.is_running()
+        if sim is not None and not sim.client.is_editing():
+            is_running = sim.client.is_running()
             ui.startSimButton.setEnabled(not is_running)
             ui.stopSimButton.setEnabled(is_running)
 
@@ -406,10 +436,10 @@ class App:
         ui.discardEditsSimButton.setEnabled(False)
 
         if sim is not None:
-            is_editing = sim.timeline_simulation.is_editing()
+            is_self_editing = sim.client.is_editing(True)
             ui.startEditSimButton.setEnabled(sim.timeline_simulation.can_start_editing())
-            ui.commitEditsSimButton.setEnabled(is_editing)
-            ui.discardEditsSimButton.setEnabled(is_editing)
+            ui.commitEditsSimButton.setEnabled(is_self_editing)
+            ui.discardEditsSimButton.setEnabled(is_self_editing)
 
     def _refresh_simulation_edit_buttons(self):
         ui = self._ui
@@ -426,7 +456,7 @@ class App:
         ui.revertSingletonStateButton.setEnabled(False)
         ui.saveSingletonStateButton.setEnabled(False)
 
-        if sim is not None and sim.timeline_simulation.is_editing():
+        if sim is not None and sim.client.is_editing(True):
             ui.createEntityButton.setEnabled(True)
 
             if eid is not None:
@@ -436,7 +466,7 @@ class App:
                 if com is not None:
                     ui.removeComponentButton.setEnabled(True)
 
-                    com_state_json = sim.timeline_simulation.get_component_json(eid, com)
+                    com_state_json = sim.client.get_component_json(eid, com)
                     com_state = json.loads(com_state_json)
 
                     if com_state is not None:
@@ -455,7 +485,7 @@ class App:
         ui.entityList.clear()
 
         if sim is not None:
-            entities = sim.timeline_simulation.get_all_entities()
+            entities = sim.client.get_all_entities()
             for eid in entities:
                 ui.entityList.addItem(str(eid))
 
@@ -467,7 +497,7 @@ class App:
         ui.singletonList.clear()
 
         if sim is not None:
-            singletons = sim.timeline_simulation.get_singleton_names()
+            singletons = sim.client.get_singleton_names()
             for singleton in singletons:
                 ui.singletonList.addItem(singleton)
 
@@ -509,7 +539,8 @@ class App:
             timeline_node = self.get_selected_timeline_node()
             timeline_id = timeline_node.timeline_id
             if timeline_id not in self._visualizations or not self._visualizations[timeline_id].is_alive():
-                new_visualization = create_gui_process(sim.timeline_simulation.get_new_client())
+                address, token = sim.timeline_simulation.make_connection_parameters()
+                new_visualization = create_gui_process(address, token)
                 new_visualization.start()
                 self._visualizations[timeline_node.timeline_id] = new_visualization
 
@@ -520,7 +551,7 @@ class App:
     def _create_entity_on_selected_sim(self):
         sim = self.get_selected_running_timeline_simulation()
         if sim is not None:
-            sim.timeline_simulation.create_entity()
+            sim.client.create_entity()
 
         # TODO: temp
         self._refresh_simulation_entity_list()
@@ -529,7 +560,7 @@ class App:
         sim = self.get_selected_running_timeline_simulation()
         eid = self.get_selected_eid()
         if sim is not None and eid is not None:
-            sim.timeline_simulation.destroy_entity(eid)
+            sim.client.destroy_entity(eid)
 
         # TODO: temp
         self._refresh_simulation_entity_list()
@@ -539,12 +570,14 @@ class App:
         timeline_id = timeline_node.timeline_id
 
         @QtCore.Slot()
-        def refresh_sim_tab_if_necessary(_self: App):
-            selected_timeline_node = _self.get_selected_timeline_node()
-            if selected_timeline_node.timeline_id == timeline_id:
-                _self._refresh_simulation_tab()
+        def refresh_sim_tab_if_necessary():
+            selected_timeline_node = self.get_selected_timeline_node()
+            if selected_timeline_node is not None and selected_timeline_node.timeline_id == timeline_id:
+                self._refresh_simulation_tab()
 
-        timeline_sim.runner_updated.connect_func_as_method(refresh_sim_tab_if_necessary, self)
+        ts_wrapper = TimelineSimulationWrapper(self, timeline_sim)
+
+        ts_wrapper.runner_updated.connect(refresh_sim_tab_if_necessary)
 
         new_sim = Simulation(self._main_window, timeline_node, timeline_sim)
 
@@ -554,7 +587,7 @@ class App:
 
         self._simulations[timeline_id] = new_sim
 
-        refresh_sim_tab_if_necessary(self)
+        refresh_sim_tab_if_necessary()
         self._refresh_convert_to_selected_sim_button()
 
     @QtCore.Slot()
@@ -579,8 +612,8 @@ class App:
         selected_eid = self.get_selected_eid()
 
         if selected_sim is not None and selected_eid is not None:
-            component_names = selected_sim.timeline_simulation.get_component_names()
-            entity_component_names = selected_sim.timeline_simulation.get_entity_component_names(selected_eid)
+            component_names = selected_sim.client.get_component_names()
+            entity_component_names = selected_sim.client.get_entity_component_names(selected_eid)
             missing_component_names = [c for c in component_names if c not in entity_component_names]
             for c in missing_component_names:
                 assign_components_button_menu.addAction(c)
@@ -591,7 +624,7 @@ class App:
         selected_simulation = self.get_selected_running_timeline_simulation()
         selected_eid = self.get_selected_eid()
         if selected_simulation is not None and selected_eid is not None:
-            selected_simulation.timeline_simulation.assign_component(selected_eid, action.text())
+            selected_simulation.client.assign_component(selected_eid, action.text())
 
             # TODO: temp
             self._on_selected_entity_changed()
@@ -600,7 +633,7 @@ class App:
         selections = self.get_all_sim_tab_selections()
         if all(s is not None for s in selections):
             sim, eid, com = selections
-            sim.timeline_simulation.remove_component(eid, com)
+            sim.client.remove_component(eid, com)
 
             # TODO: temp
             self._on_selected_entity_changed()
@@ -617,7 +650,7 @@ class App:
         selected_com = self.get_selected_component_name()
 
         if selected_sim is not None and selected_eid is not None and selected_com is not None:
-            com_state_json = selected_sim.timeline_simulation.get_component_json(selected_eid, selected_com)
+            com_state_json = selected_sim.client.get_component_json(selected_eid, selected_com)
             com_state = json.loads(com_state_json)
             com_state_json = json.dumps(com_state, indent=2)  # pretty print
             ui.comStateTextEdit.setPlainText(com_state_json)
@@ -626,31 +659,33 @@ class App:
         selected_sim = self.get_selected_running_timeline_simulation()
 
         if selected_sim is not None:
-            selected_sim.timeline_simulation.start_simulation()
+            selected_sim.client.start_simulation()
 
     def _stop_selected_simulation(self):
         selected_sim = self.get_selected_running_timeline_simulation()
 
         if selected_sim is not None:
-            selected_sim.timeline_simulation.stop_simulation()
+            selected_sim.client.stop_simulation()
 
     def _start_editing_selected_sim(self):
         selected_sim = self.get_selected_running_timeline_simulation()
 
         if selected_sim is not None and selected_sim.timeline_simulation.can_start_editing():
-            selected_sim.timeline_simulation.start_editing()
+            selected_sim.timeline_simulation.start_editing(selected_sim.token())
 
     def _commit_edits_to_selected_sim(self):
         selected_sim = self.get_selected_running_timeline_simulation()
 
-        if selected_sim is not None and selected_sim.timeline_simulation.is_editing():
-            selected_sim.timeline_simulation.commit_edits()
+        if selected_sim is not None and selected_sim.client.is_editing(True):
+            selected_sim.timeline_simulation.commit_edits(selected_sim.token())
+            selected_sim.timeline_simulation.end_editing(selected_sim.token())
 
     def _discard_edits_to_selected_sim(self):
         selected_sim = self.get_selected_running_timeline_simulation()
 
-        if selected_sim is not None and selected_sim.timeline_simulation.is_editing():
-            selected_sim.timeline_simulation.discard_edits()
+        if selected_sim is not None and selected_sim.client.is_editing(True):
+            selected_sim.timeline_simulation.discard_edits(selected_sim.token())
+            selected_sim.timeline_simulation.end_editing(selected_sim.token())
 
     def _revert_selected_com_state(self):
         self._on_selected_component_changed()
@@ -660,7 +695,7 @@ class App:
 
         if sim is not None and eid is not None and com is not None:
             com_state_json = self._ui.comStateTextEdit.toPlainText()
-            sim.timeline_simulation.replace_component(eid, com, com_state_json)
+            sim.client.replace_component(eid, com, com_state_json)
 
     def _create_timeline_at_selection(self):
         timeline_node = self.get_selected_timeline_node()
@@ -719,7 +754,7 @@ class App:
         sim = self.get_selected_running_timeline_simulation()
 
         if sim is not None and singleton is not None:
-            singleton_state_json = sim.timeline_simulation.get_singleton_json(singleton)
+            singleton_state_json = sim.client.get_singleton_json(singleton)
             singleton_state = json.loads(singleton_state_json)
             singleton_state_json = json.dumps(singleton_state, indent=2)  # pretty print
             ui.singletonStateTextEdit.setPlainText(singleton_state_json)
@@ -733,7 +768,7 @@ class App:
 
         if sim is not None and singleton is not None:
             singleton_state_json = self._ui.singletonStateTextEdit.toPlainText()
-            sim.timeline_simulation.set_singleton_json(singleton, singleton_state_json)
+            sim.client.set_singleton_json(singleton, singleton_state_json)
 
     def _refresh_sim_registry_tab(self):
         self._refresh_simulation_source_list()

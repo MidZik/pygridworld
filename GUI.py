@@ -66,7 +66,9 @@ class WorldWindow(pyglet.window.Window):
         self.fps_display.draw()
 
 
-def window_app(sim_client: SimulationClient):
+def window_app(address, token):
+    sim_client = SimulationClient(SimulationClient.make_channel(address), token)
+
     window = WorldWindow()
 
     def update(dt):
@@ -92,14 +94,12 @@ def window_app(sim_client: SimulationClient):
         window.update_frame_data(frame_data)
 
     try:
-        sim_client.open()
         pyglet.clock.schedule_interval(update, 1 / 20)
         pyglet.app.run()
     finally:
-        sim_client.close()
         pyglet.app.exit()
         window.close()
 
 
-def create_gui_process(sim_client: SimulationClient):
-    return Process(target=window_app, args=(sim_client,), daemon=True)
+def create_gui_process(address, token):
+    return Process(target=window_app, args=(address, token), daemon=True)

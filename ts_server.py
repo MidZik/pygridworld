@@ -6,6 +6,10 @@ import simrunner as sr
 import TimelinesService_pb2 as ts
 import TimelinesService_pb2_grpc as ts_grpc
 
+import traceback
+
+Command = ts.EditSimulationRequest.Command
+
 
 class Service(ts_grpc.TimelineServiceServicer):
     def __init__(self, project: sm.TimelinesProject):
@@ -130,6 +134,93 @@ class Service(ts_grpc.TimelineServiceServicer):
 
         if cur_response is not None:
             yield cur_response
+
+    def GetOrStartSimulation(self, request, context):
+        timeline_id = request.timeline_id
+        tick = request.tick
+
+        if tick == -1:
+            start_spec = timeline_id
+        else:
+            start_spec = self._project.get_timeline_node(timeline_id).point(tick)
+
+        sim = self._project.get_or_start_simulation(start_spec)
+        address, token = sim.make_connection_parameters()
+
+        return ts.GetOrStartSimulationResponse(address=address, token=token)
+
+    def StopSimulation(self, request, context):
+        timeline_id = request.timeline_id
+
+        self._project.stop_simulation(timeline_id)
+
+        return ts.StopSimulationResponse()
+
+    def MoveSimToTick(self, request, context):
+        timeline_id = request.timeline_id
+        tick = request.tick
+
+        timeline_sim = self._project.get_simulation(timeline_id)
+        if timeline_sim is None:
+            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
+            raise RuntimeError("Simulation is not running.")
+
+        if tick == -1:
+            tick = timeline_sim.timeline.head()
+
+        timeline_sim.move_to_tick(tick)
+
+        return ts.MoveSimToTickResponse()
+
+    def EditSimulation(self, request_iterator, context):
+        first_request = next(request_iterator)
+
+        timeline_id = first_request.timeline_id
+        command = first_request.command
+        metadata = {k: v for k, v in context.invocation_metadata()}
+        token = metadata['x-user-token']
+
+        if command != Command.START:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            raise RuntimeError("First edit command must be START.")
+
+        timeline_sim = self._project.get_simulation(timeline_id)
+
+        if timeline_sim is None:
+            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
+            raise RuntimeError("Simulation is not running.")
+
+        try:
+            with timeline_sim.editor(token):
+                yield ts.EditSimulationResponse(success=True)
+
+                for request in request_iterator:
+                    command = request.command
+
+                    if command == Command.START:
+                        yield ts.EditSimulationResponse(success=False, result="Editing already started.")
+                    elif command == Command.END:
+                        break
+                    elif command == Command.DISCARD:
+                        timeline_sim.discard_edits(token)
+                        yield ts.EditSimulationResponse(success=True)
+                    elif command == Command.COMMIT:
+                        timeline_sim.commit_edits(token)
+                        yield ts.EditSimulationResponse(success=True)
+                    else:
+                        yield ts.EditSimulationResponse(success=False, result=f"Unknown command: {command}")
+        except grpc.RpcError as e:
+            if not context.is_active():
+                # the editing has been cancelled
+                return
+            raise
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details("Editing ended due to exception.\n" + str(e))
+            traceback.print_exc()
+            raise
+        else:
+            yield ts.EditSimulationResponse(success=True, result="Editing ended.")
 
 
 class Server:

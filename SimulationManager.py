@@ -5,10 +5,10 @@ from collections import defaultdict, deque
 from pathlib import Path
 import json
 import re
-from threading import Thread
+from threading import Thread, Lock
 from typing import Optional, List
 from bisect import insort
-from simrunner import SimulationProcess
+from simrunner import SimulationProcess, SimulationClient
 from dataclasses import dataclass
 import sys
 from datetime import datetime
@@ -18,6 +18,8 @@ import subprocess
 import os
 import sqlite3
 import gwsignal
+from secrets import token_urlsafe
+from contextlib import contextmanager
 
 
 class Timeline:
@@ -93,23 +95,33 @@ class TimelineSimulation:
     """
     Manages a SimulationRunnerProcess associated with a timeline.
     """
+    @staticmethod
+    def _new_token():
+        return token_urlsafe(32)
 
     def __init__(self, timeline):
         self.timeline: Timeline = timeline
 
         self._simulation_process: Optional[SimulationProcess] = None
 
-        self._is_editing = False
-
         self._event_stream_context = None
         self._event_thread = None
-        self._client = None
+        self._client: Optional[SimulationClient] = None
         self._dead = False
+        self._owner_token = ""
+        self._editor_token = ""
+        self._edit_lock = Lock()
 
         self.runner_updated = gwsignal.Signal()
 
-    def is_editing(self):
-        return self._is_editing
+    def make_client(self):
+        return self._simulation_process.make_client(self._new_token())
+
+    def make_connection_parameters(self):
+        """
+        :return: simulation service address, token
+        """
+        return self._simulation_process.get_server_address(), self._new_token()
 
     def can_start_editing(self):
         # Can only edit the simulation state if:
@@ -121,62 +133,128 @@ class TimelineSimulation:
         return (timeline.head() == timeline.tail() and
                 self._client.get_tick() == timeline.head() and
                 not self._client.is_running() and
-                not self._is_editing)
+                not bool(self._editor_token))
 
-    def start_editing(self):
-        if self._is_editing:
-            raise RuntimeError("Cannot start editing: already in edit mode.")
+    @contextmanager
+    def editor(self, editor):
+        if isinstance(editor, SimulationClient):
+            editor_token = editor.token
+        elif isinstance(editor, str):
+            editor_token = editor
+        else:
+            raise TypeError("Editor must be a string or SimulationClient.")
 
-        if not self.can_start_editing():
-            raise RuntimeError("Cannot start editing: not in an editable state.")
+        self.start_editing(editor_token)
+        try:
+            yield
+        finally:
+            self.end_editing(editor_token)
 
-        self._is_editing = True
+    def start_editing(self, editor_token):
+        if not editor_token:
+            raise ValueError("Cannot start editing: invalid editor token.")
+
+        timeline = self.timeline
+
+        with self._edit_lock:
+            if self._editor_token:
+                raise RuntimeError("Cannot start editing: already in edit mode.")
+
+            if self._client.is_editing():
+                raise RuntimeError("FATAL ERROR: Simulation process editing state is not in sync with owner.")
+
+            if timeline.head() != timeline.tail():
+                raise RuntimeError("Cannot start editing: timeline is not editable.")
+
+            # Set self to editor temporarily to ensure simulation is not running,
+            # and to prevent it from running during the following checks
+            self._client.set_editor_token(self._owner_token)
+
+            if self._client.get_tick() != timeline.head():
+                raise RuntimeError("Cannot start editing: simulation is not at the head tick.")
+
+            self._client.set_editor_token(editor_token)
+            self._editor_token = editor_token
+
+        print(f"LOG: Editing started by {editor_token}")
 
         self.runner_updated.emit()
 
-    def commit_edits(self):
-        """
-        Save the current simulation state as the new head point and exit edit mode.
-        """
-        if not self._is_editing:
-            raise RuntimeError("Cannot commit edits: not in edit mode.")
+    def end_editing(self, editor_token):
+        with self._edit_lock:
+            if not self._editor_token or editor_token != self._editor_token:
+                raise RuntimeError("Cannot end edits: not editor.")
 
-        sim_state_binary = self.get_state_binary()
+            self._client.set_editor_token("")
+            self._editor_token = ""
+
+        print(f"LOG: Editing ended by {editor_token}")
+
+        self.runner_updated.emit()
+
+    def commit_edits(self, editor_token):
+        """
+        Save the current simulation state as the new head point
+        """
+        with self._edit_lock:
+            if not self._editor_token or editor_token != self._editor_token:
+                raise RuntimeError("Cannot commit edits: not editor.")
+
+            self._client.set_editor_token(self._owner_token)
+
+            if self._client.get_tick() != self.timeline.head():
+                raise RuntimeError("Cannot commit edits: simulation state at wrong tick.")
+
+            sim_state_binary = self._client.get_state_binary()
+            self._client.set_editor_token(self._editor_token)
+
         head_point_path = self.timeline.get_point_file_path(self.timeline.head())
         with head_point_path.open('bw') as f:
             f.write(sim_state_binary)
 
-        self._is_editing = False
+        print(f"LOG: Committed edits")
 
         self.runner_updated.emit()
 
-    def discard_edits(self):
+    def discard_edits(self, editor_token):
         """
-        Revert the simulation state to the head point and exit edit mode.
+        Revert the simulation state to the head point
         """
-        if not self._is_editing:
-            raise RuntimeError("Cannot discard edits: not in edit mode.")
+        with self._edit_lock:
+            if not self._editor_token or editor_token != self._editor_token:
+                raise RuntimeError("Cannot discard edits: not editor.")
 
-        head_point_path = self.timeline.get_point_file_path(self.timeline.head())
-        with head_point_path.open('br') as f:
-            self.set_state_binary(f.read())
+            self._client.set_editor_token(self._owner_token)
 
-        self._is_editing = False
+            head_point_path = self.timeline.get_point_file_path(self.timeline.head())
+            with head_point_path.open('br') as f:
+                self._client.set_state_binary(f.read())
+
+            self._client.set_editor_token(self._editor_token)
+
+        print(f"LOG: Discarded edits")
 
         self.runner_updated.emit()
 
     def move_to_tick(self, tick: int):
-        if tick not in self.timeline.tick_list:
-            raise ValueError('Point tick is not part of simulation timeline.')
+        with self._edit_lock:
+            if tick not in self.timeline.tick_list:
+                raise ValueError('Point tick is not part of simulation timeline.')
 
-        if self._is_editing:
-            raise RuntimeError('Cannot move to point while simulation is being edited.')
+            if self._editor_token:
+                raise RuntimeError('Cannot move to point while simulation is being edited.')
 
-        if self.is_running():
-            raise RuntimeError('Cannot move to point while simulation is running.')
+            if self._client.is_editing():
+                raise RuntimeError('FATAL ERROR: Simulation process editing state is not in sync with owner.')
 
-        with self.timeline.get_point_file_path(tick).open('br') as f:
-            self._client.set_state_binary(f.read())
+            self._client.set_editor_token(self._owner_token)
+
+            with self.timeline.get_point_file_path(tick).open('br') as f:
+                self._client.set_state_binary(f.read())
+
+            self._client.set_editor_token("")
+
+        print(f"LOG: Moved to tick {tick}")
 
         self.runner_updated.emit()
 
@@ -195,10 +273,11 @@ class TimelineSimulation:
             raise ValueError('Attempted to start timeline simulation at an invalid tick.')
 
         self._simulation_process = SimulationProcess(self.timeline.get_simulation_binary_path())
-        self._simulation_process.start()
 
-        self._client = self._simulation_process.make_new_client()
-        self._client.open()
+        self._owner_token = self._new_token()
+        self._simulation_process.start(self._owner_token)
+
+        self._client = self._simulation_process.make_client(self._owner_token)
 
         self._event_stream_context = self._client.get_event_stream()
         self._event_thread = Thread(target=self._event_stream_handler)
@@ -219,87 +298,9 @@ class TimelineSimulation:
         self._simulation_process = None
         self._client = None
         self._dead = True
+        self._owner_token = None
 
         self.runner_updated.emit()
-
-    def start_simulation(self):
-        if not self._is_editing:
-            self._client.start_simulation()
-
-    def stop_simulation(self):
-        self._client.stop_simulation()
-
-    def is_running(self):
-        return self._client.is_running()
-
-    def get_tick(self):
-        return self._client.get_tick()
-
-    def get_state_json(self):
-        return self._client.get_state_json()
-
-    def set_state_json(self, state_json):
-        if self._is_editing:
-            self._client.set_state_json(state_json)
-
-    def create_entity(self):
-        if self._is_editing:
-            return self._client.create_entity()
-
-    def destroy_entity(self, eid):
-        if self._is_editing:
-            self._client.destroy_entity(eid)
-
-    def get_all_entities(self):
-        return self._client.get_all_entities()
-
-    def assign_component(self, eid, com_name):
-        if self._is_editing:
-            self._client.assign_component(eid, com_name)
-
-    def get_component_json(self, eid, com_name):
-        return self._client.get_component_json(eid, com_name)
-
-    def remove_component(self, eid, com_name):
-        if self._is_editing:
-            self._client.remove_component(eid, com_name)
-
-    def replace_component(self, eid, com_name, state_json):
-        if self._is_editing:
-            self._client.replace_component(eid, com_name, state_json)
-
-    def get_component_names(self):
-        return self._client.get_component_names()
-
-    def get_entity_component_names(self, eid):
-        return self._client.get_entity_component_names(eid)
-
-    def get_singleton_json(self, singleton_name):
-        return self._client.get_singleton_json(singleton_name)
-
-    def set_singleton_json(self, singleton_name, singleton_json):
-        if self._is_editing:
-            self._client.set_singleton_json(singleton_name, singleton_json)
-
-    def get_singleton_names(self):
-        return self._client.get_singleton_names()
-
-    def get_new_client(self):
-        return self._simulation_process.make_new_client()
-
-    def get_state_binary(self):
-        return self._client.get_state_binary()
-
-    def set_state_binary(self, state_binary):
-        if self._is_editing:
-            self._client.set_state_binary(state_binary)
-
-    def run_command(self, args):
-        if args[0] == "sim" and not self._is_editing:
-            return "'sim' command only allowed while in edit mode.", None
-        elif args[0] != "sim" and self._is_editing:
-            return "Only 'sim' command is allowed while in edit mode.", None
-        return self._client.run_command(args)
 
     def is_process_running(self):
         return self._simulation_process is not None
@@ -434,6 +435,9 @@ class TimelinePoint:
 
     def timeline(self):
         return self.timeline_node.timeline
+
+    def __str__(self):
+        return f"(ID {self.timeline_id()}, Tick {self.tick}"
 
 
 class SimulationSource:
@@ -963,7 +967,19 @@ class TimelinesProject:
 
         return events
 
-    def get_or_start_simulation(self, start_spec):
+    def get_simulation(self, get_spec) -> Optional[TimelineSimulation]:
+        if isinstance(get_spec, TimelinePoint):
+            timeline_id = get_spec.timeline_id()
+        elif isinstance(get_spec, int):
+            timeline_id = get_spec
+        elif isinstance(get_spec, TimelineNode):
+            timeline_id = get_spec.timeline_id
+        else:
+            raise TypeError("'get_spec' must be one of a TimelinePoint, TimelineNode, or timeline id.")
+
+        return self._current_simulations.get(timeline_id, None)
+
+    def get_or_start_simulation(self, start_spec) -> TimelineSimulation:
         if isinstance(start_spec, TimelinePoint):
             point = start_spec
         elif isinstance(start_spec, int):
@@ -978,10 +994,12 @@ class TimelinesProject:
         if sim is not None:
             return sim
         else:
+            print(f"LOG: Starting simulation {start_spec}")
             new_sim = TimelineSimulation(point.timeline())
             new_sim.start_process(point.tick)
             self._current_simulations[point.timeline_id()] = new_sim
             self.simulation_started.emit(new_sim, point.timeline_node)
+            print(f"LOG: Started simulation {start_spec}")
             return new_sim
 
     def stop_simulation(self, stop_spec):
@@ -995,9 +1013,11 @@ class TimelinesProject:
             raise TypeError("'stop_spec' must be one of a TimelinePoint, TimelineNode, or timeline id.")
 
         if timeline_node.timeline_id in self._current_simulations:
+            print(f"LOG: Stopping simulation {timeline_node.timeline_id}")
             sim = self._current_simulations.pop(timeline_node.timeline_id)
             sim.stop_process()
             self.simulation_stopped.emit(sim, timeline_node)
+            print(f"LOG: Stopped simulation {timeline_node.timeline_id}")
 
     def _save_timeline(self, timeline: Timeline):
         if timeline.path.parent != self.timelines_dir_path:

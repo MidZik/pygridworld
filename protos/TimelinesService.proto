@@ -10,6 +10,10 @@ service TimelineService {
     rpc GetTimelineData (TimelineDataRequest) returns (stream TimelineDataResponse) {}
     rpc GetTimelineJson (TimelineJsonRequest) returns (stream TimelineJsonResponse) {}
     rpc GetTimelineEvents (TimelineEventsRequest) returns (stream TimelineEventsResponse) {}
+    rpc GetOrStartSimulation(GetOrStartSimulationRequest) returns (GetOrStartSimulationResponse) {}
+    rpc StopSimulation(StopSimulationRequest) returns (StopSimulationResponse) {}
+    rpc MoveSimToTick(MoveSimToTickRequest) returns (MoveSimToTickResponse) {}
+    rpc EditSimulation(stream EditSimulationRequest) returns (stream EditSimulationResponse) {}
 }
 
 message TickList {
@@ -78,4 +82,50 @@ message TimelineEventsResponse {
     int32 timeline_id = 1;
     int64 tick = 2;
     repeated EventMessage events = 3;
+}
+
+message GetOrStartSimulationRequest {
+    int32 timeline_id = 1;
+    int64 tick = 2;
+}
+
+message GetOrStartSimulationResponse {
+    string address = 1;
+    string token = 2;
+}
+
+message StopSimulationRequest {
+    int32 timeline_id = 1;
+}
+
+message StopSimulationResponse {
+
+}
+
+message MoveSimToTickRequest {
+    int32 timeline_id = 1;
+    int64 tick = 2;
+}
+
+message MoveSimToTickResponse {
+
+}
+
+message EditSimulationRequest {
+    int32 timeline_id = 1;
+
+    enum Command {
+        UNKNOWN = 0;
+        START = 1;
+        END = 2;
+        DISCARD = 3;
+        COMMIT = 4;
+    }
+
+    Command command = 2;
+}
+
+message EditSimulationResponse {
+    bool success = 1;
+    string result = 2;
 }

@@ -27,6 +27,8 @@ service Simulation {
     rpc GetStateBinary(GetStateBinaryRequest) returns (GetStateBinaryResponse);
     rpc SetStateBinary(SetStateBinaryRequest) returns (SetStateBinaryResponse);
     rpc RunCommand(RunCommandRequest) returns (RunCommandResponse);
+    rpc SetEditorToken(SetEditorTokenRequest) returns (SetEditorTokenResponse);
+    rpc IsEditing(IsEditingRequest) returns (IsEditingResponse);
 }
 
 message GetTickRequest {
@@ -200,4 +202,19 @@ message RunCommandRequest {
 message RunCommandResponse {
     string err = 1;
     string output = 2;
+}
+
+message SetEditorTokenRequest {
+    string token = 1;
+}
+
+message SetEditorTokenResponse {
+}
+
+message IsEditingRequest {
+    bool check_self_only = 1;
+}
+
+message IsEditingResponse {
+    bool is_editing = 1;
 }
