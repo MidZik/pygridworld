@@ -5,7 +5,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 import json
 import re
-from threading import Thread, Lock
+from threading import Thread, Lock, RLock
 from typing import Optional, List
 from bisect import insort
 from simrunner import SimulationProcess, SimulationClient
@@ -48,6 +48,8 @@ class Timeline:
         self.simulation_binary_provider = simulation_binary_provider
 
         self.tick_list: List[int] = []
+
+        self.lock = RLock()
 
         self.refresh_tick_list()
 
@@ -612,6 +614,11 @@ class TimelinesProject:
         self._simulation_registry = {}
         self._current_simulations = {}
 
+        self._timelines_lock = RLock()
+        self._sources_lock = RLock()
+        self._simulation_registry_lock = RLock()
+        self._simulations_lock = RLock()
+
         self.simulation_started = gwsignal.Signal()
         self.simulation_stopped = gwsignal.Signal()
 
@@ -647,8 +654,9 @@ class TimelinesProject:
             raise
 
         new_timeline_node = TimelineNode(parent_node, new_timeline_id, new_timeline)
-        self._timeline_nodes[new_timeline_id] = new_timeline_node
-        self._next_new_timeline_id += 1
+        with self._timelines_lock:
+            self._timeline_nodes[new_timeline_id] = new_timeline_node
+            self._next_new_timeline_id += 1
         return new_timeline_node
 
     def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
@@ -685,120 +693,130 @@ class TimelinesProject:
                       f"but data on disk will remain. ({path})", file=sys.stderr)
             del self._timeline_nodes[node.timeline_id]
 
-        TimelineNode.traverse(node_to_delete, delete_timeline_data)
-        node_to_delete.parent_node.child_nodes.remove(node_to_delete)
-        node_to_delete.parent_node = None
-
-        max_id = 0
-
         def find_max_id(node: TimelineNode):
             nonlocal max_id
             if node.timeline_id is not None:
                 max_id = max(max_id, node.timeline_id)
 
-        TimelineNode.traverse(self.root_node, find_max_id)
-        self._next_new_timeline_id = max_id + 1
+        with self._timelines_lock:
+            TimelineNode.traverse(node_to_delete, delete_timeline_data)
+            node_to_delete.parent_node.child_nodes.remove(node_to_delete)
+            node_to_delete.parent_node = None
+
+            max_id = 0
+
+            TimelineNode.traverse(self.root_node, find_max_id)
+
+            self._next_new_timeline_id = max_id + 1
 
     def load_all_timelines(self):
-        timeline_nodes = {}
-        timeline_children = defaultdict(list)
-        largest_loaded_timeline_id = 0
+        with self._timelines_lock:
+            timeline_nodes = {}
+            timeline_children = defaultdict(list)
+            largest_loaded_timeline_id = 0
 
-        # pass 1: load all timelines individually, and log parent timelines+ticks
-        for timeline_path in (p for p in self.timelines_dir_path.iterdir() if p.is_dir()):
-            timeline_id, parent_id = TimelinesProject.parse_timeline_folder_name(timeline_path.name)
-            if timeline_id is None:
-                print(f"WARNING: Improperly formatted folder found in timelines dir '{timeline_path.name}'.")
-                continue
+            # pass 1: load all timelines individually, and log parent timelines+ticks
+            for timeline_path in (p for p in self.timelines_dir_path.iterdir() if p.is_dir()):
+                timeline_id, parent_id = TimelinesProject.parse_timeline_folder_name(timeline_path.name)
+                if timeline_id is None:
+                    print(f"WARNING: Improperly formatted folder found in timelines dir '{timeline_path.name}'.")
+                    continue
 
-            timeline = self._load_timeline(timeline_path)
+                timeline = self._load_timeline(timeline_path)
 
-            timeline_children[parent_id].append((timeline_id, timeline))
-            largest_loaded_timeline_id = max(largest_loaded_timeline_id, timeline_id)
+                timeline_children[parent_id].append((timeline_id, timeline))
+                largest_loaded_timeline_id = max(largest_loaded_timeline_id, timeline_id)
 
-        # pass 2: Starting at the root, populate tree with nodes
-        root_node = TimelineNode()
-        node_deque = deque([root_node])
+            # pass 2: Starting at the root, populate tree with nodes
+            root_node = TimelineNode()
+            node_deque = deque([root_node])
 
-        while node_deque:
-            cur_node = node_deque.popleft()
-            timeline_nodes[cur_node.timeline_id] = cur_node
-            for timeline_id, timeline in timeline_children[cur_node.timeline_id]:
-                child_node = TimelineNode(cur_node, timeline_id, timeline)
-                node_deque.append(child_node)
-            del timeline_children[cur_node.timeline_id]
+            while node_deque:
+                cur_node = node_deque.popleft()
+                timeline_nodes[cur_node.timeline_id] = cur_node
+                for timeline_id, timeline in timeline_children[cur_node.timeline_id]:
+                    child_node = TimelineNode(cur_node, timeline_id, timeline)
+                    node_deque.append(child_node)
+                del timeline_children[cur_node.timeline_id]
 
-        if len(timeline_children) > 0:
-            print(f"WARNING: Some timelines are not attached to the root point and have not been loaded.")
-            print(timeline_children)
+            if len(timeline_children) > 0:
+                print(f"WARNING: Some timelines are not attached to the root point and have not been loaded.")
+                print(timeline_children)
 
-        self.root_node = root_node
-        self._timeline_nodes = timeline_nodes
-        self._next_new_timeline_id = largest_loaded_timeline_id + 1
+            self.root_node = root_node
+            self._timeline_nodes = timeline_nodes
+            self._next_new_timeline_id = largest_loaded_timeline_id + 1
 
     def get_timeline_node(self, timeline_id) -> TimelineNode:
         return self._timeline_nodes[timeline_id]
 
     def load_all_simulation_sources(self):
-        self._simulation_source_paths = []
-        sources_file_path = self.simulation_registry_path / 'sources.txt'
-        self.simulation_registry_path.mkdir(exist_ok=True)
-        sources_file_path.touch(exist_ok=True)
-        with open(sources_file_path) as sf:
-            for line in sf.readlines():
-                line = line.strip()
-                if line:
-                    try:
-                        path = Path(line)
-                        SimulationSource(path)
-                        self._simulation_source_paths.append(path)
-                    except (ValueError, FileNotFoundError):
-                        print(f"Failed to load source {line}.")
+        with self._sources_lock:
+            self._simulation_source_paths = []
+            sources_file_path = self.simulation_registry_path / 'sources.txt'
+            self.simulation_registry_path.mkdir(exist_ok=True)
+            sources_file_path.touch(exist_ok=True)
+            with open(sources_file_path) as sf:
+                for line in sf.readlines():
+                    line = line.strip()
+                    if line:
+                        try:
+                            path = Path(line)
+                            SimulationSource(path)
+                            self._simulation_source_paths.append(path)
+                        except (ValueError, FileNotFoundError):
+                            print(f"Failed to load source {line}.")
 
     def get_simulation_source_paths(self):
-        yield from self._simulation_source_paths
+        with self._sources_lock:
+            yield from self._simulation_source_paths
 
     def add_simulation_source_path(self, source_path):
         source_path = Path(source_path).resolve(True)
-        if source_path in self._simulation_source_paths:
-            raise ValueError("Source path already in sources list.")
-        SimulationSource(source_path)  # validate that path is a valid source
+        with self._sources_lock:
+            if source_path in self._simulation_source_paths:
+                raise ValueError("Source path already in sources list.")
+            SimulationSource(source_path)  # validate that path is a valid source
 
-        with open(self.simulation_registry_path / 'sources.txt', 'ba+') as f:
-            if f.tell() != 0:
-                f.seek(-1, 2)
-                last_char = f.read(1)
-                if last_char != b'\n':
-                    f.write(os.linesep.encode('utf-8'))
-            f.write(str(source_path).encode('utf-8'))
-            f.write(os.linesep.encode('utf-8'))
+            with open(self.simulation_registry_path / 'sources.txt', 'ba+') as f:
+                if f.tell() != 0:
+                    f.seek(-1, 2)
+                    last_char = f.read(1)
+                    if last_char != b'\n':
+                        f.write(os.linesep.encode('utf-8'))
+                f.write(str(source_path).encode('utf-8'))
+                f.write(os.linesep.encode('utf-8'))
 
-        self._simulation_source_paths.append(source_path)
+            self._simulation_source_paths.append(source_path)
 
     def remove_simulation_source_path(self, source_path):
         source_path = Path(source_path).resolve(True)
-        self._simulation_source_paths.remove(source_path)
 
-        with open(self.simulation_registry_path / 'sources.txt', 'w') as f:
-            f.writelines((str(p) for p in self._simulation_source_paths))
+        with self._sources_lock:
+            self._simulation_source_paths.remove(source_path)
+
+            with open(self.simulation_registry_path / 'sources.txt', 'w') as f:
+                f.writelines((str(p) for p in self._simulation_source_paths))
 
     def load_simulation_registry(self):
-        self._simulation_registry = {}
-        for dir_path in (x for x in self.simulation_registry_path.iterdir() if x.is_dir()):
-            try:
-                reg_id = UUID(dir_path.name)
-            except ValueError:
-                print(f"Bad registered simulation UUID: {dir_path.name}")
-                continue
+        with self._simulation_registry_lock:
+            self._simulation_registry = {}
+            for dir_path in (x for x in self.simulation_registry_path.iterdir() if x.is_dir()):
+                try:
+                    reg_id = UUID(dir_path.name)
+                except ValueError:
+                    print(f"Bad registered simulation UUID: {dir_path.name}")
+                    continue
 
-            if reg_id in self._simulation_registry:
-                print(f"Registered simulation appears twice with the same UUID {reg_id}")
-                continue
+                if reg_id in self._simulation_registry:
+                    print(f"Registered simulation appears twice with the same UUID {reg_id}")
+                    continue
 
-            self._simulation_registry[reg_id] = SimulationRegistration(dir_path)
+                self._simulation_registry[reg_id] = SimulationRegistration(dir_path)
 
     def get_registered_simulations(self):
-        yield from self._simulation_registry.values()
+        with self._simulation_registry_lock:
+            yield from self._simulation_registry.values()
 
     def get_registered_simulation(self, uuid) -> SimulationRegistration:
         return self._simulation_registry[uuid]
@@ -839,7 +857,8 @@ class TimelinesProject:
             else:
                 raise ValueError(f"Source file has unknown archive method: {source.archive_method}")
 
-            self._simulation_registry[uuid] = registration
+            with self._simulation_registry_lock:
+                self._simulation_registry[uuid] = registration
         except Exception:
             shutil.rmtree(registration.path)
             raise
@@ -847,9 +866,10 @@ class TimelinesProject:
         return registration
 
     def unregister_simulation(self, uuid):
-        registration = self._simulation_registry[uuid]
-        if registration.path.parent != self.simulation_registry_path:
-            raise RuntimeError("Cannot unregister: registration path is not within simulation registry.")
+        with self._simulation_registry_lock:
+            registration = self._simulation_registry[uuid]
+            if registration.path.parent != self.simulation_registry_path:
+                raise RuntimeError("Cannot unregister: registration path is not within simulation registry.")
 
         def node_has_registry(node: TimelineNode):
             if node.timeline is not None and node.timeline.simulation_binary_provider is registration:
@@ -857,54 +877,55 @@ class TimelinesProject:
             else:
                 return None
 
-        timeline_has_registration = TimelineNode.traverse(self.root_node, node_has_registry)
-        if timeline_has_registration:
-            raise RuntimeError("Cannot unregister: a timeline is currently using this registration.")
+        with self._timelines_lock:
+            timeline_has_registration = TimelineNode.traverse(self.root_node, node_has_registry)
+            if timeline_has_registration:
+                raise RuntimeError("Cannot unregister: a timeline is currently using this registration.")
 
-        shutil.rmtree(registration.path)
-        del self._simulation_registry[uuid]
-
-    def create_timeline_simulation(self, timeline_id):
-        node = self.get_timeline_node(timeline_id)
-        return TimelineSimulation(node.timeline)
+        with self._simulation_registry_lock:
+            shutil.rmtree(registration.path)
+            del self._simulation_registry[uuid]
 
     def change_timeline_simulation_provider(self, timeline_id, new_simulation_provider):
         node = self.get_timeline_node(timeline_id)
         head_point = node.head_point()
         timeline = node.timeline
 
-        if timeline.simulation_binary_provider is None:
-            head_point_path = head_point.point_file_path().resolve(False)
-            new_sim_path = str(new_simulation_provider.get_simulation_binary_path())
-            SimulationProcess.create_default(str(head_point_path), "binary", new_sim_path)
-            timeline.simulation_binary_provider = new_simulation_provider
-            self._save_timeline(timeline)
-        else:
-            head_point_path = head_point.point_file_path().resolve(True)
-            backup_path = head_point_path.with_suffix('.tmp')
-
-            try:
-                shutil.copy2(str(head_point_path), str(backup_path))
-                old_sim_path = str(timeline.get_simulation_binary_path())
+        with timeline.lock:
+            if timeline.simulation_binary_provider is None:
+                head_point_path = head_point.point_file_path().resolve(False)
                 new_sim_path = str(new_simulation_provider.get_simulation_binary_path())
-                SimulationProcess.simple_convert(str(backup_path), "binary", old_sim_path,
-                                                 str(head_point_path), "binary", new_sim_path)
-
+                SimulationProcess.create_default(str(head_point_path), "binary", new_sim_path)
                 timeline.simulation_binary_provider = new_simulation_provider
                 self._save_timeline(timeline)
-            except Exception:
-                shutil.copy2(str(backup_path), str(head_point_path))
-                raise
-            finally:
-                Path(backup_path).unlink()
+            else:
+                head_point_path = head_point.point_file_path().resolve(True)
+                backup_path = head_point_path.with_suffix('.tmp')
+
+                try:
+                    shutil.copy2(str(head_point_path), str(backup_path))
+                    old_sim_path = str(timeline.get_simulation_binary_path())
+                    new_sim_path = str(new_simulation_provider.get_simulation_binary_path())
+                    SimulationProcess.simple_convert(str(backup_path), "binary", old_sim_path,
+                                                     str(head_point_path), "binary", new_sim_path)
+
+                    timeline.simulation_binary_provider = new_simulation_provider
+                    self._save_timeline(timeline)
+                except Exception:
+                    shutil.copy2(str(backup_path), str(head_point_path))
+                    raise
+                finally:
+                    Path(backup_path).unlink()
 
     def get_all_simulation_providers(self):
-        for source in self.get_simulation_source_paths():
-            yield SimulationSource(source)
-        yield from self.get_registered_simulations()
+        with self._sources_lock:
+            for source in self.get_simulation_source_paths():
+                yield SimulationSource(source)
+            yield from self.get_registered_simulations()
 
     def get_all_timeline_nodes(self):
-        return self._timeline_nodes.values()
+        with self._timelines_lock:
+            return self._timeline_nodes.values()
 
     def get_timeline_events(self, timeline_id, *, start_tick=None, end_tick=None, filters=None):
         """
@@ -990,17 +1011,19 @@ class TimelinesProject:
         else:
             raise TypeError("'start_spec' must be one of a TimelinePoint, TimelineNode, or timeline id.")
 
-        sim = self._current_simulations.get(point.timeline_id(), None)
-        if sim is not None:
-            return sim
-        else:
-            print(f"LOG: Starting simulation {point.timeline_id()}")
-            new_sim = TimelineSimulation(point.timeline())
-            new_sim.start_process(point.tick)
-            self._current_simulations[point.timeline_id()] = new_sim
-            self.simulation_started.emit(new_sim, point.timeline_node)
-            print(f"LOG: Started simulation {point.timeline_id()}")
-            return new_sim
+        with point.timeline().lock:
+            sim = self._current_simulations.get(point.timeline_id(), None)
+            if sim is not None:
+                return sim
+            else:
+                print(f"LOG: Starting simulation {point.timeline_id()}")
+                new_sim = TimelineSimulation(point.timeline())
+                new_sim.start_process(point.tick)
+                with self._simulations_lock:
+                    self._current_simulations[point.timeline_id()] = new_sim
+                self.simulation_started.emit(new_sim, point.timeline_node)
+                print(f"LOG: Started simulation {point.timeline_id()}")
+                return new_sim
 
     def stop_simulation(self, stop_spec):
         if isinstance(stop_spec, TimelinePoint):
@@ -1012,26 +1035,29 @@ class TimelinesProject:
         else:
             raise TypeError("'stop_spec' must be one of a TimelinePoint, TimelineNode, or timeline id.")
 
-        if timeline_node.timeline_id in self._current_simulations:
-            print(f"LOG: Stopping simulation {timeline_node.timeline_id}")
-            sim = self._current_simulations.pop(timeline_node.timeline_id)
-            sim.stop_process()
-            self.simulation_stopped.emit(sim, timeline_node)
-            print(f"LOG: Stopped simulation {timeline_node.timeline_id}")
+        with timeline_node.timeline.lock:
+            if timeline_node.timeline_id in self._current_simulations:
+                print(f"LOG: Stopping simulation {timeline_node.timeline_id}")
+                with self._simulations_lock:
+                    sim = self._current_simulations.pop(timeline_node.timeline_id)
+                sim.stop_process()
+                self.simulation_stopped.emit(sim, timeline_node)
+                print(f"LOG: Stopped simulation {timeline_node.timeline_id}")
 
     def _save_timeline(self, timeline: Timeline):
         if timeline.path.parent != self.timelines_dir_path:
             raise ValueError("Provided timeline node has invalid path data")
 
-        timeline_config_path = (timeline.path / 'timeline.json').resolve()
-        data = {}
-        sim_binary_provider = timeline.simulation_binary_provider
-        with timeline_config_path.open('w') as f:
-            if isinstance(sim_binary_provider, SimulationRegistration):
-                data['simulation_uuid'] = str(timeline.simulation_binary_provider.uuid)
-            elif isinstance(sim_binary_provider, SimulationSource):
-                data['source_path'] = str(sim_binary_provider.source_file_path)
-            json.dump(data, f)
+        with timeline.lock:
+            timeline_config_path = (timeline.path / 'timeline.json').resolve()
+            data = {}
+            sim_binary_provider = timeline.simulation_binary_provider
+            with timeline_config_path.open('w') as f:
+                if isinstance(sim_binary_provider, SimulationRegistration):
+                    data['simulation_uuid'] = str(timeline.simulation_binary_provider.uuid)
+                elif isinstance(sim_binary_provider, SimulationSource):
+                    data['source_path'] = str(sim_binary_provider.source_file_path)
+                json.dump(data, f)
 
     def _load_timeline(self, timeline_path):
         if timeline_path.parent != self.timelines_dir_path:
