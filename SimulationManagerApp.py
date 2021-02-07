@@ -207,6 +207,9 @@ class App(QtCore.QObject):
 
         self._thread_pool = QtCore.QThreadPool()
 
+        self._last_entity_selected = None
+        self._last_component_selected = None
+
         # Refresh selection states
         # TODO: A better way to ensure all ui elements are in the proper state?
         self._on_timeline_tree_selected_item_changed()
@@ -488,6 +491,8 @@ class App(QtCore.QObject):
             entities = sim.client.get_all_entities()
             for eid in entities:
                 ui.entityList.addItem(str(eid))
+                if eid == self._last_entity_selected:
+                    ui.entityList.setCurrentRow(ui.entityList.count() - 1)
 
     def _refresh_simulation_singletons_list(self):
         ui = self._ui
@@ -612,6 +617,7 @@ class App(QtCore.QObject):
         selected_eid = self.get_selected_eid()
 
         if selected_sim is not None and selected_eid is not None:
+            self._last_entity_selected = selected_eid
             component_names = selected_sim.client.get_component_names()
             entity_component_names = selected_sim.client.get_entity_component_names(selected_eid)
             missing_component_names = [c for c in component_names if c not in entity_component_names]
@@ -619,6 +625,8 @@ class App(QtCore.QObject):
                 assign_components_button_menu.addAction(c)
             for c in entity_component_names:
                 ui.entityComponentList.addItem(c)
+                if c == self._last_component_selected:
+                    ui.entityComponentList.setCurrentRow(ui.entityComponentList.count() - 1)
 
     def _on_assign_component_triggered(self, action):
         selected_simulation = self.get_selected_running_timeline_simulation()
@@ -650,6 +658,7 @@ class App(QtCore.QObject):
         selected_com = self.get_selected_component_name()
 
         if selected_sim is not None and selected_eid is not None and selected_com is not None:
+            self._last_component_selected = selected_com
             com_state_json = selected_sim.client.get_component_json(selected_eid, selected_com)
             com_state = json.loads(com_state_json)
             com_state_json = json.dumps(com_state, indent=2)  # pretty print
