@@ -15,18 +15,20 @@ class Signal:
     def __init__(self):
         self._callbacks = []
 
-    def connect(self, callback, *binds):
+    def connect(self, callback, *binds, tie_lifetime_to=None):
         """
         Connects a callback to the signal. Whenever the signal is emitted, the callback will be called.
         :param callback: callable to connect to the signal
         :param binds: additional parameters that should be passed to the callback whenever the signal is emitted
+        :param tie_lifetime_to: if provided, the connection will be destroyed if tie_lifetime_to is garbage collected
         """
         if ismethod(callback):
             # Bound method case
-            self._callbacks.append((weakref.ref(callback.__self__), callback.__func__, binds))
+            self_weakref = weakref.ref(callback.__self__)
+            self._callbacks.append((self_weakref, callback.__func__, binds, self_weakref))
         else:
             # Function/callable case
-            self._callbacks.append((None, callback, binds))
+            self._callbacks.append((None, callback, binds, weakref.ref(tie_lifetime_to)))
 
     def connect_func_as_method(self, func, func_self, *binds):
         if ismethod(func):
@@ -49,7 +51,14 @@ class Signal:
         :param args: Args to pass to each callback
         """
         for i in range(len(self._callbacks) - 1, -1, -1):
-            ref, callback, binds = self._callbacks[i]
+            ref, callback, binds, tied_object = self._callbacks[i]
+
+            if tied_object is not None:
+                tied_object = tied_object()
+                if tied_object is None:
+                    self._remove_index(i)
+                    continue
+
             if ref is not None:
                 # Bound method case
                 obj = ref()
