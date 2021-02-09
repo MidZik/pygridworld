@@ -181,6 +181,8 @@ class App(QtCore.QObject):
         ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
         ui.convertToSimComboBox.currentIndexChanged.connect(self._on_convert_to_sim_combo_box_changed)
         ui.convertToSimButton.clicked.connect(self._convert_to_selected_sim)
+        ui.saveTimelineTagsButton.clicked.connect(self._save_selected_timeline_tags)
+        ui.revertTimelineTagsButton.clicked.connect(self._revert_selected_timeline_tags)
 
         # Simulation Registry Tab
         ui.addSimSourceButton.clicked.connect(self._add_sim_source)
@@ -393,6 +395,7 @@ class App(QtCore.QObject):
 
         self._refresh_convert_to_selected_sim_button()
         self._refresh_current_timeline_sim_label()
+        self._refresh_selected_timeline_tags()
         self._refresh_simulation_tab()
 
     def _refresh_simulation_tab(self):
@@ -933,6 +936,25 @@ class App(QtCore.QObject):
             config = self.get_sim_bin_provider_to_convert_to()
             self._project.change_timeline_simulation_provider(selected_timeline_node.timeline_id, config)
             self._refresh_current_timeline_sim_label()
+
+    def _refresh_selected_timeline_tags(self):
+        selected_timeline = self.get_selected_timeline()
+
+        tags_string = ""
+        if selected_timeline is not None:
+            tags = selected_timeline.get_tags()
+            tags_string = ", ".join(tags)
+
+        self._ui.timelineTagsLineEdit.setText(tags_string)
+
+    def _save_selected_timeline_tags(self):
+        selected_timeline_node = self.get_selected_timeline_node()
+        if selected_timeline_node is not None:
+            tags_list = [tag.strip() for tag in self._ui.timelineTagsLineEdit.text().split(',')]
+            self._project.set_tags(selected_timeline_node.timeline_id, tags_list)
+
+    def _revert_selected_timeline_tags(self):
+        self._refresh_selected_timeline_tags()
 
     def run(self):
         self._main_window.show()

@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'window.ui',
 # licensing of 'window.ui' applies.
 #
-# Created: Tue Dec 15 06:03:39 2020
+# Created: Tue Feb  9 00:06:47 2021
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -244,6 +244,21 @@ class Ui_MainWindow(object):
         self.horizontalLayout_15.addWidget(self.convertToSimButton)
         self.horizontalLayout_15.setStretch(1, 1)
         self.verticalLayout.addLayout(self.horizontalLayout_15)
+        self.horizontalLayout_17 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_17.setObjectName("horizontalLayout_17")
+        self.label_6 = QtWidgets.QLabel(self.timelineTab)
+        self.label_6.setObjectName("label_6")
+        self.horizontalLayout_17.addWidget(self.label_6)
+        self.timelineTagsLineEdit = QtWidgets.QLineEdit(self.timelineTab)
+        self.timelineTagsLineEdit.setObjectName("timelineTagsLineEdit")
+        self.horizontalLayout_17.addWidget(self.timelineTagsLineEdit)
+        self.revertTimelineTagsButton = QtWidgets.QPushButton(self.timelineTab)
+        self.revertTimelineTagsButton.setObjectName("revertTimelineTagsButton")
+        self.horizontalLayout_17.addWidget(self.revertTimelineTagsButton)
+        self.saveTimelineTagsButton = QtWidgets.QPushButton(self.timelineTab)
+        self.saveTimelineTagsButton.setObjectName("saveTimelineTagsButton")
+        self.horizontalLayout_17.addWidget(self.saveTimelineTagsButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_17)
         self.label = QtWidgets.QLabel(self.timelineTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -419,6 +434,9 @@ class Ui_MainWindow(object):
         self.currentTimelineSimLabel.setText(QtWidgets.QApplication.translate("MainWindow", "<current sim>", None, -1))
         self.label_5.setText(QtWidgets.QApplication.translate("MainWindow", "Convert to simulation:", None, -1))
         self.convertToSimButton.setText(QtWidgets.QApplication.translate("MainWindow", "Convert", None, -1))
+        self.label_6.setText(QtWidgets.QApplication.translate("MainWindow", "Tags:", None, -1))
+        self.revertTimelineTagsButton.setText(QtWidgets.QApplication.translate("MainWindow", "Revert", None, -1))
+        self.saveTimelineTagsButton.setText(QtWidgets.QApplication.translate("MainWindow", "Save", None, -1))
         self.label.setText(QtWidgets.QApplication.translate("MainWindow", "Point State JSON", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.timelineTab), QtWidgets.QApplication.translate("MainWindow", "Timeline", None, -1))
         self.addSimSourceButton.setText(QtWidgets.QApplication.translate("MainWindow", "Add Source", None, -1))

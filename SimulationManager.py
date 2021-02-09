@@ -40,7 +40,7 @@ class Timeline:
         else:
             return None
 
-    def __init__(self, path: Path, simulation_binary_provider):
+    def __init__(self, path: Path, simulation_binary_provider, tags=tuple()):
         """
         :param path: The folder the timeline data resides in.
         """
@@ -48,6 +48,7 @@ class Timeline:
         self.simulation_binary_provider = simulation_binary_provider
 
         self.tick_list: List[int] = []
+        self.tags = set(tags)
 
         self.lock = RLock()
 
@@ -91,6 +92,10 @@ class Timeline:
                 self.tick_list.append(tick)
 
         self.tick_list.sort()
+
+    def get_tags(self):
+        with self.lock:
+            return set(self.tags)
 
 
 class TimelineSimulation:
@@ -613,11 +618,13 @@ class TimelinesProject:
         self._simulation_source_paths = []
         self._simulation_registry = {}
         self._current_simulations = {}
+        self._timeline_tags = defaultdict(set)
 
         self._timelines_lock = RLock()
         self._sources_lock = RLock()
         self._simulation_registry_lock = RLock()
         self._simulations_lock = RLock()
+        self._tags_lock = RLock()
 
         self.simulation_started = gwsignal.Signal()
         self.simulation_stopped = gwsignal.Signal()
@@ -626,7 +633,8 @@ class TimelinesProject:
                          parent_node: TimelineNode,
                          sim_binary_provider=None,
                          initial_tick=0,
-                         source_tick_data_path=None):
+                         source_tick_data_path=None,
+                         initial_tags=()):
         new_timeline_id = self._next_new_timeline_id
 
         timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, parent_node.timeline_id)
@@ -635,7 +643,7 @@ class TimelinesProject:
         try:
             timeline_folder_path.mkdir()
 
-            new_timeline = Timeline(timeline_folder_path, sim_binary_provider)
+            new_timeline = Timeline(timeline_folder_path, sim_binary_provider, initial_tags)
             self._save_timeline(new_timeline)
 
             initial_point_path = new_timeline.get_point_file_path(initial_tick)
@@ -657,6 +665,9 @@ class TimelinesProject:
         with self._timelines_lock:
             self._timeline_nodes[new_timeline_id] = new_timeline_node
             self._next_new_timeline_id += 1
+        with self._tags_lock:
+            for tag in initial_tags:
+                self._timeline_tags[tag].add(new_timeline_node)
         return new_timeline_node
 
     def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
@@ -697,6 +708,10 @@ class TimelinesProject:
             nonlocal max_id
             if node.timeline_id is not None:
                 max_id = max(max_id, node.timeline_id)
+
+        with self._tags_lock:
+            for tag in node_to_delete.timeline.tags:
+                self._timeline_tags[tag].remove(node_to_delete)
 
         with self._timelines_lock:
             TimelineNode.traverse(node_to_delete, delete_timeline_data)
@@ -1044,6 +1059,60 @@ class TimelinesProject:
                 self.simulation_stopped.emit(sim, timeline_node)
                 print(f"LOG: Stopped simulation {timeline_node.timeline_id}")
 
+    @staticmethod
+    def validate_tags(tags):
+        invalid_tags = [tag for tag in tags if not tag.isidentifier()]
+        if invalid_tags:
+            raise ValueError(f"Some tags are not valid: {''.join(invalid_tags)}")
+
+    def add_tags(self, timeline_id, tags):
+        TimelinesProject.validate_tags(tags)
+        timeline_node = self.get_timeline_node(timeline_id)
+        timeline = timeline_node.timeline
+
+        with self._tags_lock:
+            with timeline.lock:
+                timeline.tags.update(tags)
+            for tag in tags:
+                self._timeline_tags[tag].add(timeline_node)
+
+        self._save_timeline(timeline)
+
+    def remove_tags(self, timeline_id, tags):
+        TimelinesProject.validate_tags(tags)
+        timeline_node = self.get_timeline_node(timeline_id)
+        timeline = timeline_node.timeline
+
+        with self._tags_lock:
+            with timeline.lock:
+                timeline.tags.difference_update(tags)
+            for tag in tags:
+                self._timeline_tags[tag].remove(timeline_node)
+
+        self._save_timeline(timeline)
+
+    def set_tags(self, timeline_id, tags):
+        TimelinesProject.validate_tags(tags)
+        timeline_node = self.get_timeline_node(timeline_id)
+        timeline = timeline_node.timeline
+        tags = set(tags)
+
+        with self._tags_lock:
+            with timeline.lock:
+                removed_tags = timeline.tags - tags
+                added_tags = tags - timeline.tags
+                timeline.tags = tags
+            for tag in removed_tags:
+                self._timeline_tags[tag].remove(timeline_node)
+            for tag in added_tags:
+                self._timeline_tags[tag].add(timeline_node)
+
+        self._save_timeline(timeline)
+
+    def get_all_timeline_nodes_with_tag(self, tag):
+        with self._tags_lock:
+            return set(self._timeline_tags[tag])
+
     def _save_timeline(self, timeline: Timeline):
         if timeline.path.parent != self.timelines_dir_path:
             raise ValueError("Provided timeline node has invalid path data")
@@ -1057,6 +1126,7 @@ class TimelinesProject:
                     data['simulation_uuid'] = str(timeline.simulation_binary_provider.uuid)
                 elif isinstance(sim_binary_provider, SimulationSource):
                     data['source_path'] = str(sim_binary_provider.source_file_path)
+                data['tags'] = list(timeline.tags)
                 json.dump(data, f)
 
     def _load_timeline(self, timeline_path):
@@ -1081,4 +1151,9 @@ class TimelinesProject:
             else:
                 simulation_binary_provider = None
 
-        return Timeline(timeline_path, simulation_binary_provider)
+            if 'tags' in data:
+                tags = data['tags']
+            else:
+                tags = ()
+
+        return Timeline(timeline_path, simulation_binary_provider, tags)
