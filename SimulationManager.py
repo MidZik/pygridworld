@@ -727,6 +727,7 @@ class TimelinesProject:
     def load_all_timelines(self):
         with self._timelines_lock:
             timeline_nodes = {}
+            timeline_tags = defaultdict(set)
             timeline_children = defaultdict(list)
             largest_loaded_timeline_id = 0
 
@@ -751,6 +752,8 @@ class TimelinesProject:
                 timeline_nodes[cur_node.timeline_id] = cur_node
                 for timeline_id, timeline in timeline_children[cur_node.timeline_id]:
                     child_node = TimelineNode(cur_node, timeline_id, timeline)
+                    for tag in timeline.tags:
+                        timeline_tags[tag].add(child_node)
                     node_deque.append(child_node)
                 del timeline_children[cur_node.timeline_id]
 
@@ -760,6 +763,7 @@ class TimelinesProject:
 
             self.root_node = root_node
             self._timeline_nodes = timeline_nodes
+            self._timeline_tags = timeline_tags
             self._next_new_timeline_id = largest_loaded_timeline_id + 1
 
     def get_timeline_node(self, timeline_id) -> TimelineNode:
