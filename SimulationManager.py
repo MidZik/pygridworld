@@ -1083,7 +1083,6 @@ class TimelinesProject:
         self._save_timeline(timeline)
 
     def remove_tags(self, timeline_id, tags):
-        TimelinesProject.validate_tags(tags)
         timeline_node = self.get_timeline_node(timeline_id)
         timeline = timeline_node.timeline
 
@@ -1091,7 +1090,7 @@ class TimelinesProject:
             with timeline.lock:
                 timeline.tags.difference_update(tags)
             for tag in tags:
-                self._timeline_tags[tag].remove(timeline_node)
+                self._timeline_tags[tag].discard(timeline_node)
 
         self._save_timeline(timeline)
 
