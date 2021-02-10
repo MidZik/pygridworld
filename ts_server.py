@@ -16,7 +16,13 @@ class Service(ts_grpc.TimelineServiceServicer):
         self._project = project
 
     def GetTimelines(self, request, context):
-        nodes = self._project.get_all_timeline_nodes()
+        tags = request.tags
+
+        if tags:
+            nodes = self._project.get_all_timeline_nodes_with_tags(tags)
+        else:
+            nodes = self._project.get_all_timeline_nodes()
+
         message = ts.TimelinesResponse()
         message.timeline_ids[:] = [node.timeline_id for node in nodes if node.timeline_id is not None]
         return message
@@ -221,6 +227,39 @@ class Service(ts_grpc.TimelineServiceServicer):
             raise
         else:
             yield ts.EditSimulationResponse(success=True, result="Editing ended.")
+
+    def GetTimelineTags(self, request, context):
+        timeline_id = request.timeline_id
+
+        try:
+            node = self._project.get_timeline_node(timeline_id)
+        except LookupError:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details('Timeline ID not found.')
+            raise ValueError('Timeline ID not found.')
+
+        tags = node.timeline.get_tags()
+
+        response = ts.GetTimelineTagsResponse()
+        response.tags[:] = tags
+        return response
+
+    def ModifyTimelineTags(self, request, context):
+        timeline_id = request.timeline_id
+        tags_to_add = request.tags_to_add
+        tags_to_remove = request.tags_to_remove
+
+        try:
+            self._project.get_timeline_node(timeline_id)
+        except LookupError:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details('Timeline ID not found.')
+            raise ValueError('Timeline ID not found.')
+
+        self._project.add_tags(timeline_id, tags_to_add)
+        self._project.remove_tags(timeline_id, tags_to_remove)
+
+        return ts.ModifyTimelineTagsResponse()
 
 
 class Server:

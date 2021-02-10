@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16TimelinesService.proto\x12\x0bPyGridWorld\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"\x12\n\x10TimelinesRequest\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"A\n\x15TimelineTicksResponse\x12(\n\ttick_list\x18\x01 \x01(\x0b\x32\x15.PyGridWorld.TickList\"\x93\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x93\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"i\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ntick_range\x18\x02 \x01(\x0b\x32\x16.PyGridWorld.TickRange\x12\x0f\n\x07\x66ilters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"f\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12)\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x19.PyGridWorld.EventMessage\"@\n\x1bGetOrStartSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\">\n\x1cGetOrStartSimulationResponse\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\",\n\x15StopSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16StopSimulationResponse\"9\n\x14MoveSimToTickRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"\x17\n\x15MoveSimToTickResponse\"\xae\x01\n\x15\x45\x64itSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12;\n\x07\x63ommand\x18\x02 \x01(\x0e\x32*.PyGridWorld.EditSimulationRequest.Command\"C\n\x07\x43ommand\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05START\x10\x01\x12\x07\n\x03\x45ND\x10\x02\x12\x0b\n\x07\x44ISCARD\x10\x03\x12\n\n\x06\x43OMMIT\x10\x04\"9\n\x16\x45\x64itSimulationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0e\n\x06result\x18\x02 \x01(\t2\xe0\x06\n\x0fTimelineService\x12O\n\x0cGetTimelines\x12\x1d.PyGridWorld.TimelinesRequest\x1a\x1e.PyGridWorld.TimelinesResponse\"\x00\x12[\n\x10GetTimelineTicks\x12!.PyGridWorld.TimelineTicksRequest\x1a\".PyGridWorld.TimelineTicksResponse\"\x00\x12Z\n\x0fGetTimelineData\x12 .PyGridWorld.TimelineDataRequest\x1a!.PyGridWorld.TimelineDataResponse\"\x00\x30\x01\x12Z\n\x0fGetTimelineJson\x12 .PyGridWorld.TimelineJsonRequest\x1a!.PyGridWorld.TimelineJsonResponse\"\x00\x30\x01\x12`\n\x11GetTimelineEvents\x12\".PyGridWorld.TimelineEventsRequest\x1a#.PyGridWorld.TimelineEventsResponse\"\x00\x30\x01\x12m\n\x14GetOrStartSimulation\x12(.PyGridWorld.GetOrStartSimulationRequest\x1a).PyGridWorld.GetOrStartSimulationResponse\"\x00\x12[\n\x0eStopSimulation\x12\".PyGridWorld.StopSimulationRequest\x1a#.PyGridWorld.StopSimulationResponse\"\x00\x12X\n\rMoveSimToTick\x12!.PyGridWorld.MoveSimToTickRequest\x1a\".PyGridWorld.MoveSimToTickResponse\"\x00\x12_\n\x0e\x45\x64itSimulation\x12\".PyGridWorld.EditSimulationRequest\x1a#.PyGridWorld.EditSimulationResponse\"\x00(\x01\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x16TimelinesService.proto\x12\x0bPyGridWorld\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\" \n\x10TimelinesRequest\x12\x0c\n\x04tags\x18\x01 \x03(\t\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"A\n\x15TimelineTicksResponse\x12(\n\ttick_list\x18\x01 \x01(\x0b\x32\x15.PyGridWorld.TickList\"\x93\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x93\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"i\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ntick_range\x18\x02 \x01(\x0b\x32\x16.PyGridWorld.TickRange\x12\x0f\n\x07\x66ilters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"f\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12)\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x19.PyGridWorld.EventMessage\"@\n\x1bGetOrStartSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\">\n\x1cGetOrStartSimulationResponse\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\",\n\x15StopSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16StopSimulationResponse\"9\n\x14MoveSimToTickRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"\x17\n\x15MoveSimToTickResponse\"\xae\x01\n\x15\x45\x64itSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12;\n\x07\x63ommand\x18\x02 \x01(\x0e\x32*.PyGridWorld.EditSimulationRequest.Command\"C\n\x07\x43ommand\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05START\x10\x01\x12\x07\n\x03\x45ND\x10\x02\x12\x0b\n\x07\x44ISCARD\x10\x03\x12\n\n\x06\x43OMMIT\x10\x04\"9\n\x16\x45\x64itSimulationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0e\n\x06result\x18\x02 \x01(\t\"-\n\x16GetTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\'\n\x17GetTimelineTagsResponse\x12\x0c\n\x04tags\x18\x01 \x03(\t\"]\n\x19ModifyTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x13\n\x0btags_to_add\x18\x02 \x03(\t\x12\x16\n\x0etags_to_remove\x18\x03 \x03(\t\"\x1c\n\x1aModifyTimelineTagsResponse2\xa9\x08\n\x0fTimelineService\x12O\n\x0cGetTimelines\x12\x1d.PyGridWorld.TimelinesRequest\x1a\x1e.PyGridWorld.TimelinesResponse\"\x00\x12[\n\x10GetTimelineTicks\x12!.PyGridWorld.TimelineTicksRequest\x1a\".PyGridWorld.TimelineTicksResponse\"\x00\x12Z\n\x0fGetTimelineData\x12 .PyGridWorld.TimelineDataRequest\x1a!.PyGridWorld.TimelineDataResponse\"\x00\x30\x01\x12Z\n\x0fGetTimelineJson\x12 .PyGridWorld.TimelineJsonRequest\x1a!.PyGridWorld.TimelineJsonResponse\"\x00\x30\x01\x12`\n\x11GetTimelineEvents\x12\".PyGridWorld.TimelineEventsRequest\x1a#.PyGridWorld.TimelineEventsResponse\"\x00\x30\x01\x12m\n\x14GetOrStartSimulation\x12(.PyGridWorld.GetOrStartSimulationRequest\x1a).PyGridWorld.GetOrStartSimulationResponse\"\x00\x12[\n\x0eStopSimulation\x12\".PyGridWorld.StopSimulationRequest\x1a#.PyGridWorld.StopSimulationResponse\"\x00\x12X\n\rMoveSimToTick\x12!.PyGridWorld.MoveSimToTickRequest\x1a\".PyGridWorld.MoveSimToTickResponse\"\x00\x12_\n\x0e\x45\x64itSimulation\x12\".PyGridWorld.EditSimulationRequest\x1a#.PyGridWorld.EditSimulationResponse\"\x00(\x01\x30\x01\x12^\n\x0fGetTimelineTags\x12#.PyGridWorld.GetTimelineTagsRequest\x1a$.PyGridWorld.GetTimelineTagsResponse\"\x00\x12g\n\x12ModifyTimelineTags\x12&.PyGridWorld.ModifyTimelineTagsRequest\x1a\'.PyGridWorld.ModifyTimelineTagsResponse\"\x00\x62\x06proto3'
 )
 
 
@@ -59,8 +59,8 @@ _EDITSIMULATIONREQUEST_COMMAND = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1345,
-  serialized_end=1412,
+  serialized_start=1359,
+  serialized_end=1426,
 )
 _sym_db.RegisterEnumDescriptor(_EDITSIMULATIONREQUEST_COMMAND)
 
@@ -144,6 +144,13 @@ _TIMELINESREQUEST = _descriptor.Descriptor(
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='tags', full_name='PyGridWorld.TimelinesRequest.tags', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -157,7 +164,7 @@ _TIMELINESREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=117,
-  serialized_end=135,
+  serialized_end=149,
 )
 
 
@@ -188,8 +195,8 @@ _TIMELINESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=137,
-  serialized_end=178,
+  serialized_start=151,
+  serialized_end=192,
 )
 
 
@@ -220,8 +227,8 @@ _TIMELINETICKSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=180,
-  serialized_end=223,
+  serialized_start=194,
+  serialized_end=237,
 )
 
 
@@ -252,8 +259,8 @@ _TIMELINETICKSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=225,
-  serialized_end=290,
+  serialized_start=239,
+  serialized_end=304,
 )
 
 
@@ -303,8 +310,8 @@ _TIMELINEDATAREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=293,
-  serialized_end=440,
+  serialized_start=307,
+  serialized_end=454,
 )
 
 
@@ -342,8 +349,8 @@ _TIMELINEDATARESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=442,
-  serialized_end=492,
+  serialized_start=456,
+  serialized_end=506,
 )
 
 
@@ -393,8 +400,8 @@ _TIMELINEJSONREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=495,
-  serialized_end=642,
+  serialized_start=509,
+  serialized_end=656,
 )
 
 
@@ -432,8 +439,8 @@ _TIMELINEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=644,
-  serialized_end=694,
+  serialized_start=658,
+  serialized_end=708,
 )
 
 
@@ -478,8 +485,8 @@ _TIMELINEEVENTSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=696,
-  serialized_end=801,
+  serialized_start=710,
+  serialized_end=815,
 )
 
 
@@ -517,8 +524,8 @@ _EVENTMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=803,
-  serialized_end=845,
+  serialized_start=817,
+  serialized_end=859,
 )
 
 
@@ -563,8 +570,8 @@ _TIMELINEEVENTSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=847,
-  serialized_end=949,
+  serialized_start=861,
+  serialized_end=963,
 )
 
 
@@ -602,8 +609,8 @@ _GETORSTARTSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=951,
-  serialized_end=1015,
+  serialized_start=965,
+  serialized_end=1029,
 )
 
 
@@ -641,8 +648,8 @@ _GETORSTARTSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1017,
-  serialized_end=1079,
+  serialized_start=1031,
+  serialized_end=1093,
 )
 
 
@@ -673,8 +680,8 @@ _STOPSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1081,
-  serialized_end=1125,
+  serialized_start=1095,
+  serialized_end=1139,
 )
 
 
@@ -698,8 +705,8 @@ _STOPSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1127,
-  serialized_end=1151,
+  serialized_start=1141,
+  serialized_end=1165,
 )
 
 
@@ -737,8 +744,8 @@ _MOVESIMTOTICKREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1153,
-  serialized_end=1210,
+  serialized_start=1167,
+  serialized_end=1224,
 )
 
 
@@ -762,8 +769,8 @@ _MOVESIMTOTICKRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1212,
-  serialized_end=1235,
+  serialized_start=1226,
+  serialized_end=1249,
 )
 
 
@@ -802,8 +809,8 @@ _EDITSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1238,
-  serialized_end=1412,
+  serialized_start=1252,
+  serialized_end=1426,
 )
 
 
@@ -841,8 +848,143 @@ _EDITSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1414,
-  serialized_end=1471,
+  serialized_start=1428,
+  serialized_end=1485,
+)
+
+
+_GETTIMELINETAGSREQUEST = _descriptor.Descriptor(
+  name='GetTimelineTagsRequest',
+  full_name='PyGridWorld.GetTimelineTagsRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='PyGridWorld.GetTimelineTagsRequest.timeline_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1487,
+  serialized_end=1532,
+)
+
+
+_GETTIMELINETAGSRESPONSE = _descriptor.Descriptor(
+  name='GetTimelineTagsResponse',
+  full_name='PyGridWorld.GetTimelineTagsResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='tags', full_name='PyGridWorld.GetTimelineTagsResponse.tags', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1534,
+  serialized_end=1573,
+)
+
+
+_MODIFYTIMELINETAGSREQUEST = _descriptor.Descriptor(
+  name='ModifyTimelineTagsRequest',
+  full_name='PyGridWorld.ModifyTimelineTagsRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='PyGridWorld.ModifyTimelineTagsRequest.timeline_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tags_to_add', full_name='PyGridWorld.ModifyTimelineTagsRequest.tags_to_add', index=1,
+      number=2, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tags_to_remove', full_name='PyGridWorld.ModifyTimelineTagsRequest.tags_to_remove', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1575,
+  serialized_end=1668,
+)
+
+
+_MODIFYTIMELINETAGSRESPONSE = _descriptor.Descriptor(
+  name='ModifyTimelineTagsResponse',
+  full_name='PyGridWorld.ModifyTimelineTagsResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1670,
+  serialized_end=1698,
 )
 
 _TIMELINETICKSRESPONSE.fields_by_name['tick_list'].message_type = _TICKLIST
@@ -887,6 +1029,10 @@ DESCRIPTOR.message_types_by_name['MoveSimToTickRequest'] = _MOVESIMTOTICKREQUEST
 DESCRIPTOR.message_types_by_name['MoveSimToTickResponse'] = _MOVESIMTOTICKRESPONSE
 DESCRIPTOR.message_types_by_name['EditSimulationRequest'] = _EDITSIMULATIONREQUEST
 DESCRIPTOR.message_types_by_name['EditSimulationResponse'] = _EDITSIMULATIONRESPONSE
+DESCRIPTOR.message_types_by_name['GetTimelineTagsRequest'] = _GETTIMELINETAGSREQUEST
+DESCRIPTOR.message_types_by_name['GetTimelineTagsResponse'] = _GETTIMELINETAGSRESPONSE
+DESCRIPTOR.message_types_by_name['ModifyTimelineTagsRequest'] = _MODIFYTIMELINETAGSREQUEST
+DESCRIPTOR.message_types_by_name['ModifyTimelineTagsResponse'] = _MODIFYTIMELINETAGSRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 TickList = _reflection.GeneratedProtocolMessageType('TickList', (_message.Message,), {
@@ -1036,6 +1182,34 @@ EditSimulationResponse = _reflection.GeneratedProtocolMessageType('EditSimulatio
   })
 _sym_db.RegisterMessage(EditSimulationResponse)
 
+GetTimelineTagsRequest = _reflection.GeneratedProtocolMessageType('GetTimelineTagsRequest', (_message.Message,), {
+  'DESCRIPTOR' : _GETTIMELINETAGSREQUEST,
+  '__module__' : 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.GetTimelineTagsRequest)
+  })
+_sym_db.RegisterMessage(GetTimelineTagsRequest)
+
+GetTimelineTagsResponse = _reflection.GeneratedProtocolMessageType('GetTimelineTagsResponse', (_message.Message,), {
+  'DESCRIPTOR' : _GETTIMELINETAGSRESPONSE,
+  '__module__' : 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.GetTimelineTagsResponse)
+  })
+_sym_db.RegisterMessage(GetTimelineTagsResponse)
+
+ModifyTimelineTagsRequest = _reflection.GeneratedProtocolMessageType('ModifyTimelineTagsRequest', (_message.Message,), {
+  'DESCRIPTOR' : _MODIFYTIMELINETAGSREQUEST,
+  '__module__' : 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.ModifyTimelineTagsRequest)
+  })
+_sym_db.RegisterMessage(ModifyTimelineTagsRequest)
+
+ModifyTimelineTagsResponse = _reflection.GeneratedProtocolMessageType('ModifyTimelineTagsResponse', (_message.Message,), {
+  'DESCRIPTOR' : _MODIFYTIMELINETAGSRESPONSE,
+  '__module__' : 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.ModifyTimelineTagsResponse)
+  })
+_sym_db.RegisterMessage(ModifyTimelineTagsResponse)
+
 
 
 _TIMELINESERVICE = _descriptor.ServiceDescriptor(
@@ -1045,8 +1219,8 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1474,
-  serialized_end=2338,
+  serialized_start=1701,
+  serialized_end=2766,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTimelines',
@@ -1135,6 +1309,26 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_EDITSIMULATIONREQUEST,
     output_type=_EDITSIMULATIONRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetTimelineTags',
+    full_name='PyGridWorld.TimelineService.GetTimelineTags',
+    index=9,
+    containing_service=None,
+    input_type=_GETTIMELINETAGSREQUEST,
+    output_type=_GETTIMELINETAGSRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='ModifyTimelineTags',
+    full_name='PyGridWorld.TimelineService.ModifyTimelineTags',
+    index=10,
+    containing_service=None,
+    input_type=_MODIFYTIMELINETAGSREQUEST,
+    output_type=_MODIFYTIMELINETAGSRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

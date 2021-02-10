@@ -14,6 +14,8 @@ service TimelineService {
     rpc StopSimulation(StopSimulationRequest) returns (StopSimulationResponse) {}
     rpc MoveSimToTick(MoveSimToTickRequest) returns (MoveSimToTickResponse) {}
     rpc EditSimulation(stream EditSimulationRequest) returns (stream EditSimulationResponse) {}
+    rpc GetTimelineTags(GetTimelineTagsRequest) returns (GetTimelineTagsResponse) {}
+    rpc ModifyTimelineTags(ModifyTimelineTagsRequest) returns (ModifyTimelineTagsResponse) {}
 }
 
 message TickList {
@@ -26,7 +28,7 @@ message TickRange {
 }
 
 message TimelinesRequest {
-
+    repeated string tags = 1;
 }
 
 message TimelinesResponse {
@@ -128,4 +130,22 @@ message EditSimulationRequest {
 message EditSimulationResponse {
     bool success = 1;
     string result = 2;
+}
+
+message GetTimelineTagsRequest {
+    int32 timeline_id = 1;
+}
+
+message GetTimelineTagsResponse {
+    repeated string tags = 1;
+}
+
+message ModifyTimelineTagsRequest {
+    int32 timeline_id = 1;
+    repeated string tags_to_add = 2;
+    repeated string tags_to_remove = 3;
+}
+
+message ModifyTimelineTagsResponse {
+
 }

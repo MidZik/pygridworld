@@ -84,9 +84,12 @@ class Client:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    def get_timelines(self):
+    def get_timelines(self, tags=()):
         stub = ts_grpc.TimelineServiceStub(self._channel)
-        response = stub.GetTimelines(ts.TimelinesRequest())
+        request = ts.TimelinesRequest()
+        request.tags[:] = tags
+
+        response = stub.GetTimelines(request)
         return response.timeline_ids
 
     def get_timeline_ticks(self, timeline_id):
@@ -163,3 +166,16 @@ class Client:
 
     def start_editing(self, timeline_id, token):
         return EditorContext(self._channel, timeline_id, token)
+
+    def get_timeline_tags(self, timeline_id):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = ts.GetTimelineTagsRequest(timeline_id=timeline_id)
+        response = stub.GetTimelineTags(request)
+        return response.tags
+
+    def modify_timeline_tags(self, timeline_id, *, tags_to_add=(), tags_to_remove=()):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = ts.ModifyTimelineTagsRequest(timeline_id=timeline_id)
+        request.tags_to_add[:] = tags_to_add
+        request.tags_to_remove[:] = tags_to_remove
+        stub.ModifyTimelineTags(request)

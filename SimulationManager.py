@@ -1116,6 +1116,17 @@ class TimelinesProject:
         with self._tags_lock:
             return set(self._timeline_tags[tag])
 
+    def get_all_timeline_nodes_with_tags(self, tags):
+        if not tags:
+            return self.get_all_timeline_nodes()
+
+        with self._tags_lock:
+            nodes = set(self._timeline_tags[tags[0]])
+            for tag in tags[1:]:
+                nodes &= self._timeline_tags[tag]
+
+        return nodes
+
     def _save_timeline(self, timeline: Timeline):
         if timeline.path.parent != self.timelines_dir_path:
             raise ValueError("Provided timeline node has invalid path data")

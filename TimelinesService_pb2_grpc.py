@@ -61,6 +61,16 @@ class TimelineServiceStub(object):
                 request_serializer=TimelinesService__pb2.EditSimulationRequest.SerializeToString,
                 response_deserializer=TimelinesService__pb2.EditSimulationResponse.FromString,
                 )
+        self.GetTimelineTags = channel.unary_unary(
+                '/PyGridWorld.TimelineService/GetTimelineTags',
+                request_serializer=TimelinesService__pb2.GetTimelineTagsRequest.SerializeToString,
+                response_deserializer=TimelinesService__pb2.GetTimelineTagsResponse.FromString,
+                )
+        self.ModifyTimelineTags = channel.unary_unary(
+                '/PyGridWorld.TimelineService/ModifyTimelineTags',
+                request_serializer=TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
+                response_deserializer=TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
+                )
 
 
 class TimelineServiceServicer(object):
@@ -122,6 +132,18 @@ class TimelineServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetTimelineTags(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ModifyTimelineTags(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TimelineServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -169,6 +191,16 @@ def add_TimelineServiceServicer_to_server(servicer, server):
                     servicer.EditSimulation,
                     request_deserializer=TimelinesService__pb2.EditSimulationRequest.FromString,
                     response_serializer=TimelinesService__pb2.EditSimulationResponse.SerializeToString,
+            ),
+            'GetTimelineTags': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTimelineTags,
+                    request_deserializer=TimelinesService__pb2.GetTimelineTagsRequest.FromString,
+                    response_serializer=TimelinesService__pb2.GetTimelineTagsResponse.SerializeToString,
+            ),
+            'ModifyTimelineTags': grpc.unary_unary_rpc_method_handler(
+                    servicer.ModifyTimelineTags,
+                    request_deserializer=TimelinesService__pb2.ModifyTimelineTagsRequest.FromString,
+                    response_serializer=TimelinesService__pb2.ModifyTimelineTagsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -332,5 +364,39 @@ class TimelineService(object):
         return grpc.experimental.stream_stream(request_iterator, target, '/PyGridWorld.TimelineService/EditSimulation',
             TimelinesService__pb2.EditSimulationRequest.SerializeToString,
             TimelinesService__pb2.EditSimulationResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTimelineTags(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelineTags',
+            TimelinesService__pb2.GetTimelineTagsRequest.SerializeToString,
+            TimelinesService__pb2.GetTimelineTagsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ModifyTimelineTags(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/ModifyTimelineTags',
+            TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
+            TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
