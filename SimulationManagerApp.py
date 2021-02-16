@@ -368,10 +368,10 @@ class App(QtCore.QObject):
             self._add_timeline_simulation_provider_to_combo_box(config)
         self._refresh_convert_to_selected_sim_button()
 
-        self._project.simulation_started.connect(self.simulation_started.emit, tie_lifetime_to=self._project)
-        self._project.simulation_stopped.connect(self.simulation_stopped.emit, tie_lifetime_to=self._project)
-        self._project.timeline_created.connect(self.timeline_created.emit, tie_lifetime_to=self._project)
-        self._project.timeline_deleted.connect(self.timeline_deleted.emit, tie_lifetime_to=self._project)
+        self._project.simulation_started.connect(self.simulation_started.emit)
+        self._project.simulation_stopped.connect(self.simulation_stopped.emit)
+        self._project.timeline_created.connect(self.timeline_created.emit)
+        self._project.timeline_deleted.connect(self.timeline_deleted.emit)
 
     def _on_timeline_tree_selected_item_changed(self):
         ui = self._ui
