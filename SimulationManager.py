@@ -271,6 +271,23 @@ class TimelineSimulation:
 
         self.runner_updated.emit()
 
+    def save_tick_from_current_sim_state(self):
+        with self._edit_lock:
+            if self._editor_token:
+                raise RuntimeError('Cannot save tick from current state while simulation is being edited.')
+
+            if self._client.is_editing():
+                raise RuntimeError('FATAL ERROR: Simulation process editing state is not in sync with owner.')
+
+            if self._client.get_tick() == self.timeline.head():
+                raise RuntimeError("Cannot save head tick by saving current sim state. Commit from editing instead.")
+
+        state_binary, tick = self._client.get_state_binary()
+
+        if tick == self.timeline.head():
+            raise RuntimeError("Cannot save head tick by saving current sim state. Commit from editing instead.")
+
+        self._save_tick_state_binary(tick, state_binary)
 
     def start_process(self, initial_tick=None):
         """
