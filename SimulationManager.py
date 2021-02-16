@@ -5,7 +5,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 import json
 import re
-from threading import Thread, Lock, RLock
+from threading import Thread, RLock
 from typing import Optional, List
 from bisect import insort
 from simrunner import SimulationProcess, SimulationClient
@@ -117,7 +117,8 @@ class TimelineSimulation:
         self._dead = False
         self._owner_token = ""
         self._editor_token = ""
-        self._edit_lock = Lock()
+        self._edit_lock = RLock()
+        self._pending_added_ticks = []
 
         self.runner_updated = gwsignal.Signal()
 
@@ -132,15 +133,18 @@ class TimelineSimulation:
 
     def can_start_editing(self):
         # Can only edit the simulation state if:
-        # 1. The simulation tick matches the head point tick.
-        # 2. The head point is the only point in the timeline.
+        # 1. The head point is the only point in the timeline.
+        # 2. The simulation tick matches the head point tick.
         # 3. Simulation is not currently running.
         # 4. Not currently in edit mode.
         timeline = self.timeline
-        return (timeline.head() == timeline.tail() and
+        return (len(timeline.tick_list) == 1 and not self._pending_added_ticks and
                 self._client.get_tick() == timeline.head() and
                 not self._client.is_running() and
                 not bool(self._editor_token))
+
+    def is_editing(self):
+        return bool(self._editor_token)
 
     @contextmanager
     def editor(self, editor):
@@ -170,18 +174,19 @@ class TimelineSimulation:
             if self._client.is_editing():
                 raise RuntimeError("FATAL ERROR: Simulation process editing state is not in sync with owner.")
 
-            if timeline.head() != timeline.tail():
-                raise RuntimeError("Cannot start editing: timeline is not editable.")
+            with self.timeline.lock:
+                if len(self.timeline.tick_list) > 1 or self._pending_added_ticks:
+                    raise RuntimeError("Cannot start editing: timeline is not editable.")
 
-            # Set self to editor temporarily to ensure simulation is not running,
-            # and to prevent it from running during the following checks
-            self._client.set_editor_token(self._owner_token)
+                # Set self to editor temporarily to ensure simulation is not running,
+                # and to prevent it from running during the following checks
+                self._client.set_editor_token(self._owner_token)
 
-            if self._client.get_tick() != timeline.head():
-                raise RuntimeError("Cannot start editing: simulation is not at the head tick.")
+                if self._client.get_tick() != timeline.head():
+                    raise RuntimeError("Cannot start editing: simulation is not at the head tick.")
 
-            self._client.set_editor_token(editor_token)
-            self._editor_token = editor_token
+                self._client.set_editor_token(editor_token)
+                self._editor_token = editor_token
 
         print(f"LOG: Editing started by {editor_token}")
 
@@ -212,12 +217,10 @@ class TimelineSimulation:
             if self._client.get_tick() != self.timeline.head():
                 raise RuntimeError("Cannot commit edits: simulation state at wrong tick.")
 
-            sim_state_binary = self._client.get_state_binary()
+            sim_state_binary, _ = self._client.get_state_binary()
             self._client.set_editor_token(self._editor_token)
 
-        head_point_path = self.timeline.get_point_file_path(self.timeline.head())
-        with head_point_path.open('bw') as f:
-            f.write(sim_state_binary)
+            self._save_tick_state_binary(self.timeline.head(), sim_state_binary)
 
         print(f"LOG: Committed edits")
 
@@ -245,25 +248,29 @@ class TimelineSimulation:
 
     def move_to_tick(self, tick: int):
         with self._edit_lock:
-            if tick not in self.timeline.tick_list:
-                raise ValueError('Point tick is not part of simulation timeline.')
-
             if self._editor_token:
                 raise RuntimeError('Cannot move to point while simulation is being edited.')
 
             if self._client.is_editing():
                 raise RuntimeError('FATAL ERROR: Simulation process editing state is not in sync with owner.')
 
-            self._client.set_editor_token(self._owner_token)
+            with self.timeline.lock:
+                if tick not in self.timeline.tick_list:
+                    raise ValueError('Point tick is not part of simulation timeline.')
 
-            with self.timeline.get_point_file_path(tick).open('br') as f:
-                self._client.set_state_binary(f.read())
+                with self.timeline.get_point_file_path(tick).open('br') as f:
+                    state_binary = f.read()
 
-            self._client.set_editor_token("")
+            try:
+                self._client.set_editor_token(self._owner_token)
+                self._client.set_state_binary(state_binary)
+            finally:
+                self._client.set_editor_token("")
 
         print(f"LOG: Moved to tick {tick}")
 
         self.runner_updated.emit()
+
 
     def start_process(self, initial_tick=None):
         """
@@ -332,17 +339,34 @@ class TimelineSimulation:
                     VALUES(?,?,?)
                     ''', (tick, e.name, e.json))
                 elif e.name == "meta.state_bin":
-                    if tick in self.timeline.tick_list:
-                        continue
-                    else:
-                        state_file_path = self.timeline.get_point_file_path(tick)
-                        with state_file_path.open('bw') as state_file:
-                            state_file.write(e.bin)
-                        insort(self.timeline.tick_list, tick)
+                    self._save_tick_state_binary(tick, e.bin)
                 elif e.name == "runner.update":
                     self.runner_updated.emit()
 
             db_conn.commit()
+
+    def _save_tick_state_binary(self, tick, state_binary):
+        """
+        Saves the given binary for the given tick to the timeline, if it is not pending and doesn't exist
+        :param tick:
+        :param state_binary:
+        :return:
+        """
+        with self._edit_lock:
+            if tick in self.timeline.tick_list or tick in self._pending_added_ticks:
+                return
+            self._pending_added_ticks.append(tick)
+        try:
+            state_file_path = self.timeline.get_point_file_path(tick)
+            with state_file_path.open('bw') as state_file:
+                state_file.write(state_binary)
+
+            with self.timeline.lock:
+                if tick not in self.timeline.tick_list:
+                    insort(self.timeline.tick_list, tick)
+        finally:
+            with self._edit_lock:
+                self._pending_added_ticks.remove(tick)
 
 
 class TimelineNode:
@@ -634,7 +658,15 @@ class TimelinesProject:
                          sim_binary_provider=None,
                          initial_tick=0,
                          source_tick_data_path=None,
+                         source_tick_data_binary=None,
                          initial_tags=()):
+        if source_tick_data_path and source_tick_data_binary:
+            raise ValueError("Only one of source_tick_data_path or source_tick_data_binary can be provided.")
+
+        if (source_tick_data_path or source_tick_data_binary) and not sim_binary_provider:
+            raise ValueError("If source_tick_data_path or source_tick_data_binary are provided, sim_binary_provider "
+                             "must also be provided.")
+
         new_timeline_id = self._next_new_timeline_id
 
         timeline_folder_name = TimelinesProject.timeline_folder_name(new_timeline_id, parent_node.timeline_id)
@@ -651,8 +683,12 @@ class TimelinesProject:
             if source_tick_data_path is not None:
                 shutil.copy(str(source_tick_data_path), str(initial_point_path))
             elif sim_binary_provider is not None:
-                sim_path = str(sim_binary_provider.get_simulation_binary_path())
-                SimulationProcess.create_default(str(initial_point_path), "binary", sim_path)
+                if source_tick_data_binary:
+                    with open(initial_point_path, "wb") as f:
+                        f.write(source_tick_data_binary)
+                else:
+                    sim_path = str(sim_binary_provider.get_simulation_binary_path())
+                    SimulationProcess.create_default(str(initial_point_path), "binary", sim_path)
             else:
                 initial_point_path.touch(exist_ok=False)
 
@@ -678,6 +714,33 @@ class TimelinesProject:
                                          derive_from.timeline().simulation_binary_provider,
                                          derive_from.tick,
                                          derive_from.point_file_path())
+
+    def create_timeline_from_simulation(self, derive_from_id, as_sibling=False):
+        node = self.get_timeline_node(derive_from_id)
+        sim = self.get_simulation(derive_from_id)
+
+        if sim is None:
+            raise ValueError(f"Cannot create timeline from sim {derive_from_id}: sim not running.")
+
+        if not sim.is_editing():
+            raise ValueError(f"Cannot create timeline from sim {derive_from_id}: sim not in edit mode.")
+
+        client = sim.make_client()
+        state_binary, tick = client.get_state_binary()
+
+        if tick != node.head_point().tick:
+            raise RuntimeError(f"Cannot create timeline from sim {derive_from_id}: received binary for wrong tick. "
+                               f"Ensure that sim remains in edit mode during this operation.")
+
+        if as_sibling:
+            parent_node = node.parent_node
+        else:
+            parent_node = node
+
+        return self._create_timeline(parent_node,
+                                     node.timeline.simulation_binary_provider,
+                                     tick,
+                                     source_tick_data_binary=state_binary)
 
     def clone_timeline(self, node_to_clone: TimelineNode):
         return self._create_timeline(node_to_clone.parent_node,

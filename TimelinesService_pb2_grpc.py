@@ -71,6 +71,21 @@ class TimelineServiceStub(object):
                 request_serializer=TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
                 response_deserializer=TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
                 )
+        self.CreateTimeline = channel.unary_unary(
+                '/PyGridWorld.TimelineService/CreateTimeline',
+                request_serializer=TimelinesService__pb2.CreateTimelineRequest.SerializeToString,
+                response_deserializer=TimelinesService__pb2.CreateTimelineResponse.FromString,
+                )
+        self.CloneTimeline = channel.unary_unary(
+                '/PyGridWorld.TimelineService/CloneTimeline',
+                request_serializer=TimelinesService__pb2.CloneTimelineRequest.SerializeToString,
+                response_deserializer=TimelinesService__pb2.CloneTimelineResponse.FromString,
+                )
+        self.CreateTimelineFromSimulation = channel.unary_unary(
+                '/PyGridWorld.TimelineService/CreateTimelineFromSimulation',
+                request_serializer=TimelinesService__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
+                response_deserializer=TimelinesService__pb2.CreateTimelineFromSimulationResponse.FromString,
+                )
 
 
 class TimelineServiceServicer(object):
@@ -144,6 +159,24 @@ class TimelineServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def CreateTimeline(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CloneTimeline(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateTimelineFromSimulation(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TimelineServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -201,6 +234,21 @@ def add_TimelineServiceServicer_to_server(servicer, server):
                     servicer.ModifyTimelineTags,
                     request_deserializer=TimelinesService__pb2.ModifyTimelineTagsRequest.FromString,
                     response_serializer=TimelinesService__pb2.ModifyTimelineTagsResponse.SerializeToString,
+            ),
+            'CreateTimeline': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateTimeline,
+                    request_deserializer=TimelinesService__pb2.CreateTimelineRequest.FromString,
+                    response_serializer=TimelinesService__pb2.CreateTimelineResponse.SerializeToString,
+            ),
+            'CloneTimeline': grpc.unary_unary_rpc_method_handler(
+                    servicer.CloneTimeline,
+                    request_deserializer=TimelinesService__pb2.CloneTimelineRequest.FromString,
+                    response_serializer=TimelinesService__pb2.CloneTimelineResponse.SerializeToString,
+            ),
+            'CreateTimelineFromSimulation': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateTimelineFromSimulation,
+                    request_deserializer=TimelinesService__pb2.CreateTimelineFromSimulationRequest.FromString,
+                    response_serializer=TimelinesService__pb2.CreateTimelineFromSimulationResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -398,5 +446,56 @@ class TimelineService(object):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/ModifyTimelineTags',
             TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
             TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CreateTimeline(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/CreateTimeline',
+            TimelinesService__pb2.CreateTimelineRequest.SerializeToString,
+            TimelinesService__pb2.CreateTimelineResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CloneTimeline(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/CloneTimeline',
+            TimelinesService__pb2.CloneTimelineRequest.SerializeToString,
+            TimelinesService__pb2.CloneTimelineResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CreateTimelineFromSimulation(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/CreateTimelineFromSimulation',
+            TimelinesService__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
+            TimelinesService__pb2.CreateTimelineFromSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

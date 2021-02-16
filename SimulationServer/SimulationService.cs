@@ -71,7 +71,7 @@ namespace SimulationServer
             // TEMP/TODO: this value will be configurable
             if (tick % 500000 == 0)
             {
-                byte[] state_binary = simulation.GetStateBinary();
+                (byte[] state_binary, _) = simulation.GetStateBinary();
                 event_messages.Add(new EventMessage()
                 {
                     Name = "meta.state_bin",
@@ -117,15 +117,15 @@ namespace SimulationServer
 
         public override Task<GetAllEntitiesResponse> GetAllEntities(GetAllEntitesRequest request, ServerCallContext context)
         {
-            List<ulong> eids = simulation.GetAllEntities();
-            GetAllEntitiesResponse result = new GetAllEntitiesResponse();
+            (List<ulong> eids, ulong tick) = simulation.GetAllEntities();
+            GetAllEntitiesResponse result = new GetAllEntitiesResponse { Tick = tick };
             result.Eids.Add(eids);
             return Task.FromResult(result);
         }
 
         public override Task<GetComponentJsonResponse> GetComponentJson(GetComponentJsonRequest request, ServerCallContext context)
         {
-            string json = simulation.GetComponentJson(request.Eid, request.ComponentName);
+            (string json, ulong tick) = simulation.GetComponentJson(request.Eid, request.ComponentName);
             return Task.FromResult(new GetComponentJsonResponse { Json = json });
         }
 
@@ -139,8 +139,8 @@ namespace SimulationServer
 
         public override Task<GetEntityComponentNamesResponse> GetEntityComponentNames(GetEntityComponentNamesRequest request, ServerCallContext context)
         {
-            List<string> names = simulation.GetEntityComponentNames(request.Eid);
-            GetEntityComponentNamesResponse result = new GetEntityComponentNamesResponse();
+            (List<string> names, ulong tick) = simulation.GetEntityComponentNames(request.Eid);
+            GetEntityComponentNamesResponse result = new GetEntityComponentNamesResponse { Tick = tick };
             result.ComponentNames.Add(names);
             return Task.FromResult(result);
         }
@@ -175,8 +175,8 @@ namespace SimulationServer
 
         public override Task<GetSingletonJsonResponse> GetSingletonJson(GetSingletonJsonRequest request, ServerCallContext context)
         {
-            string json = simulation.GetSingletonJson(request.SingletonName);
-            return Task.FromResult(new GetSingletonJsonResponse { Json = json });
+            (string json, ulong tick) = simulation.GetSingletonJson(request.SingletonName);
+            return Task.FromResult(new GetSingletonJsonResponse { Json = json, Tick = tick });
         }
 
         public override Task<GetSingletonNamesResponse> GetSingletonNames(GetSingletonNamesRequest request, ServerCallContext context)
@@ -189,8 +189,8 @@ namespace SimulationServer
 
         public override Task<GetStateJsonResponse> GetStateJson(GetStateJsonRequest request, ServerCallContext context)
         {
-            string json = simulation.GetStateJson();
-            return Task.FromResult(new GetStateJsonResponse { Json = json });
+            (string json, ulong tick) = simulation.GetStateJson();
+            return Task.FromResult(new GetStateJsonResponse { Json = json, Tick = tick });
         }
 
         public override Task<GetTickResponse> GetTick(GetTickRequest request, ServerCallContext context)
@@ -253,8 +253,8 @@ namespace SimulationServer
 
         public override Task<GetStateBinaryResponse> GetStateBinary(GetStateBinaryRequest request, ServerCallContext context)
         {
-            byte[] bin = simulation.GetStateBinary();
-            return Task.FromResult(new GetStateBinaryResponse { Binary = Google.Protobuf.ByteString.CopyFrom(bin) });
+            (byte[] bin, ulong tick) = simulation.GetStateBinary();
+            return Task.FromResult(new GetStateBinaryResponse { Binary = Google.Protobuf.ByteString.CopyFrom(bin), Tick = tick });
         }
 
         public override Task<SetStateBinaryResponse> SetStateBinary(SetStateBinaryRequest request, ServerCallContext context)

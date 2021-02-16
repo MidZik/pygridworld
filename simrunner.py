@@ -8,6 +8,8 @@ import grpc
 import simulation_pb2 as sim
 import simulation_pb2_grpc as sim_grpc
 
+from time import monotonic
+
 RpcError = grpc.RpcError
 
 
@@ -188,7 +190,7 @@ class SimulationClient:
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetStateJsonRequest()
         response = stub.GetStateJson(request, metadata=self._create_metadata())
-        return response.json
+        return response.json, response.tick
 
     def set_state_json(self, state_json: str):
         stub = sim_grpc.SimulationStub(self._channel)
@@ -210,7 +212,7 @@ class SimulationClient:
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetAllEntitesRequest()
         response = stub.GetAllEntities(request, metadata=self._create_metadata())
-        return response.eids
+        return response.eids, response.tick
 
     def assign_component(self, eid, com_name):
         stub = sim_grpc.SimulationStub(self._channel)
@@ -221,7 +223,7 @@ class SimulationClient:
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetComponentJsonRequest(eid=eid, component_name=com_name)
         response = stub.GetComponentJson(request, metadata=self._create_metadata())
-        return response.json
+        return response.json, response.tick
 
     def remove_component(self, eid, com_name):
         stub = sim_grpc.SimulationStub(self._channel)
@@ -243,13 +245,13 @@ class SimulationClient:
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetEntityComponentNamesRequest(eid=eid)
         response = stub.GetEntityComponentNames(request, metadata=self._create_metadata())
-        return response.component_names
+        return response.component_names, response.tick
 
     def get_singleton_json(self, singleton_name):
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetSingletonJsonRequest(singleton_name=singleton_name)
         response = stub.GetSingletonJson(request, metadata=self._create_metadata())
-        return response.json
+        return response.json, response.tick
 
     def set_singleton_json(self, singleton_name, json):
         stub = sim_grpc.SimulationStub(self._channel)
@@ -309,7 +311,7 @@ class SimulationClient:
         stub = sim_grpc.SimulationStub(self._channel)
         request = sim.GetStateBinaryRequest()
         response = stub.GetStateBinary(request, metadata=self._create_metadata())
-        return response.binary
+        return response.binary, response.tick
 
     def set_state_binary(self, state_bin: bytes):
         stub = sim_grpc.SimulationStub(self._channel)

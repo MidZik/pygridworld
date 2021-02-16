@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10simulation.proto\x12\x1cPyGridWorld.SimulationServer\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"$\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"&\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"(\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\":\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"(\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"C\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x04json\x18\x02 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"]\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12:\n\x06\x65vents\x18\x02 \x03(\x0b\x32*.PyGridWorld.SimulationServer.EventMessage\"\x17\n\x15GetStateBinaryRequest\"(\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse\"!\n\x11RunCommandRequest\x12\x0c\n\x04\x61rgs\x18\x01 \x03(\t\"1\n\x12RunCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0e\n\x06output\x18\x02 \x01(\t\"&\n\x15SetEditorTokenRequest\x12\r\n\x05token\x18\x01 \x01(\t\"\x18\n\x16SetEditorTokenResponse\"+\n\x10IsEditingRequest\x12\x17\n\x0f\x63heck_self_only\x18\x01 \x01(\x08\"\'\n\x11IsEditingResponse\x12\x12\n\nis_editing\x18\x01 \x01(\x08\x32\xb7\x17\n\nSimulation\x12\x66\n\x07GetTick\x12,.PyGridWorld.SimulationServer.GetTickRequest\x1a-.PyGridWorld.SimulationServer.GetTickResponse\x12u\n\x0cGetStateJson\x12\x31.PyGridWorld.SimulationServer.GetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.GetStateJsonResponse\x12u\n\x0cSetStateJson\x12\x31.PyGridWorld.SimulationServer.SetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.SetStateJsonResponse\x12u\n\x0c\x43reateEntity\x12\x31.PyGridWorld.SimulationServer.CreateEntityRequest\x1a\x32.PyGridWorld.SimulationServer.CreateEntityResponse\x12x\n\rDestroyEntity\x12\x32.PyGridWorld.SimulationServer.DestroyEntityRequest\x1a\x33.PyGridWorld.SimulationServer.DestroyEntityResponse\x12z\n\x0eGetAllEntities\x12\x32.PyGridWorld.SimulationServer.GetAllEntitesRequest\x1a\x34.PyGridWorld.SimulationServer.GetAllEntitiesResponse\x12~\n\x0fStartSimulation\x12\x34.PyGridWorld.SimulationServer.StartSimulationRequest\x1a\x35.PyGridWorld.SimulationServer.StartSimulationResponse\x12{\n\x0eStopSimulation\x12\x33.PyGridWorld.SimulationServer.StopSimulationRequest\x1a\x34.PyGridWorld.SimulationServer.StopSimulationResponse\x12l\n\tIsRunning\x12..PyGridWorld.SimulationServer.IsRunningRequest\x1a/.PyGridWorld.SimulationServer.IsRunningResponse\x12~\n\x0f\x41ssignComponent\x12\x34.PyGridWorld.SimulationServer.AssignComponentRequest\x1a\x35.PyGridWorld.SimulationServer.AssignComponentResponse\x12\x81\x01\n\x10GetComponentJson\x12\x35.PyGridWorld.SimulationServer.GetComponentJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetComponentJsonResponse\x12~\n\x0fRemoveComponent\x12\x34.PyGridWorld.SimulationServer.RemoveComponentRequest\x1a\x35.PyGridWorld.SimulationServer.RemoveComponentResponse\x12\x81\x01\n\x10ReplaceComponent\x12\x35.PyGridWorld.SimulationServer.ReplaceComponentRequest\x1a\x36.PyGridWorld.SimulationServer.ReplaceComponentResponse\x12\x84\x01\n\x11GetComponentNames\x12\x36.PyGridWorld.SimulationServer.GetComponentNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetComponentNamesResponse\x12\x96\x01\n\x17GetEntityComponentNames\x12<.PyGridWorld.SimulationServer.GetEntityComponentNamesRequest\x1a=.PyGridWorld.SimulationServer.GetEntityComponentNamesResponse\x12\x81\x01\n\x10GetSingletonJson\x12\x35.PyGridWorld.SimulationServer.GetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetSingletonJsonResponse\x12\x81\x01\n\x10SetSingletonJson\x12\x35.PyGridWorld.SimulationServer.SetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.SetSingletonJsonResponse\x12\x84\x01\n\x11GetSingletonNames\x12\x36.PyGridWorld.SimulationServer.GetSingletonNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetSingletonNamesResponse\x12n\n\tGetEvents\x12..PyGridWorld.SimulationServer.GetEventsRequest\x1a/.PyGridWorld.SimulationServer.GetEventsResponse0\x01\x12{\n\x0eGetStateBinary\x12\x33.PyGridWorld.SimulationServer.GetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.GetStateBinaryResponse\x12{\n\x0eSetStateBinary\x12\x33.PyGridWorld.SimulationServer.SetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.SetStateBinaryResponse\x12o\n\nRunCommand\x12/.PyGridWorld.SimulationServer.RunCommandRequest\x1a\x30.PyGridWorld.SimulationServer.RunCommandResponse\x12{\n\x0eSetEditorToken\x12\x33.PyGridWorld.SimulationServer.SetEditorTokenRequest\x1a\x34.PyGridWorld.SimulationServer.SetEditorTokenResponse\x12l\n\tIsEditing\x12..PyGridWorld.SimulationServer.IsEditingRequest\x1a/.PyGridWorld.SimulationServer.IsEditingResponseb\x06proto3'
+  serialized_pb=b'\n\x10simulation.proto\x12\x1cPyGridWorld.SimulationServer\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"2\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x16\n\x14GetAllEntitesRequest\"4\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"6\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"H\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"6\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"C\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x04json\x18\x02 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"]\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12:\n\x06\x65vents\x18\x02 \x03(\x0b\x32*.PyGridWorld.SimulationServer.EventMessage\"\x17\n\x15GetStateBinaryRequest\"6\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse\"!\n\x11RunCommandRequest\x12\x0c\n\x04\x61rgs\x18\x01 \x03(\t\"1\n\x12RunCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0e\n\x06output\x18\x02 \x01(\t\"&\n\x15SetEditorTokenRequest\x12\r\n\x05token\x18\x01 \x01(\t\"\x18\n\x16SetEditorTokenResponse\"+\n\x10IsEditingRequest\x12\x17\n\x0f\x63heck_self_only\x18\x01 \x01(\x08\"\'\n\x11IsEditingResponse\x12\x12\n\nis_editing\x18\x01 \x01(\x08\x32\xb7\x17\n\nSimulation\x12\x66\n\x07GetTick\x12,.PyGridWorld.SimulationServer.GetTickRequest\x1a-.PyGridWorld.SimulationServer.GetTickResponse\x12u\n\x0cGetStateJson\x12\x31.PyGridWorld.SimulationServer.GetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.GetStateJsonResponse\x12u\n\x0cSetStateJson\x12\x31.PyGridWorld.SimulationServer.SetStateJsonRequest\x1a\x32.PyGridWorld.SimulationServer.SetStateJsonResponse\x12u\n\x0c\x43reateEntity\x12\x31.PyGridWorld.SimulationServer.CreateEntityRequest\x1a\x32.PyGridWorld.SimulationServer.CreateEntityResponse\x12x\n\rDestroyEntity\x12\x32.PyGridWorld.SimulationServer.DestroyEntityRequest\x1a\x33.PyGridWorld.SimulationServer.DestroyEntityResponse\x12z\n\x0eGetAllEntities\x12\x32.PyGridWorld.SimulationServer.GetAllEntitesRequest\x1a\x34.PyGridWorld.SimulationServer.GetAllEntitiesResponse\x12~\n\x0fStartSimulation\x12\x34.PyGridWorld.SimulationServer.StartSimulationRequest\x1a\x35.PyGridWorld.SimulationServer.StartSimulationResponse\x12{\n\x0eStopSimulation\x12\x33.PyGridWorld.SimulationServer.StopSimulationRequest\x1a\x34.PyGridWorld.SimulationServer.StopSimulationResponse\x12l\n\tIsRunning\x12..PyGridWorld.SimulationServer.IsRunningRequest\x1a/.PyGridWorld.SimulationServer.IsRunningResponse\x12~\n\x0f\x41ssignComponent\x12\x34.PyGridWorld.SimulationServer.AssignComponentRequest\x1a\x35.PyGridWorld.SimulationServer.AssignComponentResponse\x12\x81\x01\n\x10GetComponentJson\x12\x35.PyGridWorld.SimulationServer.GetComponentJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetComponentJsonResponse\x12~\n\x0fRemoveComponent\x12\x34.PyGridWorld.SimulationServer.RemoveComponentRequest\x1a\x35.PyGridWorld.SimulationServer.RemoveComponentResponse\x12\x81\x01\n\x10ReplaceComponent\x12\x35.PyGridWorld.SimulationServer.ReplaceComponentRequest\x1a\x36.PyGridWorld.SimulationServer.ReplaceComponentResponse\x12\x84\x01\n\x11GetComponentNames\x12\x36.PyGridWorld.SimulationServer.GetComponentNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetComponentNamesResponse\x12\x96\x01\n\x17GetEntityComponentNames\x12<.PyGridWorld.SimulationServer.GetEntityComponentNamesRequest\x1a=.PyGridWorld.SimulationServer.GetEntityComponentNamesResponse\x12\x81\x01\n\x10GetSingletonJson\x12\x35.PyGridWorld.SimulationServer.GetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.GetSingletonJsonResponse\x12\x81\x01\n\x10SetSingletonJson\x12\x35.PyGridWorld.SimulationServer.SetSingletonJsonRequest\x1a\x36.PyGridWorld.SimulationServer.SetSingletonJsonResponse\x12\x84\x01\n\x11GetSingletonNames\x12\x36.PyGridWorld.SimulationServer.GetSingletonNamesRequest\x1a\x37.PyGridWorld.SimulationServer.GetSingletonNamesResponse\x12n\n\tGetEvents\x12..PyGridWorld.SimulationServer.GetEventsRequest\x1a/.PyGridWorld.SimulationServer.GetEventsResponse0\x01\x12{\n\x0eGetStateBinary\x12\x33.PyGridWorld.SimulationServer.GetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.GetStateBinaryResponse\x12{\n\x0eSetStateBinary\x12\x33.PyGridWorld.SimulationServer.SetStateBinaryRequest\x1a\x34.PyGridWorld.SimulationServer.SetStateBinaryResponse\x12o\n\nRunCommand\x12/.PyGridWorld.SimulationServer.RunCommandRequest\x1a\x30.PyGridWorld.SimulationServer.RunCommandResponse\x12{\n\x0eSetEditorToken\x12\x33.PyGridWorld.SimulationServer.SetEditorTokenRequest\x1a\x34.PyGridWorld.SimulationServer.SetEditorTokenResponse\x12l\n\tIsEditing\x12..PyGridWorld.SimulationServer.IsEditingRequest\x1a/.PyGridWorld.SimulationServer.IsEditingResponseb\x06proto3'
 )
 
 
@@ -122,6 +122,13 @@ _GETSTATEJSONRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.SimulationServer.GetStateJsonResponse.tick', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -135,7 +142,7 @@ _GETSTATEJSONRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=124,
-  serialized_end=160,
+  serialized_end=174,
 )
 
 
@@ -166,8 +173,8 @@ _SETSTATEJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=162,
-  serialized_end=197,
+  serialized_start=176,
+  serialized_end=211,
 )
 
 
@@ -191,8 +198,8 @@ _SETSTATEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=199,
-  serialized_end=221,
+  serialized_start=213,
+  serialized_end=235,
 )
 
 
@@ -216,8 +223,8 @@ _CREATEENTITYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=223,
-  serialized_end=244,
+  serialized_start=237,
+  serialized_end=258,
 )
 
 
@@ -248,8 +255,8 @@ _CREATEENTITYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=246,
-  serialized_end=281,
+  serialized_start=260,
+  serialized_end=295,
 )
 
 
@@ -280,8 +287,8 @@ _DESTROYENTITYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=283,
-  serialized_end=318,
+  serialized_start=297,
+  serialized_end=332,
 )
 
 
@@ -305,8 +312,8 @@ _DESTROYENTITYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=320,
-  serialized_end=343,
+  serialized_start=334,
+  serialized_end=357,
 )
 
 
@@ -330,8 +337,8 @@ _GETALLENTITESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=345,
-  serialized_end=367,
+  serialized_start=359,
+  serialized_end=381,
 )
 
 
@@ -350,6 +357,13 @@ _GETALLENTITIESRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.SimulationServer.GetAllEntitiesResponse.tick', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -362,8 +376,8 @@ _GETALLENTITIESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=369,
-  serialized_end=407,
+  serialized_start=383,
+  serialized_end=435,
 )
 
 
@@ -387,8 +401,8 @@ _STARTSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=409,
-  serialized_end=433,
+  serialized_start=437,
+  serialized_end=461,
 )
 
 
@@ -412,8 +426,8 @@ _STARTSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=435,
-  serialized_end=460,
+  serialized_start=463,
+  serialized_end=488,
 )
 
 
@@ -437,8 +451,8 @@ _STOPSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=462,
-  serialized_end=485,
+  serialized_start=490,
+  serialized_end=513,
 )
 
 
@@ -462,8 +476,8 @@ _STOPSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=487,
-  serialized_end=511,
+  serialized_start=515,
+  serialized_end=539,
 )
 
 
@@ -487,8 +501,8 @@ _ISRUNNINGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=513,
-  serialized_end=531,
+  serialized_start=541,
+  serialized_end=559,
 )
 
 
@@ -519,8 +533,8 @@ _ISRUNNINGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=533,
-  serialized_end=569,
+  serialized_start=561,
+  serialized_end=597,
 )
 
 
@@ -558,8 +572,8 @@ _ASSIGNCOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=571,
-  serialized_end=632,
+  serialized_start=599,
+  serialized_end=660,
 )
 
 
@@ -583,8 +597,8 @@ _ASSIGNCOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=634,
-  serialized_end=659,
+  serialized_start=662,
+  serialized_end=687,
 )
 
 
@@ -622,8 +636,8 @@ _GETCOMPONENTJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=661,
-  serialized_end=723,
+  serialized_start=689,
+  serialized_end=751,
 )
 
 
@@ -642,6 +656,13 @@ _GETCOMPONENTJSONRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.SimulationServer.GetComponentJsonResponse.tick', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -654,8 +675,8 @@ _GETCOMPONENTJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=725,
-  serialized_end=765,
+  serialized_start=753,
+  serialized_end=807,
 )
 
 
@@ -693,8 +714,8 @@ _REMOVECOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=767,
-  serialized_end=828,
+  serialized_start=809,
+  serialized_end=870,
 )
 
 
@@ -718,8 +739,8 @@ _REMOVECOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=830,
-  serialized_end=855,
+  serialized_start=872,
+  serialized_end=897,
 )
 
 
@@ -764,8 +785,8 @@ _REPLACECOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=857,
-  serialized_end=933,
+  serialized_start=899,
+  serialized_end=975,
 )
 
 
@@ -789,8 +810,8 @@ _REPLACECOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=935,
-  serialized_end=961,
+  serialized_start=977,
+  serialized_end=1003,
 )
 
 
@@ -814,8 +835,8 @@ _GETCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=963,
-  serialized_end=989,
+  serialized_start=1005,
+  serialized_end=1031,
 )
 
 
@@ -846,8 +867,8 @@ _GETCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=991,
-  serialized_end=1043,
+  serialized_start=1033,
+  serialized_end=1085,
 )
 
 
@@ -878,8 +899,8 @@ _GETENTITYCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1045,
-  serialized_end=1090,
+  serialized_start=1087,
+  serialized_end=1132,
 )
 
 
@@ -898,6 +919,13 @@ _GETENTITYCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.SimulationServer.GetEntityComponentNamesResponse.tick', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -910,8 +938,8 @@ _GETENTITYCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1092,
-  serialized_end=1150,
+  serialized_start=1134,
+  serialized_end=1206,
 )
 
 
@@ -942,8 +970,8 @@ _GETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1152,
-  serialized_end=1201,
+  serialized_start=1208,
+  serialized_end=1257,
 )
 
 
@@ -962,6 +990,13 @@ _GETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.SimulationServer.GetSingletonJsonResponse.tick', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -974,8 +1009,8 @@ _GETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1203,
-  serialized_end=1243,
+  serialized_start=1259,
+  serialized_end=1313,
 )
 
 
@@ -1013,8 +1048,8 @@ _SETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1245,
-  serialized_end=1308,
+  serialized_start=1315,
+  serialized_end=1378,
 )
 
 
@@ -1038,8 +1073,8 @@ _SETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1310,
-  serialized_end=1336,
+  serialized_start=1380,
+  serialized_end=1406,
 )
 
 
@@ -1063,8 +1098,8 @@ _GETSINGLETONNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1338,
-  serialized_end=1364,
+  serialized_start=1408,
+  serialized_end=1434,
 )
 
 
@@ -1095,8 +1130,8 @@ _GETSINGLETONNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1366,
-  serialized_end=1418,
+  serialized_start=1436,
+  serialized_end=1488,
 )
 
 
@@ -1120,8 +1155,8 @@ _GETEVENTSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1420,
-  serialized_end=1438,
+  serialized_start=1490,
+  serialized_end=1508,
 )
 
 
@@ -1171,8 +1206,8 @@ _EVENTMESSAGE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1440,
-  serialized_end=1507,
+  serialized_start=1510,
+  serialized_end=1577,
 )
 
 
@@ -1210,8 +1245,8 @@ _GETEVENTSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1509,
-  serialized_end=1602,
+  serialized_start=1579,
+  serialized_end=1672,
 )
 
 
@@ -1235,8 +1270,8 @@ _GETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1604,
-  serialized_end=1627,
+  serialized_start=1674,
+  serialized_end=1697,
 )
 
 
@@ -1255,6 +1290,13 @@ _GETSTATEBINARYRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='PyGridWorld.SimulationServer.GetStateBinaryResponse.tick', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -1267,8 +1309,8 @@ _GETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1629,
-  serialized_end=1669,
+  serialized_start=1699,
+  serialized_end=1753,
 )
 
 
@@ -1299,8 +1341,8 @@ _SETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1671,
-  serialized_end=1710,
+  serialized_start=1755,
+  serialized_end=1794,
 )
 
 
@@ -1324,8 +1366,8 @@ _SETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1712,
-  serialized_end=1736,
+  serialized_start=1796,
+  serialized_end=1820,
 )
 
 
@@ -1356,8 +1398,8 @@ _RUNCOMMANDREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1738,
-  serialized_end=1771,
+  serialized_start=1822,
+  serialized_end=1855,
 )
 
 
@@ -1395,8 +1437,8 @@ _RUNCOMMANDRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1773,
-  serialized_end=1822,
+  serialized_start=1857,
+  serialized_end=1906,
 )
 
 
@@ -1427,8 +1469,8 @@ _SETEDITORTOKENREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1824,
-  serialized_end=1862,
+  serialized_start=1908,
+  serialized_end=1946,
 )
 
 
@@ -1452,8 +1494,8 @@ _SETEDITORTOKENRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1864,
-  serialized_end=1888,
+  serialized_start=1948,
+  serialized_end=1972,
 )
 
 
@@ -1484,8 +1526,8 @@ _ISEDITINGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1890,
-  serialized_end=1933,
+  serialized_start=1974,
+  serialized_end=2017,
 )
 
 
@@ -1516,8 +1558,8 @@ _ISEDITINGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1935,
-  serialized_end=1974,
+  serialized_start=2019,
+  serialized_end=2058,
 )
 
 _EVENTMESSAGE.oneofs_by_name['data'].fields.append(
@@ -1930,8 +1972,8 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1977,
-  serialized_end=4976,
+  serialized_start=2061,
+  serialized_end=5060,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTick',

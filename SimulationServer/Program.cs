@@ -205,7 +205,7 @@ namespace SimulationServer
                         if (input_wrapper != output_wrapper)
                         {
                             // Converting versions, the json states are expected to work between versions
-                            output_wrapper.SetStateJson(input_wrapper.GetStateJson());
+                            output_wrapper.SetStateJson(input_wrapper.GetStateJson().Item1);
                         }
 
                         Stream out_stream;
@@ -230,11 +230,11 @@ namespace SimulationServer
                         switch (output_format.Value())
                         {
                             case "json":
-                                out_stream.Write(Encoding.UTF8.GetBytes(output_wrapper.GetStateJson()));
+                                out_stream.Write(Encoding.UTF8.GetBytes(output_wrapper.GetStateJson().Item1));
                                 out_stream.Write(Encoding.UTF8.GetBytes("\r\n"));
                                 break;
                             case "binary":
-                                out_stream.Write(output_wrapper.GetStateBinary());
+                                out_stream.Write(output_wrapper.GetStateBinary().Item1);
                                 break;
                             default:
                                 return 1;
@@ -290,11 +290,11 @@ namespace SimulationServer
                     switch (output_format.Value())
                     {
                         case "json":
-                            out_stream.Write(Encoding.UTF8.GetBytes(simulation_wrapper.GetStateJson()));
+                            out_stream.Write(Encoding.UTF8.GetBytes(simulation_wrapper.GetStateJson().Item1));
                             out_stream.Write(Encoding.UTF8.GetBytes("\r\n"));
                             break;
                         case "binary":
-                            out_stream.Write(simulation_wrapper.GetStateBinary());
+                            out_stream.Write(simulation_wrapper.GetStateBinary().Item1);
                             break;
                         default:
                             return 1;

@@ -73,7 +73,8 @@ def window_app(address, token):
 
     def update(dt):
         try:
-            state_obj = json.loads(sim_client.get_state_json())
+            state_json, _ = sim_client.get_state_json()
+            state_obj = json.loads(state_json)
         except RpcError:
             # grpc doesn't provide easy-to-use exceptions so for now just handle all grpc errors cleanly
             window.close()

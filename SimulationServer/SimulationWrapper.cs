@@ -20,7 +20,7 @@ namespace SimulationServer
         DestroySimulationDelegate destroy_simulation;
         delegate ulong GetTickDelegate(IntPtr sim);
         GetTickDelegate get_tick;
-        delegate void GetStateJsonDelegate(IntPtr sim, IntPtr string_result_handler);
+        delegate ulong GetStateJsonDelegate(IntPtr sim, IntPtr string_result_handler);
         GetStateJsonDelegate get_state_json;
         delegate void SetStateJsonDelegate(IntPtr sim, string json);
         SetStateJsonDelegate set_state_json;
@@ -28,7 +28,7 @@ namespace SimulationServer
         CreateEntityDelegate create_entity;
         delegate void DestroyEntityDelegate(IntPtr sim, ulong eid);
         DestroyEntityDelegate destroy_entity;
-        delegate void GetAllEntitiesDelegate(IntPtr sim, IntPtr ulong_result_handler);
+        delegate ulong GetAllEntitiesDelegate(IntPtr sim, IntPtr ulong_result_handler);
         GetAllEntitiesDelegate get_all_entities;
         delegate void StartSimulationDelegate(IntPtr sim);
         StartSimulationDelegate start_simulation;
@@ -38,7 +38,7 @@ namespace SimulationServer
         IsRunningDelegate is_running;
         delegate void AssignComponentDelegate(IntPtr sim, ulong eid, string component_name);
         AssignComponentDelegate assign_component;
-        delegate void GetComponentJsonDelegate(IntPtr sim, IntPtr string_result_handler, ulong eid, string component_name);
+        delegate ulong GetComponentJsonDelegate(IntPtr sim, IntPtr string_result_handler, ulong eid, string component_name);
         GetComponentJsonDelegate get_component_json;
         delegate void RemoveComponentDelegate(IntPtr sim, ulong eid, string component_name);
         RemoveComponentDelegate remove_component;
@@ -46,9 +46,9 @@ namespace SimulationServer
         ReplaceComponentDelegate replace_component;
         delegate void GetComponentNamesDelegate(IntPtr sim, IntPtr string_result_handler);
         GetComponentNamesDelegate get_component_names;
-        delegate void GetEntityComponentNamesDelegate(IntPtr sim, IntPtr string_result_handler, ulong eid);
+        delegate ulong GetEntityComponentNamesDelegate(IntPtr sim, IntPtr string_result_handler, ulong eid);
         GetEntityComponentNamesDelegate get_entity_component_names;
-        delegate void GetSingletonJsonDelegate(IntPtr sim, IntPtr string_result_handler, string singleton_name);
+        delegate ulong GetSingletonJsonDelegate(IntPtr sim, IntPtr string_result_handler, string singleton_name);
         GetSingletonJsonDelegate get_singleton_json;
         delegate void SetSingletonJsonDelegate(IntPtr sim, string singleton_name, string singleton_json);
         SetSingletonJsonDelegate set_singleton_json;
@@ -56,11 +56,11 @@ namespace SimulationServer
         GetSingletonNamesDelegate get_singleton_names;
         delegate void SetTickEventCallbackDelegate(IntPtr sim, IntPtr tick_event_result_handler);
         SetTickEventCallbackDelegate set_tick_event_callback;
-        delegate void GetStateBinaryDelegate(IntPtr sim, IntPtr buffer_result_handler);
+        delegate ulong GetStateBinaryDelegate(IntPtr sim, IntPtr buffer_result_handler);
         GetStateBinaryDelegate get_state_binary;
         delegate void SetStateBinaryDelegate(IntPtr sim, IntPtr binary, ulong size);
         SetStateBinaryDelegate set_state_binary;
-        delegate void GetEventsLastTickDelegate(IntPtr sim, IntPtr sim_event_handler);
+        delegate ulong GetEventsLastTickDelegate(IntPtr sim, IntPtr sim_event_handler);
         GetEventsLastTickDelegate get_events_last_tick;
         delegate void RunCommandDelegate(IntPtr sim, long argc, [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] argv, IntPtr command_result_handler);
         RunCommandDelegate run_command;
@@ -126,17 +126,17 @@ namespace SimulationServer
             return get_tick(simulation_handle);
         }
 
-        public string GetStateJson()
+        public (string, ulong) GetStateJson()
         {
             string result = "";
 
             StringResultHandler handler = (string s) => { result = s; };
 
-            get_state_json(simulation_handle, DelegateToUnmanaged(handler));
+            ulong tick = get_state_json(simulation_handle, DelegateToUnmanaged(handler));
 
             GC.KeepAlive(handler);
 
-            return result;
+            return (result, tick);
         }
 
         public void SetStateJson(string json)
@@ -154,17 +154,17 @@ namespace SimulationServer
             destroy_entity(simulation_handle, eid);
         }
 
-        public List<ulong> GetAllEntities()
+        public (List<ulong>, ulong) GetAllEntities()
         {
             List<ulong> eids = new List<ulong>();
 
             ULongResultHandler handler = (ulong l) => { eids.Add(l); };
 
-            get_all_entities(simulation_handle, DelegateToUnmanaged(handler));
+            ulong tick = get_all_entities(simulation_handle, DelegateToUnmanaged(handler));
 
             GC.KeepAlive(handler);
 
-            return eids;
+            return (eids, tick);
         }
 
         public void StartSimulation()
@@ -187,17 +187,17 @@ namespace SimulationServer
             assign_component(simulation_handle, eid, component_name);
         }
 
-        public string GetComponentJson(ulong eid, string component_name)
+        public (string, ulong) GetComponentJson(ulong eid, string component_name)
         {
             string result = "";
 
             StringResultHandler handler = (string s) => { result = s; };
 
-            get_component_json(simulation_handle, DelegateToUnmanaged(handler), eid, component_name);
+            ulong tick = get_component_json(simulation_handle, DelegateToUnmanaged(handler), eid, component_name);
 
             GC.KeepAlive(handler);
 
-            return result;
+            return (result, tick);
         }
 
         public void RemoveComponent(ulong eid, string component_name)
@@ -223,30 +223,30 @@ namespace SimulationServer
             return names;
         }
 
-        public List<string> GetEntityComponentNames(ulong eid)
+        public (List<string>, ulong) GetEntityComponentNames(ulong eid)
         {
             List<string> names = new List<string>();
 
             StringResultHandler handler = (string s) => { names.Add(s); };
 
-            get_entity_component_names(simulation_handle, DelegateToUnmanaged(handler), eid);
+            ulong tick = get_entity_component_names(simulation_handle, DelegateToUnmanaged(handler), eid);
 
             GC.KeepAlive(handler);
 
-            return names;
+            return (names, tick);
         }
 
-        public string GetSingletonJson(string singleton_name)
+        public (string, ulong) GetSingletonJson(string singleton_name)
         {
             string result = "";
 
             StringResultHandler handler = (string s) => { result = s; };
 
-            get_singleton_json(simulation_handle, DelegateToUnmanaged(handler), singleton_name);
+            ulong tick = get_singleton_json(simulation_handle, DelegateToUnmanaged(handler), singleton_name);
 
             GC.KeepAlive(handler);
 
-            return result;
+            return (result, tick);
         }
 
         public void SetSingletonJson(string singleton_name, string singleton_json)
@@ -280,17 +280,17 @@ namespace SimulationServer
             set_tick_event_callback(simulation_handle, handler_ptr);
         }
 
-        public byte[] GetStateBinary()
+        public (byte[], ulong) GetStateBinary()
         {
             byte[] bin = null;
 
             BufferResultHandler handler = (IntPtr buf, ulong size) => { bin = new byte[size]; Marshal.Copy(buf, bin, 0, (int)size); };
 
-            get_state_binary(simulation_handle, DelegateToUnmanaged(handler));
+            ulong tick = get_state_binary(simulation_handle, DelegateToUnmanaged(handler));
 
             GC.KeepAlive(handler);
 
-            return bin;
+            return (bin, tick);
         }
 
         public void SetStateBinary(byte[] bin)
@@ -301,11 +301,13 @@ namespace SimulationServer
             bin_handle.Free();
         }
 
-        public void GetEventsLastTick(SimEventHandler callback)
+        public ulong GetEventsLastTick(SimEventHandler callback)
         {
-            get_events_last_tick(simulation_handle, DelegateToUnmanaged(callback));
+            ulong tick = get_events_last_tick(simulation_handle, DelegateToUnmanaged(callback));
 
             GC.KeepAlive(callback);
+
+            return tick;
         }
 
         public (string, string) RunCommand(string[] args)

@@ -179,3 +179,25 @@ class Client:
         request.tags_to_add[:] = tags_to_add
         request.tags_to_remove[:] = tags_to_remove
         stub.ModifyTimelineTags(request)
+
+    def create_timeline(self, source_timeline_id=None, source_tick=-1):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+
+        if source_timeline_id is None:
+            source_timeline_id = 0
+
+        request = ts.CreateTimelineRequest(source_timeline_id=source_timeline_id, source_tick=source_tick)
+        response = stub.CreateTimeline(request)
+        return response.created_timeline_id
+
+    def clone_timeline(self, source_timeline_id):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = ts.CreateTimelineRequest(source_timeline_id=source_timeline_id)
+        response = stub.CloneTimeline(request)
+        return response.created_timeline_id
+
+    def create_timeline_from_simulation(self, source_timeline_id, as_sibling=False):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = ts.CreateTimelineFromSimulationRequest(source_timeline_id=source_timeline_id, as_sibling=as_sibling)
+        response = stub.CreateTimelineFromSimulation(request)
+        return response.created_timeline_id

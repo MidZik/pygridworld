@@ -261,6 +261,36 @@ class Service(ts_grpc.TimelineServiceServicer):
 
         return ts.ModifyTimelineTagsResponse()
 
+    def CreateTimeline(self, request, context):
+        source_timeline_id = request.source_timeline_id
+        source_tick = request.source_tick
+
+        if source_timeline_id > 0:
+            point = self._project.get_timeline_node(source_timeline_id).point(source_tick)
+        else:
+            point = None
+
+        created_node = self._project.create_timeline(point)
+
+        return ts.CreateTimelineResponse(created_timeline_id=created_node.timeline_id)
+
+    def CloneTimeline(self, request, context):
+        source_timeline_id = request.source_timeline_id
+
+        node_to_clone = self._project.get_timeline_node(source_timeline_id)
+
+        created_node = self._project.clone_timeline(node_to_clone)
+
+        return ts.CloneTimelineResponse(created_timeline_id=created_node.timeline_id)
+
+    def CreateTimelineFromSimulation(self, request, context):
+        source_timeline_id = request.source_timeline_id
+        as_sibling = request.as_sibling
+
+        created_node = self._project.create_timeline_from_simulation(source_timeline_id, as_sibling)
+
+        return ts.CreateTimelineFromSimulationResponse(created_timeline_id=created_node.timeline_id)
+
 
 class Server:
     def __init__(self, project_to_serve, address='[::]:4969'):

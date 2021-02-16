@@ -16,6 +16,9 @@ service TimelineService {
     rpc EditSimulation(stream EditSimulationRequest) returns (stream EditSimulationResponse) {}
     rpc GetTimelineTags(GetTimelineTagsRequest) returns (GetTimelineTagsResponse) {}
     rpc ModifyTimelineTags(ModifyTimelineTagsRequest) returns (ModifyTimelineTagsResponse) {}
+    rpc CreateTimeline (CreateTimelineRequest) returns (CreateTimelineResponse) {}
+    rpc CloneTimeline (CloneTimelineRequest) returns (CloneTimelineResponse) {}
+    rpc CreateTimelineFromSimulation (CreateTimelineFromSimulationRequest) returns (CreateTimelineFromSimulationResponse) {}
 }
 
 message TickList {
@@ -148,4 +151,30 @@ message ModifyTimelineTagsRequest {
 
 message ModifyTimelineTagsResponse {
 
+}
+
+message CreateTimelineRequest {
+    int32 source_timeline_id = 1;
+    int64 source_tick = 2;
+}
+
+message CreateTimelineResponse {
+    int32 created_timeline_id = 1;
+}
+
+message CloneTimelineRequest {
+    int32 source_timeline_id = 1;
+}
+
+message CloneTimelineResponse {
+    int32 created_timeline_id = 1;
+}
+
+message CreateTimelineFromSimulationRequest {
+    int32 source_timeline_id = 1;
+    bool as_sibling = 2;
+}
+
+message CreateTimelineFromSimulationResponse {
+    int32 created_timeline_id = 1;
 }

@@ -43,6 +43,7 @@ message GetStateJsonRequest {
 
 message GetStateJsonResponse {
     string json = 1;
+    uint64 tick = 2;
 }
 
 message SetStateJsonRequest {
@@ -71,6 +72,7 @@ message GetAllEntitesRequest {
 
 message GetAllEntitiesResponse {
     repeated uint64 eids = 1;
+    uint64 tick = 2;
 }
 
 message StartSimulationRequest {
@@ -107,6 +109,7 @@ message GetComponentJsonRequest {
 
 message GetComponentJsonResponse {
     string json = 1;
+    uint64 tick = 2;
 }
 
 message RemoveComponentRequest {
@@ -139,6 +142,7 @@ message GetEntityComponentNamesRequest {
 
 message GetEntityComponentNamesResponse {
     repeated string component_names = 1;
+    uint64 tick = 2;
 }
 
 message GetSingletonJsonRequest {
@@ -147,6 +151,7 @@ message GetSingletonJsonRequest {
 
 message GetSingletonJsonResponse {
     string json = 1;
+    uint64 tick = 2;
 }
 
 message SetSingletonJsonRequest {
@@ -186,6 +191,7 @@ message GetStateBinaryRequest {
 
 message GetStateBinaryResponse {
     bytes binary = 1;
+    uint64 tick = 2;
 }
 
 message SetStateBinaryRequest {

@@ -472,7 +472,7 @@ class App(QtCore.QObject):
                 if com is not None:
                     ui.removeComponentButton.setEnabled(True)
 
-                    com_state_json = sim.client.get_component_json(eid, com)
+                    com_state_json, _ = sim.client.get_component_json(eid, com)
                     com_state = json.loads(com_state_json)
 
                     if com_state is not None:
@@ -491,7 +491,7 @@ class App(QtCore.QObject):
         ui.entityList.clear()
 
         if sim is not None:
-            entities = sim.client.get_all_entities()
+            entities, _ = sim.client.get_all_entities()
             for eid in entities:
                 ui.entityList.addItem(str(eid))
                 if eid == self._last_entity_selected:
@@ -622,7 +622,7 @@ class App(QtCore.QObject):
         if selected_sim is not None and selected_eid is not None:
             self._last_entity_selected = selected_eid
             component_names = selected_sim.client.get_component_names()
-            entity_component_names = selected_sim.client.get_entity_component_names(selected_eid)
+            entity_component_names, _ = selected_sim.client.get_entity_component_names(selected_eid)
             missing_component_names = [c for c in component_names if c not in entity_component_names]
             for c in missing_component_names:
                 assign_components_button_menu.addAction(c)
@@ -662,7 +662,7 @@ class App(QtCore.QObject):
 
         if selected_sim is not None and selected_eid is not None and selected_com is not None:
             self._last_component_selected = selected_com
-            com_state_json = selected_sim.client.get_component_json(selected_eid, selected_com)
+            com_state_json, _ = selected_sim.client.get_component_json(selected_eid, selected_com)
             com_state = json.loads(com_state_json)
             com_state_json = json.dumps(com_state, indent=2)  # pretty print
             ui.comStateTextEdit.setPlainText(com_state_json)
@@ -766,7 +766,7 @@ class App(QtCore.QObject):
         sim = self.get_selected_running_timeline_simulation()
 
         if sim is not None and singleton is not None:
-            singleton_state_json = sim.client.get_singleton_json(singleton)
+            singleton_state_json, _ = sim.client.get_singleton_json(singleton)
             singleton_state = json.loads(singleton_state_json)
             singleton_state_json = json.dumps(singleton_state, indent=2)  # pretty print
             ui.singletonStateTextEdit.setPlainText(singleton_state_json)
