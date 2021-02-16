@@ -100,24 +100,6 @@ class Simulation:
         ui.cmdPromptInput.setText("")
 
 
-class ProjectWrapper(QtCore.QObject):
-    simulation_started = QtCore.Signal(object, object)
-    simulation_stopped = QtCore.Signal(object, object)
-
-    def __init__(self, parent, project: sm.TimelinesProject):
-        super().__init__(parent)
-        project.simulation_started.connect(lambda *args: self.simulation_started.emit(*args), tie_lifetime_to=project)
-        project.simulation_stopped.connect(lambda *args: self.simulation_stopped.emit(*args), tie_lifetime_to=project)
-
-
-class TimelineSimulationWrapper(QtCore.QObject):
-    runner_updated = QtCore.Signal()
-
-    def __init__(self, parent, timeline_simulation: sm.TimelineSimulation):
-        super().__init__(parent)
-        timeline_simulation.runner_updated.connect(lambda *args: self.runner_updated.emit(*args), tie_lifetime_to=timeline_simulation)
-
-
 class App(QtCore.QObject):
     _PointRole = QtCore.Qt.UserRole + 0
     _TimelineTreeNodeRole = QtCore.Qt.UserRole + 1
@@ -125,6 +107,11 @@ class App(QtCore.QObject):
     _SimulationRegistration = QtCore.Qt.UserRole + 0
 
     _SimulationBinaryProvider = QtCore.Qt.UserRole + 1
+
+    simulation_started = QtCore.Signal(object, object)
+    simulation_stopped = QtCore.Signal(object, object)
+
+    simulation_runner_updated = QtCore.Signal(int)
 
     def __init__(self, argv):
         super().__init__(None)
@@ -196,6 +183,12 @@ class App(QtCore.QObject):
         ui.saveRegisteredSimDescButton.clicked.connect(self._save_registered_sim_description)
         ui.discardRegisteredSimDescButton.clicked.connect(self._discard_registered_sim_description)
         ui.unregisterSimButton.clicked.connect(self._unregister_selected_sim_registration)
+
+        # connect to own signals
+        self.simulation_started.connect(self._on_project_simulation_started)
+        self.simulation_stopped.connect(self._on_project_simulation_stopped)
+
+        self.simulation_runner_updated.connect(self._on_simulation_runner_updated)
 
         self._project: Optional[sm.TimelinesProject] = None
         self._server = None
@@ -371,10 +364,8 @@ class App(QtCore.QObject):
             self._add_timeline_simulation_provider_to_combo_box(config)
         self._refresh_convert_to_selected_sim_button()
 
-        wrapper = ProjectWrapper(self, self._project)
-
-        wrapper.simulation_started.connect(self._on_project_simulation_started)
-        wrapper.simulation_stopped.connect(self._on_project_simulation_stopped)
+        self._project.simulation_started.connect(self.simulation_started.emit, tie_lifetime_to=self._project)
+        self._project.simulation_stopped.connect(self.simulation_stopped.emit, tie_lifetime_to=self._project)
 
     def _on_timeline_tree_selected_item_changed(self):
         ui = self._ui
@@ -577,15 +568,7 @@ class App(QtCore.QObject):
     def _on_project_simulation_started(self, timeline_sim, timeline_node):
         timeline_id = timeline_node.timeline_id
 
-        @QtCore.Slot()
-        def refresh_sim_tab_if_necessary():
-            selected_timeline_node = self.get_selected_timeline_node()
-            if selected_timeline_node is not None and selected_timeline_node.timeline_id == timeline_id:
-                self._refresh_simulation_tab()
-
-        ts_wrapper = TimelineSimulationWrapper(self, timeline_sim)
-
-        ts_wrapper.runner_updated.connect(refresh_sim_tab_if_necessary)
+        timeline_sim.runner_updated.connect(self.simulation_runner_updated.emit, timeline_node.timeline_id)
 
         new_sim = Simulation(self._main_window, timeline_node, timeline_sim)
 
@@ -595,7 +578,7 @@ class App(QtCore.QObject):
 
         self._simulations[timeline_id] = new_sim
 
-        refresh_sim_tab_if_necessary()
+        self._on_simulation_runner_updated(timeline_node.timeline_id)
         self._refresh_convert_to_selected_sim_button()
 
     @QtCore.Slot()
@@ -606,6 +589,12 @@ class App(QtCore.QObject):
             del self._simulations[timeline_node.timeline_id]
             sim.remove_dock()
             self._refresh_convert_to_selected_sim_button()
+
+    @QtCore.Slot()
+    def _on_simulation_runner_updated(self, timeline_id):
+        selected_timeline_node = self.get_selected_timeline_node()
+        if selected_timeline_node is not None and selected_timeline_node.timeline_id == timeline_id:
+            self._refresh_simulation_tab()
 
     def _on_selected_entity_changed(self):
         ui = self._ui
