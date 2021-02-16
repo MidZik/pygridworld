@@ -22,13 +22,19 @@ class Signal:
         :param binds: additional parameters that should be passed to the callback whenever the signal is emitted
         :param tie_lifetime_to: if provided, the connection will be destroyed if tie_lifetime_to is garbage collected
         """
+        if tie_lifetime_to is not None:
+            tie_ref = weakref.ref(tie_lifetime_to)
+        else:
+            tie_ref = None
+
         if ismethod(callback):
             # Bound method case
             self_weakref = weakref.ref(callback.__self__)
-            self._callbacks.append((self_weakref, callback.__func__, binds, self_weakref))
+            self._callbacks.append((self_weakref, callback.__func__, binds, tie_ref))
         else:
             # Function/callable case
-            self._callbacks.append((None, callback, binds, weakref.ref(tie_lifetime_to)))
+
+            self._callbacks.append((None, callback, binds, tie_ref))
 
     def connect_func_as_method(self, func, func_self, *binds):
         if ismethod(func):
