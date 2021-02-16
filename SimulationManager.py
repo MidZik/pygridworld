@@ -670,6 +670,9 @@ class TimelinesProject:
         self.simulation_started = gwsignal.Signal()
         self.simulation_stopped = gwsignal.Signal()
 
+        self.timeline_created = gwsignal.Signal()
+        self.timeline_deleted = gwsignal.Signal()
+
     def _create_timeline(self,
                          parent_node: TimelineNode,
                          sim_binary_provider=None,
@@ -721,6 +724,7 @@ class TimelinesProject:
         with self._tags_lock:
             for tag in initial_tags:
                 self._timeline_tags[tag].add(new_timeline_node)
+        self.timeline_created.emit(new_timeline_node)
         return new_timeline_node
 
     def create_timeline(self, derive_from: Optional[TimelinePoint] = None):
@@ -782,6 +786,7 @@ class TimelinesProject:
             else:
                 print(f"Attempted to delete a timeline that is not part of this project. Node will be removed, "
                       f"but data on disk will remain. ({path})", file=sys.stderr)
+            node.timeline = None
             del self._timeline_nodes[node.timeline_id]
 
         def find_max_id(node: TimelineNode):
@@ -796,13 +801,14 @@ class TimelinesProject:
         with self._timelines_lock:
             TimelineNode.traverse(node_to_delete, delete_timeline_data)
             node_to_delete.parent_node.child_nodes.remove(node_to_delete)
-            node_to_delete.parent_node = None
 
             max_id = 0
 
             TimelineNode.traverse(self.root_node, find_max_id)
 
             self._next_new_timeline_id = max_id + 1
+
+        self.timeline_deleted.emit(node_to_delete)
 
     def load_all_timelines(self):
         with self._timelines_lock:

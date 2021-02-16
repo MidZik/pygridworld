@@ -110,6 +110,8 @@ class App(QtCore.QObject):
 
     simulation_started = QtCore.Signal(object, object)
     simulation_stopped = QtCore.Signal(object, object)
+    timeline_created = QtCore.Signal(object)
+    timeline_deleted = QtCore.Signal(object)
 
     simulation_runner_updated = QtCore.Signal(int)
 
@@ -187,6 +189,8 @@ class App(QtCore.QObject):
         # connect to own signals
         self.simulation_started.connect(self._on_project_simulation_started)
         self.simulation_stopped.connect(self._on_project_simulation_stopped)
+        self.timeline_created.connect(self._on_timeline_created)
+        self.timeline_deleted.connect(self._on_timeline_deleted)
 
         self.simulation_runner_updated.connect(self._on_simulation_runner_updated)
 
@@ -366,6 +370,8 @@ class App(QtCore.QObject):
 
         self._project.simulation_started.connect(self.simulation_started.emit, tie_lifetime_to=self._project)
         self._project.simulation_stopped.connect(self.simulation_stopped.emit, tie_lifetime_to=self._project)
+        self._project.timeline_created.connect(self.timeline_created.emit, tie_lifetime_to=self._project)
+        self._project.timeline_deleted.connect(self.timeline_deleted.emit, tie_lifetime_to=self._project)
 
     def _on_timeline_tree_selected_item_changed(self):
         ui = self._ui
@@ -705,17 +711,17 @@ class App(QtCore.QObject):
         if point is None and timeline_node is not None:
             point = timeline_node.head_point()
 
-        new_timeline_node = self._project.create_timeline(point)
-
-        self._make_timeline_item(new_timeline_node)
+        self._project.create_timeline(point)
 
     def _create_sibling_timeline(self):
         timeline_node = self.get_selected_timeline_node()
 
         if timeline_node is not None:
-            new_timeline_node = self._project.clone_timeline(timeline_node)
+            self._project.clone_timeline(timeline_node)
 
-            self._make_timeline_item(new_timeline_node)
+    @QtCore.Slot()
+    def _on_timeline_created(self, created_timeline_node):
+        self._make_timeline_item(created_timeline_node)
 
     def _delete_selected_timeline(self):
         from PySide2.QtWidgets import QMessageBox
@@ -738,11 +744,14 @@ class App(QtCore.QObject):
             ).exec_()
 
             if result == QMessageBox.Yes:
-                parent_node = timeline_node.parent_node
                 self._project.delete_timeline(timeline_node)
-                widget: QtWidgets.QTreeWidgetItem = self._timeline_tree_widget_map[timeline_node]
-                parent_widget = self._timeline_tree_widget_map[parent_node]
-                parent_widget.removeChild(widget)
+
+    @QtCore.Slot()
+    def _on_timeline_deleted(self, deleted_timeline_node):
+        parent_node = deleted_timeline_node.parent_node
+        widget: QtWidgets.QTreeWidgetItem = self._timeline_tree_widget_map[deleted_timeline_node]
+        parent_widget = self._timeline_tree_widget_map[parent_node]
+        parent_widget.removeChild(widget)
 
     def _on_selected_singleton_changed(self):
         ui = self._ui
