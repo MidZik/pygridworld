@@ -734,7 +734,8 @@ class TimelinesProject:
             return self._create_timeline(derive_from.timeline_node,
                                          derive_from.timeline().simulation_binary_provider,
                                          derive_from.tick,
-                                         derive_from.point_file_path())
+                                         derive_from.point_file_path(),
+                                         initial_tags=derive_from.timeline().tags)
 
     def create_timeline_from_simulation(self, derive_from_id, as_sibling=False):
         node = self.get_timeline_node(derive_from_id)
@@ -761,13 +762,15 @@ class TimelinesProject:
         return self._create_timeline(parent_node,
                                      node.timeline.simulation_binary_provider,
                                      tick,
-                                     source_tick_data_binary=state_binary)
+                                     source_tick_data_binary=state_binary,
+                                     initial_tags=node.timeline.tags)
 
     def clone_timeline(self, node_to_clone: TimelineNode):
         return self._create_timeline(node_to_clone.parent_node,
                                      node_to_clone.timeline.simulation_binary_provider,
                                      node_to_clone.head_point().tick,
-                                     node_to_clone.head_point().point_file_path())
+                                     node_to_clone.head_point().point_file_path(),
+                                     initial_tags=node_to_clone.timeline.tags)
 
     def delete_timeline(self, node_to_delete: TimelineNode):
         """
