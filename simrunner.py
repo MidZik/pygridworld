@@ -8,8 +8,6 @@ import grpc
 import simulation_pb2 as sim
 import simulation_pb2_grpc as sim_grpc
 
-from time import monotonic
-
 RpcError = grpc.RpcError
 
 

@@ -10,7 +10,7 @@ from PySide2 import QtCore, QtWidgets, QtGui
 from pathlib import Path
 import json
 from collections import deque
-from weakref import WeakKeyDictionary, ref
+from weakref import WeakKeyDictionary
 from ts_server import Server
 from PySide2.QtWidgets import QFileDialog
 import shlex
