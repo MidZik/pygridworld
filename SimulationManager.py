@@ -63,6 +63,16 @@ class Timeline:
                 event_json TEXT,
                 PRIMARY KEY(tick, event_name)
             )''')
+        db_conn.execute('''
+            CREATE TABLE IF NOT EXISTS last_commit (
+                id INTEGER PRIMARY KEY CHECK (id = 0),
+                timestamp TEXT
+            )''')
+        db_conn.execute('''
+            INSERT OR IGNORE INTO
+            last_commit(id, timestamp)
+            VALUES(0,?)
+            ''', (datetime.now().isoformat(),))
         db_conn.commit()
 
     def get_point_file_path(self, tick):
@@ -221,6 +231,15 @@ class TimelineSimulation:
             self._client.set_editor_token(self._editor_token)
 
             self._save_tick_state_binary(self.timeline.head(), sim_state_binary)
+
+            db_conn = self.timeline.get_db_conn()
+            db_conn.execute('DELETE FROM events')
+            db_conn.execute('''
+                INSERT OR REPLACE INTO
+                last_commit(id, timestamp)
+                VALUES(0,?)
+                ''', (datetime.now().isoformat(),))
+            db_conn.commit()
 
         print(f"LOG: Committed edits")
 
