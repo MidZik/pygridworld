@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16TimelinesService.proto\x12\x0bPyGridWorld\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\" \n\x10TimelinesRequest\x12\x0c\n\x04tags\x18\x01 \x03(\t\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"A\n\x15TimelineTicksResponse\x12(\n\ttick_list\x18\x01 \x01(\x0b\x32\x15.PyGridWorld.TickList\"\x93\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x93\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"i\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ntick_range\x18\x02 \x01(\x0b\x32\x16.PyGridWorld.TickRange\x12\x0f\n\x07\x66ilters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"f\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12)\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x19.PyGridWorld.EventMessage\"@\n\x1bGetOrStartSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\">\n\x1cGetOrStartSimulationResponse\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\",\n\x15StopSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16StopSimulationResponse\"9\n\x14MoveSimToTickRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"\x17\n\x15MoveSimToTickResponse\"\xae\x01\n\x15\x45\x64itSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12;\n\x07\x63ommand\x18\x02 \x01(\x0e\x32*.PyGridWorld.EditSimulationRequest.Command\"C\n\x07\x43ommand\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05START\x10\x01\x12\x07\n\x03\x45ND\x10\x02\x12\x0b\n\x07\x44ISCARD\x10\x03\x12\n\n\x06\x43OMMIT\x10\x04\"9\n\x16\x45\x64itSimulationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0e\n\x06result\x18\x02 \x01(\t\"-\n\x16GetTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\'\n\x17GetTimelineTagsResponse\x12\x0c\n\x04tags\x18\x01 \x03(\t\"]\n\x19ModifyTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x13\n\x0btags_to_add\x18\x02 \x03(\t\x12\x16\n\x0etags_to_remove\x18\x03 \x03(\t\"\x1c\n\x1aModifyTimelineTagsResponse\"H\n\x15\x43reateTimelineRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\x12\x13\n\x0bsource_tick\x18\x02 \x01(\x03\"5\n\x16\x43reateTimelineResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\"2\n\x14\x43loneTimelineRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\"4\n\x15\x43loneTimelineResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\"U\n#CreateTimelineFromSimulationRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\x12\x12\n\nas_sibling\x18\x02 \x01(\x08\"C\n$CreateTimelineFromSimulationResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\x32\xe8\n\n\x0fTimelineService\x12O\n\x0cGetTimelines\x12\x1d.PyGridWorld.TimelinesRequest\x1a\x1e.PyGridWorld.TimelinesResponse\"\x00\x12[\n\x10GetTimelineTicks\x12!.PyGridWorld.TimelineTicksRequest\x1a\".PyGridWorld.TimelineTicksResponse\"\x00\x12Z\n\x0fGetTimelineData\x12 .PyGridWorld.TimelineDataRequest\x1a!.PyGridWorld.TimelineDataResponse\"\x00\x30\x01\x12Z\n\x0fGetTimelineJson\x12 .PyGridWorld.TimelineJsonRequest\x1a!.PyGridWorld.TimelineJsonResponse\"\x00\x30\x01\x12`\n\x11GetTimelineEvents\x12\".PyGridWorld.TimelineEventsRequest\x1a#.PyGridWorld.TimelineEventsResponse\"\x00\x30\x01\x12m\n\x14GetOrStartSimulation\x12(.PyGridWorld.GetOrStartSimulationRequest\x1a).PyGridWorld.GetOrStartSimulationResponse\"\x00\x12[\n\x0eStopSimulation\x12\".PyGridWorld.StopSimulationRequest\x1a#.PyGridWorld.StopSimulationResponse\"\x00\x12X\n\rMoveSimToTick\x12!.PyGridWorld.MoveSimToTickRequest\x1a\".PyGridWorld.MoveSimToTickResponse\"\x00\x12_\n\x0e\x45\x64itSimulation\x12\".PyGridWorld.EditSimulationRequest\x1a#.PyGridWorld.EditSimulationResponse\"\x00(\x01\x30\x01\x12^\n\x0fGetTimelineTags\x12#.PyGridWorld.GetTimelineTagsRequest\x1a$.PyGridWorld.GetTimelineTagsResponse\"\x00\x12g\n\x12ModifyTimelineTags\x12&.PyGridWorld.ModifyTimelineTagsRequest\x1a\'.PyGridWorld.ModifyTimelineTagsResponse\"\x00\x12[\n\x0e\x43reateTimeline\x12\".PyGridWorld.CreateTimelineRequest\x1a#.PyGridWorld.CreateTimelineResponse\"\x00\x12X\n\rCloneTimeline\x12!.PyGridWorld.CloneTimelineRequest\x1a\".PyGridWorld.CloneTimelineResponse\"\x00\x12\x85\x01\n\x1c\x43reateTimelineFromSimulation\x12\x30.PyGridWorld.CreateTimelineFromSimulationRequest\x1a\x31.PyGridWorld.CreateTimelineFromSimulationResponse\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x16TimelinesService.proto\x12\x0bPyGridWorld\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\" \n\x10TimelinesRequest\x12\x0c\n\x04tags\x18\x01 \x03(\t\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"A\n\x15TimelineTicksResponse\x12(\n\ttick_list\x18\x01 \x01(\x0b\x32\x15.PyGridWorld.TickList\"\x93\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x93\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ttick_list\x18\x02 \x01(\x0b\x32\x15.PyGridWorld.TickListH\x00\x12,\n\ntick_range\x18\x03 \x01(\x0b\x32\x16.PyGridWorld.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"i\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12*\n\ntick_range\x18\x02 \x01(\x0b\x32\x16.PyGridWorld.TickRange\x12\x0f\n\x07\x66ilters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"f\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12)\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x19.PyGridWorld.EventMessage\"@\n\x1bGetOrStartSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\">\n\x1cGetOrStartSimulationResponse\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\",\n\x15StopSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16StopSimulationResponse\"9\n\x14MoveSimToTickRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"\x17\n\x15MoveSimToTickResponse\"\xae\x01\n\x15\x45\x64itSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12;\n\x07\x63ommand\x18\x02 \x01(\x0e\x32*.PyGridWorld.EditSimulationRequest.Command\"C\n\x07\x43ommand\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05START\x10\x01\x12\x07\n\x03\x45ND\x10\x02\x12\x0b\n\x07\x44ISCARD\x10\x03\x12\n\n\x06\x43OMMIT\x10\x04\"9\n\x16\x45\x64itSimulationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0e\n\x06result\x18\x02 \x01(\t\"-\n\x16GetTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\'\n\x17GetTimelineTagsResponse\x12\x0c\n\x04tags\x18\x01 \x03(\t\"]\n\x19ModifyTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x13\n\x0btags_to_add\x18\x02 \x03(\t\x12\x16\n\x0etags_to_remove\x18\x03 \x03(\t\"\x1c\n\x1aModifyTimelineTagsResponse\"H\n\x15\x43reateTimelineRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\x12\x13\n\x0bsource_tick\x18\x02 \x01(\x03\"5\n\x16\x43reateTimelineResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\"2\n\x14\x43loneTimelineRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\"4\n\x15\x43loneTimelineResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\"U\n#CreateTimelineFromSimulationRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\x12\x12\n\nas_sibling\x18\x02 \x01(\x08\"C\n$CreateTimelineFromSimulationResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\"7\n GetTimelineLastCommitInfoRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"6\n!GetTimelineLastCommitInfoResponse\x12\x11\n\ttimestamp\x18\x01 \x01(\t2\xe6\x0b\n\x0fTimelineService\x12O\n\x0cGetTimelines\x12\x1d.PyGridWorld.TimelinesRequest\x1a\x1e.PyGridWorld.TimelinesResponse\"\x00\x12[\n\x10GetTimelineTicks\x12!.PyGridWorld.TimelineTicksRequest\x1a\".PyGridWorld.TimelineTicksResponse\"\x00\x12Z\n\x0fGetTimelineData\x12 .PyGridWorld.TimelineDataRequest\x1a!.PyGridWorld.TimelineDataResponse\"\x00\x30\x01\x12Z\n\x0fGetTimelineJson\x12 .PyGridWorld.TimelineJsonRequest\x1a!.PyGridWorld.TimelineJsonResponse\"\x00\x30\x01\x12`\n\x11GetTimelineEvents\x12\".PyGridWorld.TimelineEventsRequest\x1a#.PyGridWorld.TimelineEventsResponse\"\x00\x30\x01\x12m\n\x14GetOrStartSimulation\x12(.PyGridWorld.GetOrStartSimulationRequest\x1a).PyGridWorld.GetOrStartSimulationResponse\"\x00\x12[\n\x0eStopSimulation\x12\".PyGridWorld.StopSimulationRequest\x1a#.PyGridWorld.StopSimulationResponse\"\x00\x12X\n\rMoveSimToTick\x12!.PyGridWorld.MoveSimToTickRequest\x1a\".PyGridWorld.MoveSimToTickResponse\"\x00\x12_\n\x0e\x45\x64itSimulation\x12\".PyGridWorld.EditSimulationRequest\x1a#.PyGridWorld.EditSimulationResponse\"\x00(\x01\x30\x01\x12^\n\x0fGetTimelineTags\x12#.PyGridWorld.GetTimelineTagsRequest\x1a$.PyGridWorld.GetTimelineTagsResponse\"\x00\x12g\n\x12ModifyTimelineTags\x12&.PyGridWorld.ModifyTimelineTagsRequest\x1a\'.PyGridWorld.ModifyTimelineTagsResponse\"\x00\x12[\n\x0e\x43reateTimeline\x12\".PyGridWorld.CreateTimelineRequest\x1a#.PyGridWorld.CreateTimelineResponse\"\x00\x12X\n\rCloneTimeline\x12!.PyGridWorld.CloneTimelineRequest\x1a\".PyGridWorld.CloneTimelineResponse\"\x00\x12\x85\x01\n\x1c\x43reateTimelineFromSimulation\x12\x30.PyGridWorld.CreateTimelineFromSimulationRequest\x1a\x31.PyGridWorld.CreateTimelineFromSimulationResponse\"\x00\x12|\n\x19GetTimelineLastCommitInfo\x12-.PyGridWorld.GetTimelineLastCommitInfoRequest\x1a..PyGridWorld.GetTimelineLastCommitInfoResponse\"\x00\x62\x06proto3'
 )
 
 
@@ -1193,6 +1193,70 @@ _CREATETIMELINEFROMSIMULATIONRESPONSE = _descriptor.Descriptor(
   serialized_end=2089,
 )
 
+
+_GETTIMELINELASTCOMMITINFOREQUEST = _descriptor.Descriptor(
+  name='GetTimelineLastCommitInfoRequest',
+  full_name='PyGridWorld.GetTimelineLastCommitInfoRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='PyGridWorld.GetTimelineLastCommitInfoRequest.timeline_id', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2091,
+  serialized_end=2146,
+)
+
+
+_GETTIMELINELASTCOMMITINFORESPONSE = _descriptor.Descriptor(
+  name='GetTimelineLastCommitInfoResponse',
+  full_name='PyGridWorld.GetTimelineLastCommitInfoResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timestamp', full_name='PyGridWorld.GetTimelineLastCommitInfoResponse.timestamp', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2148,
+  serialized_end=2202,
+)
+
 _TIMELINETICKSRESPONSE.fields_by_name['tick_list'].message_type = _TICKLIST
 _TIMELINEDATAREQUEST.fields_by_name['tick_list'].message_type = _TICKLIST
 _TIMELINEDATAREQUEST.fields_by_name['tick_range'].message_type = _TICKRANGE
@@ -1245,6 +1309,8 @@ DESCRIPTOR.message_types_by_name['CloneTimelineRequest'] = _CLONETIMELINEREQUEST
 DESCRIPTOR.message_types_by_name['CloneTimelineResponse'] = _CLONETIMELINERESPONSE
 DESCRIPTOR.message_types_by_name['CreateTimelineFromSimulationRequest'] = _CREATETIMELINEFROMSIMULATIONREQUEST
 DESCRIPTOR.message_types_by_name['CreateTimelineFromSimulationResponse'] = _CREATETIMELINEFROMSIMULATIONRESPONSE
+DESCRIPTOR.message_types_by_name['GetTimelineLastCommitInfoRequest'] = _GETTIMELINELASTCOMMITINFOREQUEST
+DESCRIPTOR.message_types_by_name['GetTimelineLastCommitInfoResponse'] = _GETTIMELINELASTCOMMITINFORESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 TickList = _reflection.GeneratedProtocolMessageType('TickList', (_message.Message,), {
@@ -1464,6 +1530,20 @@ CreateTimelineFromSimulationResponse = _reflection.GeneratedProtocolMessageType(
   })
 _sym_db.RegisterMessage(CreateTimelineFromSimulationResponse)
 
+GetTimelineLastCommitInfoRequest = _reflection.GeneratedProtocolMessageType('GetTimelineLastCommitInfoRequest', (_message.Message,), {
+  'DESCRIPTOR' : _GETTIMELINELASTCOMMITINFOREQUEST,
+  '__module__' : 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.GetTimelineLastCommitInfoRequest)
+  })
+_sym_db.RegisterMessage(GetTimelineLastCommitInfoRequest)
+
+GetTimelineLastCommitInfoResponse = _reflection.GeneratedProtocolMessageType('GetTimelineLastCommitInfoResponse', (_message.Message,), {
+  'DESCRIPTOR' : _GETTIMELINELASTCOMMITINFORESPONSE,
+  '__module__' : 'TimelinesService_pb2'
+  # @@protoc_insertion_point(class_scope:PyGridWorld.GetTimelineLastCommitInfoResponse)
+  })
+_sym_db.RegisterMessage(GetTimelineLastCommitInfoResponse)
+
 
 
 _TIMELINESERVICE = _descriptor.ServiceDescriptor(
@@ -1473,8 +1553,8 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=2092,
-  serialized_end=3476,
+  serialized_start=2205,
+  serialized_end=3715,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTimelines',
@@ -1613,6 +1693,16 @@ _TIMELINESERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_CREATETIMELINEFROMSIMULATIONREQUEST,
     output_type=_CREATETIMELINEFROMSIMULATIONRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetTimelineLastCommitInfo',
+    full_name='PyGridWorld.TimelineService.GetTimelineLastCommitInfo',
+    index=14,
+    containing_service=None,
+    input_type=_GETTIMELINELASTCOMMITINFOREQUEST,
+    output_type=_GETTIMELINELASTCOMMITINFORESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

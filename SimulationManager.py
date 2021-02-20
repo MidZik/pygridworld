@@ -1,7 +1,7 @@
 """
 @author: Matt Idzik (MidZik)
 """
-from collections import defaultdict, deque
+from collections import defaultdict, deque, namedtuple
 from pathlib import Path
 import json
 import re
@@ -22,10 +22,14 @@ from secrets import token_urlsafe
 from contextlib import contextmanager
 
 
+LastCommitInfo = namedtuple('LastCommitInfo', ['timestamp'])
+
+
 class Timeline:
     """
     Represents a timeline stored on disk
     """
+
 
     @staticmethod
     def point_file_name(tick):
@@ -92,6 +96,12 @@ class Timeline:
 
     def get_simulation_binary_path(self):
         return self.simulation_binary_provider.get_simulation_binary_path()
+
+    def get_last_commit_details(self):
+        with self.get_db_conn() as db_conn:
+            cursor = db_conn.execute('SELECT timestamp FROM last_commit')
+            timestamp, = cursor.fetchone()
+            return LastCommitInfo(timestamp)
 
     def refresh_tick_list(self):
         self.tick_list = []

@@ -291,6 +291,15 @@ class Service(ts_grpc.TimelineServiceServicer):
 
         return ts.CreateTimelineFromSimulationResponse(created_timeline_id=created_node.timeline_id)
 
+    def GetTimelineLastCommitInfo(self, request, context):
+        timeline_id = request.timeline_id
+
+        node = self._project.get_timeline_node(timeline_id)
+
+        timestamp, = node.timeline.get_last_commit_details()
+
+        return ts.GetTimelineLastCommitInfoResponse(timestamp=timestamp)
+
 
 class Server:
     def __init__(self, project_to_serve, address='[::]:4969'):

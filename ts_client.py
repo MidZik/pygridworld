@@ -201,3 +201,9 @@ class Client:
         request = ts.CreateTimelineFromSimulationRequest(source_timeline_id=source_timeline_id, as_sibling=as_sibling)
         response = stub.CreateTimelineFromSimulation(request)
         return response.created_timeline_id
+
+    def get_timeline_last_commit_info(self, timeline_id):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = ts.GetTimelineLastCommitInfoRequest(timeline_id=timeline_id)
+        response = stub.GetTimelineLastCommitInfo(request)
+        return response.timestamp,

@@ -19,6 +19,7 @@ service TimelineService {
     rpc CreateTimeline (CreateTimelineRequest) returns (CreateTimelineResponse) {}
     rpc CloneTimeline (CloneTimelineRequest) returns (CloneTimelineResponse) {}
     rpc CreateTimelineFromSimulation (CreateTimelineFromSimulationRequest) returns (CreateTimelineFromSimulationResponse) {}
+    rpc GetTimelineLastCommitInfo (GetTimelineLastCommitInfoRequest) returns (GetTimelineLastCommitInfoResponse) {}
 }
 
 message TickList {
@@ -177,4 +178,12 @@ message CreateTimelineFromSimulationRequest {
 
 message CreateTimelineFromSimulationResponse {
     int32 created_timeline_id = 1;
+}
+
+message GetTimelineLastCommitInfoRequest {
+    int32 timeline_id = 1;
+}
+
+message GetTimelineLastCommitInfoResponse {
+    string timestamp = 1;
 }
