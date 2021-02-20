@@ -72,7 +72,7 @@ class Timeline:
             INSERT OR IGNORE INTO
             last_commit(id, timestamp)
             VALUES(0,?)
-            ''', (datetime.now().isoformat(),))
+            ''', (datetime.utcnow().isoformat(),))
         db_conn.commit()
 
     def get_point_file_path(self, tick):
@@ -238,7 +238,7 @@ class TimelineSimulation:
                 INSERT OR REPLACE INTO
                 last_commit(id, timestamp)
                 VALUES(0,?)
-                ''', (datetime.now().isoformat(),))
+                ''', (datetime.utcnow().isoformat(),))
             db_conn.commit()
 
         print(f"LOG: Committed edits")
