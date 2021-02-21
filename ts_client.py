@@ -171,7 +171,7 @@ class Client:
         stub = ts_grpc.TimelineServiceStub(self._channel)
         request = ts.GetTimelineTagsRequest(timeline_id=timeline_id)
         response = stub.GetTimelineTags(request)
-        return response.tags
+        return list(response.tags)
 
     def modify_timeline_tags(self, timeline_id, *, tags_to_add=(), tags_to_remove=()):
         stub = ts_grpc.TimelineServiceStub(self._channel)
