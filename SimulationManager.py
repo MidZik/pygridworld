@@ -19,7 +19,7 @@ import os
 import sqlite3
 import gwsignal
 from secrets import token_urlsafe
-from contextlib import contextmanager
+from contextlib import contextmanager, closing
 
 
 LastCommitInfo = namedtuple('LastCommitInfo', ['timestamp'])
@@ -58,26 +58,25 @@ class Timeline:
 
         self.refresh_tick_list()
 
-        db_conn = self.get_db_conn()
+        with closing(self.get_db_conn()) as db_conn, db_conn:
 
-        db_conn.execute('''
-            CREATE TABLE IF NOT EXISTS events (
-                tick INTEGER NOT NULL,
-                event_name TEXT,
-                event_json TEXT,
-                PRIMARY KEY(tick, event_name)
-            )''')
-        db_conn.execute('''
-            CREATE TABLE IF NOT EXISTS last_commit (
-                id INTEGER PRIMARY KEY CHECK (id = 0),
-                timestamp TEXT
-            )''')
-        db_conn.execute('''
-            INSERT OR IGNORE INTO
-            last_commit(id, timestamp)
-            VALUES(0,?)
-            ''', (datetime.utcnow().isoformat(),))
-        db_conn.commit()
+            db_conn.execute('''
+                CREATE TABLE IF NOT EXISTS events (
+                    tick INTEGER NOT NULL,
+                    event_name TEXT,
+                    event_json TEXT,
+                    PRIMARY KEY(tick, event_name)
+                )''')
+            db_conn.execute('''
+                CREATE TABLE IF NOT EXISTS last_commit (
+                    id INTEGER PRIMARY KEY CHECK (id = 0),
+                    timestamp TEXT
+                )''')
+            db_conn.execute('''
+                INSERT OR IGNORE INTO
+                last_commit(id, timestamp)
+                VALUES(0,?)
+                ''', (datetime.utcnow().isoformat(),))
 
     def get_point_file_path(self, tick):
         return self.path / Timeline.point_file_name(tick)
@@ -98,7 +97,7 @@ class Timeline:
         return self.simulation_binary_provider.get_simulation_binary_path()
 
     def get_last_commit_details(self):
-        with self.get_db_conn() as db_conn:
+        with closing(self.get_db_conn()) as db_conn, db_conn:
             cursor = db_conn.execute('SELECT timestamp FROM last_commit')
             timestamp, = cursor.fetchone()
             return LastCommitInfo(timestamp)
@@ -242,14 +241,13 @@ class TimelineSimulation:
 
             self._save_tick_state_binary(self.timeline.head(), sim_state_binary)
 
-            db_conn = self.timeline.get_db_conn()
-            db_conn.execute('DELETE FROM events')
-            db_conn.execute('''
-                INSERT OR REPLACE INTO
-                last_commit(id, timestamp)
-                VALUES(0,?)
-                ''', (datetime.utcnow().isoformat(),))
-            db_conn.commit()
+            with closing(self.timeline.get_db_conn()) as db_conn, db_conn:
+                db_conn.execute('DELETE FROM events')
+                db_conn.execute('''
+                    INSERT OR REPLACE INTO
+                    last_commit(id, timestamp)
+                    VALUES(0,?)
+                    ''', (datetime.utcnow().isoformat(),))
 
         print(f"LOG: Committed edits")
 
@@ -355,6 +353,8 @@ class TimelineSimulation:
         self._event_stream_context.cancel()
         self._event_thread.join()
         self._simulation_process.stop()
+        self._event_stream_context = None
+        self._event_thread = None
         self._simulation_process = None
         self._client = None
         self._dead = True
@@ -366,30 +366,28 @@ class TimelineSimulation:
         return self._simulation_process is not None
 
     def _event_stream_handler(self):
-        db_conn = self.timeline.get_db_conn()
+        with closing(self.timeline.get_db_conn()) as db_conn:
+            # Since many events can occur quite rapidly, enforcing sync with the disk can result
+            # in excessive disk activity, and might cause writes to disk becoming a bottleneck.
+            # Thus, we disable requiring a disk sync on every commit with this pragma.
+            # This CAN cause the database to become corrupted in the event of a power loss,
+            # but since the database can be easily reconstructed just by running the simulation,
+            # this is not an important factor when compared to speed of handling events.
+            db_conn.execute('PRAGMA synchronous = OFF')
 
-        # Since many events can occur quite rapidly, enforcing sync with the disk can result
-        # in excessive disk activity, and might cause writes to disk becoming a bottleneck.
-        # Thus, we disable requiring a disk sync on every commit with this pragma.
-        # This CAN cause the database to become corrupted in the event of a power loss,
-        # but since the database can be easily reconstructed just by running the simulation,
-        # this is not an important factor when compared to speed of handling events.
-        db_conn.execute('PRAGMA synchronous = OFF')
-
-        for (tick, events) in self._event_stream_context:
-            for e in events:
-                if e.in_namespace("sim."):
-                    db_conn.execute('''
-                    INSERT OR IGNORE INTO
-                    events(tick, event_name, event_json)
-                    VALUES(?,?,?)
-                    ''', (tick, e.name, e.json))
-                elif e.name == "meta.state_bin":
-                    self._save_tick_state_binary(tick, e.bin)
-                elif e.name == "runner.update":
-                    self.runner_updated.emit()
-
-            db_conn.commit()
+            for (tick, events) in self._event_stream_context:
+                with db_conn:
+                    for e in events:
+                        if e.in_namespace("sim."):
+                            db_conn.execute('''
+                            INSERT OR IGNORE INTO
+                            events(tick, event_name, event_json)
+                            VALUES(?,?,?)
+                            ''', (tick, e.name, e.json))
+                        elif e.name == "meta.state_bin":
+                            self._save_tick_state_binary(tick, e.bin)
+                        elif e.name == "runner.update":
+                            self.runner_updated.emit()
 
     def _save_tick_state_binary(self, tick, state_binary):
         """
@@ -1112,16 +1110,14 @@ class TimelinesProject:
 
         query += " ORDER BY tick ASC"
 
-        db_conn = node.timeline.get_db_conn()
-
-        cursor = db_conn.execute(query, tuple(parameters))
-
-        row = cursor.fetchone()
         events = []
+        with closing(node.timeline.get_db_conn()) as db_conn, db_conn:
+            cursor = db_conn.execute(query, tuple(parameters))
 
-        while row is not None:
-            events.append(tuple(row))
             row = cursor.fetchone()
+            while row is not None:
+                events.append(tuple(row))
+                row = cursor.fetchone()
 
         return events
 
