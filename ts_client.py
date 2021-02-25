@@ -7,8 +7,9 @@ from queue import Queue
 
 
 Event = namedtuple('Event', 'name json')
-
 Command = ts.EditSimulationRequest.Command
+RpcError = grpc.RpcError
+StatusCode = grpc.StatusCode
 
 
 class EditorContext:
@@ -72,6 +73,7 @@ class Client:
 
     def open(self):
         self._channel = grpc.insecure_channel(self._address)
+        grpc.channel_ready_future(self._channel).result()
 
     def close(self):
         self._channel.close()
