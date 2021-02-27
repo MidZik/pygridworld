@@ -182,11 +182,15 @@ class Client:
         request.tags_to_remove[:] = tags_to_remove
         stub.ModifyTimelineTags(request)
 
-    def create_timeline(self, source_timeline_id=None, source_tick=-1):
+    def create_timeline(self, source_timeline_id=None, source_tick=None):
         stub = ts_grpc.TimelineServiceStub(self._channel)
+
+        if source_timeline_id is not None and source_tick is None:
+            raise ValueError("source_tick must be provided if source_timeline_id is provided.")
 
         if source_timeline_id is None:
             source_timeline_id = 0
+            source_tick = -1
 
         request = ts.CreateTimelineRequest(source_timeline_id=source_timeline_id, source_tick=source_tick)
         response = stub.CreateTimeline(request)
