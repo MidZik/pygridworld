@@ -92,12 +92,12 @@ class Client:
         request.tags[:] = tags
 
         response = stub.GetTimelines(request)
-        return response.timeline_ids
+        return list(response.timeline_ids)
 
     def get_timeline_ticks(self, timeline_id):
         stub = ts_grpc.TimelineServiceStub(self._channel)
         response = stub.GetTimelineTicks(ts.TimelineTicksRequest(timeline_id=timeline_id))
-        return response.tick_list.ticks
+        return list(response.tick_list.ticks)
 
     def get_timeline_data(self, timeline_id, *, ticks=None, start_tick=None, end_tick=None):
         stub = ts_grpc.TimelineServiceStub(self._channel)
