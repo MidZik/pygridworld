@@ -116,6 +116,10 @@ class Timeline:
         with self.lock:
             return set(self.tags)
 
+    def has_tags(self, tags):
+        with self.lock:
+            return self.tags.issuperset(tags)
+
 
 class TimelineSimulation:
     """
@@ -884,6 +888,49 @@ class TimelinesProject:
 
     def get_timeline_node(self, timeline_id) -> TimelineNode:
         return self._timeline_nodes[timeline_id]
+
+    def get_timeline_nodes(self, *, parent_id=None, head_tick=None, tags=None):
+        """
+        Returns a set of all timeline nodes that match ALL criteria
+        :param parent_id:
+        :param head_tick:
+        :param tags:
+        :return:
+        """
+        candidate_nodes = None
+        checks = []
+
+        def add_filter(node_getter, checker):
+            nonlocal candidate_nodes
+            if candidate_nodes is None:
+                candidate_nodes = node_getter()
+            else:
+                checks.append(checker)
+
+        if parent_id is not None:
+            if parent_id not in self._timeline_nodes:
+                # nonexistent parent
+                return []
+            add_filter(lambda: self.get_timeline_node(parent_id).child_nodes,
+                       lambda n: n.parent_node.timeline_id == parent_id)
+        if tags is not None:
+            add_filter(lambda: self.get_all_timeline_nodes_with_tags(tags),
+                       lambda n: n.timeline.has_tags(tags))
+        if head_tick is not None:
+            add_filter(lambda: self.get_all_timeline_nodes(),
+                       lambda n: n.head_point().tick == head_tick)
+
+        if candidate_nodes is None:
+            return self.get_all_timeline_nodes()
+
+        selected_nodes = []
+        # candidate_nodes will never be None here, due to the above return + add_filter calls
+        # noinspection PyTypeChecker
+        for node in candidate_nodes:
+            if all(map(lambda c: c(node), checks)):
+                selected_nodes.append(node)
+
+        return selected_nodes
 
     def load_all_simulation_sources(self):
         with self._sources_lock:

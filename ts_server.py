@@ -17,11 +17,14 @@ class Service(ts_grpc.TimelineServiceServicer):
 
     def GetTimelines(self, request, context):
         tags = request.tags
+        parent_id = request.parent_id
+        if parent_id == -1:
+            parent_id = None
+        head_tick = request.head_tick
+        if head_tick == -1:
+            head_tick = None
 
-        if tags:
-            nodes = self._project.get_all_timeline_nodes_with_tags(tags)
-        else:
-            nodes = self._project.get_all_timeline_nodes()
+        nodes = self._project.get_timeline_nodes(parent_id=parent_id, head_tick=head_tick, tags=tags)
 
         message = ts.TimelinesResponse()
         message.timeline_ids[:] = [node.timeline_id for node in nodes if node.timeline_id is not None]

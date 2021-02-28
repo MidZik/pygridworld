@@ -86,10 +86,22 @@ class Client:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    def get_timelines(self, tags=()):
+    def get_timelines(self, *, parent_id=None, head_tick=None, tags=None):
         stub = ts_grpc.TimelineServiceStub(self._channel)
+
+        if parent_id is None:
+            parent_id = -1
+
+        if tags is None:
+            tags = ()
+
+        if head_tick is None:
+            head_tick = -1
+
         request = ts.TimelinesRequest()
         request.tags[:] = tags
+        request.parent_id = parent_id
+        request.head_tick = head_tick
 
         response = stub.GetTimelines(request)
         return list(response.timeline_ids)

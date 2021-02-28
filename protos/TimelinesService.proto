@@ -33,6 +33,8 @@ message TickRange {
 
 message TimelinesRequest {
     repeated string tags = 1;
+    int32 parent_id = 2;
+    int64 head_tick = 3;
 }
 
 message TimelinesResponse {
