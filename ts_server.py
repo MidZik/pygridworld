@@ -27,7 +27,7 @@ class Service(ts_grpc.TimelineServiceServicer):
         nodes = self._project.get_timeline_nodes(parent_id=parent_id, head_tick=head_tick, tags=tags)
 
         message = ts.TimelinesResponse()
-        message.timeline_ids[:] = [node.timeline_id for node in nodes if node.timeline_id is not None]
+        message.timeline_ids[:] = [node.timeline_id for node in nodes]
         return message
 
     def GetTimelineTicks(self, request, context):

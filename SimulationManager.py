@@ -869,9 +869,9 @@ class TimelinesProject:
 
             while node_deque:
                 cur_node = node_deque.popleft()
-                timeline_nodes[cur_node.timeline_id] = cur_node
                 for timeline_id, timeline in timeline_children[cur_node.timeline_id]:
                     child_node = TimelineNode(cur_node, timeline_id, timeline)
+                    timeline_nodes[child_node.timeline_id] = child_node
                     for tag in timeline.tags:
                         timeline_tags[tag].add(child_node)
                     node_deque.append(child_node)
@@ -1057,16 +1057,10 @@ class TimelinesProject:
             if registration.path.parent != self.simulation_registry_path:
                 raise RuntimeError("Cannot unregister: registration path is not within simulation registry.")
 
-        def node_has_registry(node: TimelineNode):
-            if node.timeline is not None and node.timeline.simulation_binary_provider is registration:
-                return True
-            else:
-                return None
-
         with self._timelines_lock:
-            timeline_has_registration = TimelineNode.traverse(self.root_node, node_has_registry)
-            if timeline_has_registration:
-                raise RuntimeError("Cannot unregister: a timeline is currently using this registration.")
+            for node in self._timeline_nodes.values():
+                if node.timeline.simulation_binary_provider is registration:
+                    raise RuntimeError("Cannot unregister: a timeline is currently using this registration.")
 
         with self._simulation_registry_lock:
             shutil.rmtree(registration.path)
