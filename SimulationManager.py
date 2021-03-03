@@ -116,9 +116,13 @@ class Timeline:
         with self.lock:
             return set(self.tags)
 
-    def has_tags(self, tags):
+    def has_all_tags(self, tags):
         with self.lock:
             return self.tags.issuperset(tags)
+
+    def has_any_tag(self, tags):
+        with self.lock:
+            return not self.tags.isdisjoint(tags)
 
 
 class TimelineSimulation:
@@ -889,12 +893,13 @@ class TimelinesProject:
     def get_timeline_node(self, timeline_id) -> TimelineNode:
         return self._timeline_nodes[timeline_id]
 
-    def get_timeline_nodes(self, *, parent_id=None, head_tick=None, tags=None):
+    def get_timeline_nodes(self, *, parent_id=None, head_tick=None, tags=None, exclude_tags=None):
         """
         Returns a set of all timeline nodes that match ALL criteria
         :param parent_id:
         :param head_tick:
         :param tags:
+        :param exclude_tags:
         :return:
         """
         candidate_nodes = None
@@ -916,13 +921,16 @@ class TimelinesProject:
             add_filter(lambda: self.get_timeline_node(parent_id).child_nodes,
                        lambda n: n.parent_node.timeline_id == parent_id,
                        getter_requires_checker=False)
-        if tags is not None:
+        if tags:
             add_filter(lambda: self.get_all_timeline_nodes_with_tags(tags),
                        lambda n: n.timeline.has_all_tags(tags),
                        getter_requires_checker=False)
         if head_tick is not None:
             add_filter(lambda: self.get_all_timeline_nodes(),
                        lambda n: n.head_point().tick == head_tick)
+        if exclude_tags:
+            add_filter(lambda: self.get_all_timeline_nodes(),
+                       lambda n: not n.timeline.has_any_tag(exclude_tags))
 
         if candidate_nodes is None:
             return self.get_all_timeline_nodes()

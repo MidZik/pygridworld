@@ -23,8 +23,12 @@ class Service(ts_grpc.TimelineServiceServicer):
         head_tick = request.head_tick
         if head_tick == -1:
             head_tick = None
+        exclude_tags = request.exclude_tags
 
-        nodes = self._project.get_timeline_nodes(parent_id=parent_id, head_tick=head_tick, tags=tags)
+        nodes = self._project.get_timeline_nodes(parent_id=parent_id,
+                                                 head_tick=head_tick,
+                                                 tags=tags,
+                                                 exclude_tags=exclude_tags)
 
         message = ts.TimelinesResponse()
         message.timeline_ids[:] = [node.timeline_id for node in nodes]
