@@ -900,10 +900,12 @@ class TimelinesProject:
         candidate_nodes = None
         checks = []
 
-        def add_filter(node_getter, checker):
+        def add_filter(node_getter, checker, getter_requires_checker=True):
             nonlocal candidate_nodes
             if candidate_nodes is None:
                 candidate_nodes = node_getter()
+                if getter_requires_checker:
+                    checks.append(checker)
             else:
                 checks.append(checker)
 
@@ -912,10 +914,12 @@ class TimelinesProject:
                 # nonexistent parent
                 return []
             add_filter(lambda: self.get_timeline_node(parent_id).child_nodes,
-                       lambda n: n.parent_node.timeline_id == parent_id)
+                       lambda n: n.parent_node.timeline_id == parent_id,
+                       getter_requires_checker=False)
         if tags is not None:
             add_filter(lambda: self.get_all_timeline_nodes_with_tags(tags),
-                       lambda n: n.timeline.has_tags(tags))
+                       lambda n: n.timeline.has_all_tags(tags),
+                       getter_requires_checker=False)
         if head_tick is not None:
             add_filter(lambda: self.get_all_timeline_nodes(),
                        lambda n: n.head_point().tick == head_tick)
