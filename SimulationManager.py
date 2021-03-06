@@ -247,7 +247,7 @@ class TimelineSimulation:
             sim_state_binary, _ = self._client.get_state_binary()
             self._client.set_editor_token(self._editor_token)
 
-            self._save_tick_state_binary(self.timeline.head(), sim_state_binary)
+            self._save_tick_state_binary(self.timeline.head(), sim_state_binary, overwrite=True)
 
             with closing(self.timeline.get_db_conn()) as db_conn, db_conn:
                 db_conn.execute('DELETE FROM events')
@@ -397,7 +397,7 @@ class TimelineSimulation:
                         elif e.name == "runner.update":
                             self.runner_updated.emit()
 
-    def _save_tick_state_binary(self, tick, state_binary):
+    def _save_tick_state_binary(self, tick, state_binary, overwrite=False):
         """
         Saves the given binary for the given tick to the timeline, if it is not pending and doesn't exist
         :param tick:
@@ -405,7 +405,13 @@ class TimelineSimulation:
         :return:
         """
         with self._edit_lock:
-            if tick in self.timeline.tick_list or tick in self._pending_added_ticks:
+            if (
+                not overwrite and
+                (
+                    tick in self.timeline.tick_list or
+                    tick in self._pending_added_ticks
+                )
+            ):
                 return
             self._pending_added_ticks.append(tick)
         try:
