@@ -307,6 +307,18 @@ class Service(ts_grpc.TimelineServiceServicer):
 
         return ts.GetTimelineLastCommitInfoResponse(timestamp=timestamp)
 
+    def DeleteTimeline(self, request, context):
+        timeline_id = request.timeline_id
+
+        node_to_delete = self._project.get_timeline_node(timeline_id)
+
+        if node_to_delete.child_nodes:
+            raise RuntimeError("Unable to delete node with children. Delete children first.")
+
+        self._project.delete_timeline(node_to_delete)
+
+        return ts.DeleteTimelineResponse()
+
 
 class Server:
     def __init__(self, project_to_serve, address='[::]:4969'):

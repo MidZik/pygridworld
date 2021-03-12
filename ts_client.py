@@ -229,3 +229,8 @@ class Client:
         request = ts.GetTimelineLastCommitInfoRequest(timeline_id=timeline_id)
         response = stub.GetTimelineLastCommitInfo(request)
         return response.timestamp,
+
+    def delete_timeline(self, timeline_id):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = ts.DeleteTimelineRequest(timeline_id=timeline_id)
+        stub.DeleteTimeline(request)

@@ -20,6 +20,7 @@ service TimelineService {
     rpc CloneTimeline (CloneTimelineRequest) returns (CloneTimelineResponse) {}
     rpc CreateTimelineFromSimulation (CreateTimelineFromSimulationRequest) returns (CreateTimelineFromSimulationResponse) {}
     rpc GetTimelineLastCommitInfo (GetTimelineLastCommitInfoRequest) returns (GetTimelineLastCommitInfoResponse) {}
+    rpc DeleteTimeline (DeleteTimelineRequest) returns (DeleteTimelineResponse) {}
 }
 
 message TickList {
@@ -189,4 +190,12 @@ message GetTimelineLastCommitInfoRequest {
 
 message GetTimelineLastCommitInfoResponse {
     string timestamp = 1;
+}
+
+message DeleteTimelineRequest {
+    int32 timeline_id = 1;
+}
+
+message DeleteTimelineResponse {
+
 }

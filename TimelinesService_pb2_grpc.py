@@ -91,6 +91,11 @@ class TimelineServiceStub(object):
                 request_serializer=TimelinesService__pb2.GetTimelineLastCommitInfoRequest.SerializeToString,
                 response_deserializer=TimelinesService__pb2.GetTimelineLastCommitInfoResponse.FromString,
                 )
+        self.DeleteTimeline = channel.unary_unary(
+                '/PyGridWorld.TimelineService/DeleteTimeline',
+                request_serializer=TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
+                response_deserializer=TimelinesService__pb2.DeleteTimelineResponse.FromString,
+                )
 
 
 class TimelineServiceServicer(object):
@@ -188,6 +193,12 @@ class TimelineServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteTimeline(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TimelineServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -265,6 +276,11 @@ def add_TimelineServiceServicer_to_server(servicer, server):
                     servicer.GetTimelineLastCommitInfo,
                     request_deserializer=TimelinesService__pb2.GetTimelineLastCommitInfoRequest.FromString,
                     response_serializer=TimelinesService__pb2.GetTimelineLastCommitInfoResponse.SerializeToString,
+            ),
+            'DeleteTimeline': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteTimeline,
+                    request_deserializer=TimelinesService__pb2.DeleteTimelineRequest.FromString,
+                    response_serializer=TimelinesService__pb2.DeleteTimelineResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -530,5 +546,22 @@ class TimelineService(object):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelineLastCommitInfo',
             TimelinesService__pb2.GetTimelineLastCommitInfoRequest.SerializeToString,
             TimelinesService__pb2.GetTimelineLastCommitInfoResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteTimeline(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/DeleteTimeline',
+            TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
+            TimelinesService__pb2.DeleteTimelineResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
