@@ -29,8 +29,6 @@ class Timeline:
     """
     Represents a timeline stored on disk
     """
-
-
     @staticmethod
     def point_file_name(tick):
         return f'tick-{tick}.point'
@@ -805,11 +803,12 @@ class TimelinesProject:
                                      source_tick_data_binary=state_binary)
 
     def clone_timeline(self, node_to_clone: TimelineNode):
+        clone_tags = (tag for tag in node_to_clone.timeline.tags if not tag.startswith('_'))
         return self._create_timeline(node_to_clone.parent_node,
                                      node_to_clone.timeline.simulation_binary_provider,
                                      node_to_clone.head_point().tick,
                                      node_to_clone.head_point().point_file_path(),
-                                     initial_tags=node_to_clone.timeline.tags)
+                                     initial_tags=clone_tags)
 
     def delete_timeline(self, node_to_delete: TimelineNode):
         """
