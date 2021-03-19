@@ -6,10 +6,11 @@ from collections import namedtuple
 from queue import Queue
 
 
-Event = namedtuple('Event', 'name json')
+Event = namedtuple('Event', 'name, json')
 Command = ts.EditSimulationRequest.Command
 RpcError = grpc.RpcError
 StatusCode = grpc.StatusCode
+TimelineDetails = namedtuple('TimelineDetails', 'parent_id, head_tick, last_commit_timestamp, tags')
 
 
 class EditorContext:
@@ -130,7 +131,6 @@ class Client:
 
     def get_timeline_json(self, timeline_id, *, ticks=None, start_tick=None, end_tick=None):
         stub = ts_grpc.TimelineServiceStub(self._channel)
-        request = None
         if ticks is not None:
             tick_list = ts.TickList(ticks=ticks)
             request = ts.TimelineJsonRequest(timeline_id=timeline_id, tick_list=tick_list)
@@ -185,12 +185,6 @@ class Client:
     def start_editing(self, timeline_id, token):
         return EditorContext(self._channel, timeline_id, token)
 
-    def get_timeline_tags(self, timeline_id):
-        stub = ts_grpc.TimelineServiceStub(self._channel)
-        request = ts.GetTimelineTagsRequest(timeline_id=timeline_id)
-        response = stub.GetTimelineTags(request)
-        return list(response.tags)
-
     def modify_timeline_tags(self, timeline_id, *, tags_to_add=(), tags_to_remove=()):
         stub = ts_grpc.TimelineServiceStub(self._channel)
         request = ts.ModifyTimelineTagsRequest(timeline_id=timeline_id)
@@ -224,13 +218,18 @@ class Client:
         response = stub.CreateTimelineFromSimulation(request)
         return response.created_timeline_id
 
-    def get_timeline_last_commit_info(self, timeline_id):
-        stub = ts_grpc.TimelineServiceStub(self._channel)
-        request = ts.GetTimelineLastCommitInfoRequest(timeline_id=timeline_id)
-        response = stub.GetTimelineLastCommitInfo(request)
-        return response.timestamp,
-
     def delete_timeline(self, timeline_id):
         stub = ts_grpc.TimelineServiceStub(self._channel)
         request = ts.DeleteTimelineRequest(timeline_id=timeline_id)
         stub.DeleteTimeline(request)
+
+    def get_timeline_details(self, timeline_id):
+        stub = ts_grpc.TimelineServiceStub(self._channel)
+        request = ts.GetTimelineDetailsRequest(timeline_id=timeline_id)
+        response = stub.GetTimelineDetails(request)
+
+        return TimelineDetails(parent_id=response.parent_id,
+                               head_tick=response.head_tick,
+                               last_commit_timestamp=response.last_commit_timestamp,
+                               tags=tuple(response.tags))
+

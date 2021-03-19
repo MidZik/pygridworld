@@ -14,13 +14,12 @@ service TimelineService {
     rpc StopSimulation(StopSimulationRequest) returns (StopSimulationResponse) {}
     rpc MoveSimToTick(MoveSimToTickRequest) returns (MoveSimToTickResponse) {}
     rpc EditSimulation(stream EditSimulationRequest) returns (stream EditSimulationResponse) {}
-    rpc GetTimelineTags(GetTimelineTagsRequest) returns (GetTimelineTagsResponse) {}
     rpc ModifyTimelineTags(ModifyTimelineTagsRequest) returns (ModifyTimelineTagsResponse) {}
     rpc CreateTimeline (CreateTimelineRequest) returns (CreateTimelineResponse) {}
     rpc CloneTimeline (CloneTimelineRequest) returns (CloneTimelineResponse) {}
     rpc CreateTimelineFromSimulation (CreateTimelineFromSimulationRequest) returns (CreateTimelineFromSimulationResponse) {}
-    rpc GetTimelineLastCommitInfo (GetTimelineLastCommitInfoRequest) returns (GetTimelineLastCommitInfoResponse) {}
     rpc DeleteTimeline (DeleteTimelineRequest) returns (DeleteTimelineResponse) {}
+    rpc GetTimelineDetails (GetTimelineDetailsRequest) returns (GetTimelineDetailsResponse) {}
 }
 
 message TickList {
@@ -140,14 +139,6 @@ message EditSimulationResponse {
     string result = 2;
 }
 
-message GetTimelineTagsRequest {
-    int32 timeline_id = 1;
-}
-
-message GetTimelineTagsResponse {
-    repeated string tags = 1;
-}
-
 message ModifyTimelineTagsRequest {
     int32 timeline_id = 1;
     repeated string tags_to_add = 2;
@@ -184,18 +175,22 @@ message CreateTimelineFromSimulationResponse {
     int32 created_timeline_id = 1;
 }
 
-message GetTimelineLastCommitInfoRequest {
-    int32 timeline_id = 1;
-}
-
-message GetTimelineLastCommitInfoResponse {
-    string timestamp = 1;
-}
-
 message DeleteTimelineRequest {
     int32 timeline_id = 1;
 }
 
 message DeleteTimelineResponse {
 
+}
+
+message GetTimelineDetailsRequest {
+    int32 timeline_id = 1;
+}
+
+message GetTimelineDetailsResponse {
+    int32 parent_id = 1;
+    int64 head_tick = 2;
+    string last_commit_timestamp = 3;
+    repeated string tags = 4;
+    int64 furthest_tick = 5;
 }

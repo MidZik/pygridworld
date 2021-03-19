@@ -61,11 +61,6 @@ class TimelineServiceStub(object):
                 request_serializer=TimelinesService__pb2.EditSimulationRequest.SerializeToString,
                 response_deserializer=TimelinesService__pb2.EditSimulationResponse.FromString,
                 )
-        self.GetTimelineTags = channel.unary_unary(
-                '/PyGridWorld.TimelineService/GetTimelineTags',
-                request_serializer=TimelinesService__pb2.GetTimelineTagsRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.GetTimelineTagsResponse.FromString,
-                )
         self.ModifyTimelineTags = channel.unary_unary(
                 '/PyGridWorld.TimelineService/ModifyTimelineTags',
                 request_serializer=TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
@@ -86,15 +81,15 @@ class TimelineServiceStub(object):
                 request_serializer=TimelinesService__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
                 response_deserializer=TimelinesService__pb2.CreateTimelineFromSimulationResponse.FromString,
                 )
-        self.GetTimelineLastCommitInfo = channel.unary_unary(
-                '/PyGridWorld.TimelineService/GetTimelineLastCommitInfo',
-                request_serializer=TimelinesService__pb2.GetTimelineLastCommitInfoRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.GetTimelineLastCommitInfoResponse.FromString,
-                )
         self.DeleteTimeline = channel.unary_unary(
                 '/PyGridWorld.TimelineService/DeleteTimeline',
                 request_serializer=TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
                 response_deserializer=TimelinesService__pb2.DeleteTimelineResponse.FromString,
+                )
+        self.GetTimelineDetails = channel.unary_unary(
+                '/PyGridWorld.TimelineService/GetTimelineDetails',
+                request_serializer=TimelinesService__pb2.GetTimelineDetailsRequest.SerializeToString,
+                response_deserializer=TimelinesService__pb2.GetTimelineDetailsResponse.FromString,
                 )
 
 
@@ -157,12 +152,6 @@ class TimelineServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetTimelineTags(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def ModifyTimelineTags(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -187,13 +176,13 @@ class TimelineServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetTimelineLastCommitInfo(self, request, context):
+    def DeleteTimeline(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def DeleteTimeline(self, request, context):
+    def GetTimelineDetails(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -247,11 +236,6 @@ def add_TimelineServiceServicer_to_server(servicer, server):
                     request_deserializer=TimelinesService__pb2.EditSimulationRequest.FromString,
                     response_serializer=TimelinesService__pb2.EditSimulationResponse.SerializeToString,
             ),
-            'GetTimelineTags': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetTimelineTags,
-                    request_deserializer=TimelinesService__pb2.GetTimelineTagsRequest.FromString,
-                    response_serializer=TimelinesService__pb2.GetTimelineTagsResponse.SerializeToString,
-            ),
             'ModifyTimelineTags': grpc.unary_unary_rpc_method_handler(
                     servicer.ModifyTimelineTags,
                     request_deserializer=TimelinesService__pb2.ModifyTimelineTagsRequest.FromString,
@@ -272,15 +256,15 @@ def add_TimelineServiceServicer_to_server(servicer, server):
                     request_deserializer=TimelinesService__pb2.CreateTimelineFromSimulationRequest.FromString,
                     response_serializer=TimelinesService__pb2.CreateTimelineFromSimulationResponse.SerializeToString,
             ),
-            'GetTimelineLastCommitInfo': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetTimelineLastCommitInfo,
-                    request_deserializer=TimelinesService__pb2.GetTimelineLastCommitInfoRequest.FromString,
-                    response_serializer=TimelinesService__pb2.GetTimelineLastCommitInfoResponse.SerializeToString,
-            ),
             'DeleteTimeline': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteTimeline,
                     request_deserializer=TimelinesService__pb2.DeleteTimelineRequest.FromString,
                     response_serializer=TimelinesService__pb2.DeleteTimelineResponse.SerializeToString,
+            ),
+            'GetTimelineDetails': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTimelineDetails,
+                    request_deserializer=TimelinesService__pb2.GetTimelineDetailsRequest.FromString,
+                    response_serializer=TimelinesService__pb2.GetTimelineDetailsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -448,23 +432,6 @@ class TimelineService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetTimelineTags(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelineTags',
-            TimelinesService__pb2.GetTimelineTagsRequest.SerializeToString,
-            TimelinesService__pb2.GetTimelineTagsResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def ModifyTimelineTags(request,
             target,
             options=(),
@@ -533,23 +500,6 @@ class TimelineService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetTimelineLastCommitInfo(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelineLastCommitInfo',
-            TimelinesService__pb2.GetTimelineLastCommitInfoRequest.SerializeToString,
-            TimelinesService__pb2.GetTimelineLastCommitInfoResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def DeleteTimeline(request,
             target,
             options=(),
@@ -563,5 +513,22 @@ class TimelineService(object):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/DeleteTimeline',
             TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
             TimelinesService__pb2.DeleteTimelineResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTimelineDetails(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelineDetails',
+            TimelinesService__pb2.GetTimelineDetailsRequest.SerializeToString,
+            TimelinesService__pb2.GetTimelineDetailsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

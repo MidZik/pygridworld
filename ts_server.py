@@ -235,22 +235,6 @@ class Service(ts_grpc.TimelineServiceServicer):
         else:
             yield ts.EditSimulationResponse(success=True, result="Editing ended.")
 
-    def GetTimelineTags(self, request, context):
-        timeline_id = request.timeline_id
-
-        try:
-            node = self._project.get_timeline_node(timeline_id)
-        except LookupError:
-            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details('Timeline ID not found.')
-            raise ValueError('Timeline ID not found.')
-
-        tags = node.timeline.get_tags()
-
-        response = ts.GetTimelineTagsResponse()
-        response.tags[:] = tags
-        return response
-
     def ModifyTimelineTags(self, request, context):
         timeline_id = request.timeline_id
         tags_to_add = request.tags_to_add
@@ -298,15 +282,6 @@ class Service(ts_grpc.TimelineServiceServicer):
 
         return ts.CreateTimelineFromSimulationResponse(created_timeline_id=created_node.timeline_id)
 
-    def GetTimelineLastCommitInfo(self, request, context):
-        timeline_id = request.timeline_id
-
-        node = self._project.get_timeline_node(timeline_id)
-
-        timestamp, = node.timeline.get_last_commit_details()
-
-        return ts.GetTimelineLastCommitInfoResponse(timestamp=timestamp)
-
     def DeleteTimeline(self, request, context):
         timeline_id = request.timeline_id
 
@@ -318,6 +293,29 @@ class Service(ts_grpc.TimelineServiceServicer):
         self._project.delete_timeline(node_to_delete)
 
         return ts.DeleteTimelineResponse()
+
+    def GetTimelineDetails(self, request, context):
+        timeline_id = request.timeline_id
+
+        try:
+            node = self._project.get_timeline_node(timeline_id)
+        except LookupError:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details('Timeline ID not found.')
+            raise ValueError('Timeline ID not found.')
+
+        response = ts.GetTimelineDetailsResponse()
+
+        response.parent_id = node.parent_node.timeline_id or 0
+
+        response.head_tick = node.head_point().tick
+
+        last_commit_timestamp, = node.timeline.get_last_commit_details()
+        response.last_commit_timestamp = last_commit_timestamp
+
+        response.tags[:] = node.timeline.get_tags()
+
+        return response
 
 
 class Server:
