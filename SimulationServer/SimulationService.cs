@@ -42,82 +42,140 @@ namespace SimulationServer
         private ulong stopAtTick = 0;
         private string ownerToken = "";
         private string editorToken = "";
+        private ReaderWriterLockSlim readerWriterLock = new ReaderWriterLockSlim();
+
+        private Thread simulationThread;
+        private bool simulationRunning = false;
+        ulong currentTick = 0;
 
         public SimulationService(SimulationWrapper simulation, string ownerToken)
         {
             this.ownerToken = ownerToken ?? string.Empty;
             this.simulation = simulation;
-            simulation.SetTickEventCallback(TickEventCallback);
         }
 
-        private void TickEventCallback(ulong tick, ulong raw_flags)
+        private void RunSimulation()
         {
             List<EventMessage> event_messages = new List<EventMessage>();
-            TickEventFlags flags = (TickEventFlags)raw_flags;
-            if (flags.HasFlag(TickEventFlags.EventsOccurred))
-            {
-                SimulationWrapper.SimEventHandler sim_event_handler = (string name, string json) =>
-                {
-                    event_messages.Add(new EventMessage()
-                    {
-                        Name = "sim." + name,
-                        Json = json
-                    });
-                };
 
-                simulation.GetEventsLastTick(sim_event_handler);
-            }
-
-            // TEMP/TODO: this value will be configurable
-            if (tick % 500000 == 0)
+            SimulationWrapper.SimEventHandler sim_event_handler = (string name, string json) =>
             {
-                (byte[] state_binary, _) = simulation.GetStateBinary();
                 event_messages.Add(new EventMessage()
                 {
-                    Name = "meta.state_bin",
-                    Bin = Google.Protobuf.ByteString.CopyFrom(state_binary)
+                    Name = "sim." + name,
+                    Json = json
                 });
-            }
+            };
 
-            if (event_messages.Count > 0)
+            while (simulationRunning)
             {
-                events_committed(new EventsData { tick = tick, events = event_messages });
-            }
+                readerWriterLock.EnterWriteLock();
+                try
+                {
+                    currentTick = simulation.Tick();
+                    simulation.GetEventsLastTick(sim_event_handler);
 
-            if (stopAtTick > 0 && tick >= stopAtTick)
-            {
-                simulation.RequestStop();
-                Task.Factory.StartNew(StopSimulationImpl);
+                    if (currentTick % 500000 == 0)
+                    {
+                        byte[] state_binary = simulation.GetStateBinary();
+                        event_messages.Add(new EventMessage()
+                        {
+                            Name = "meta.state_bin",
+                            Bin = Google.Protobuf.ByteString.CopyFrom(state_binary)
+                        });
+                    }
+
+                    if (event_messages.Count > 0)
+                    {
+                        events_committed(new EventsData { tick = currentTick, events = event_messages });
+                        event_messages = new List<EventMessage>();
+                    }
+
+                    if (stopAtTick > 0 && currentTick >= stopAtTick)
+                    {
+                        simulationRunning = false;
+                    }
+                }
+                finally
+                {
+                    readerWriterLock.ExitWriteLock();
+                }
             }
         }
 
         public override Task<AssignComponentResponse> AssignComponent(AssignComponentRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            simulation.AssignComponent(request.Eid, request.ComponentName);
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                simulation.AssignComponent(request.Eid, request.ComponentName);
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
             return Task.FromResult(new AssignComponentResponse { });
         }
 
         public override Task<CreateEntityResponse> CreateEntity(CreateEntityRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            ulong eid = simulation.CreateEntity();
+            ulong eid;
+
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                eid = simulation.CreateEntity();
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
             return Task.FromResult(new CreateEntityResponse { Eid = eid });
         }
 
         public override Task<DestroyEntityResponse> DestroyEntity(DestroyEntityRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            simulation.DestroyEntity(request.Eid);
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                simulation.DestroyEntity(request.Eid);
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
+            
             return Task.FromResult(new DestroyEntityResponse { });
         }
 
         public override Task<GetAllEntitiesResponse> GetAllEntities(GetAllEntitesRequest request, ServerCallContext context)
         {
-            (List<ulong> eids, ulong tick) = simulation.GetAllEntities();
+            ulong tick;
+            List<ulong> eids;
+
+            readerWriterLock.EnterReadLock();
+            try
+            {
+                eids = simulation.GetAllEntities();
+                tick = currentTick;
+            }
+            finally
+            {
+                readerWriterLock.ExitReadLock();
+            }
+
             GetAllEntitiesResponse result = new GetAllEntitiesResponse { Tick = tick };
             result.Eids.Add(eids);
             return Task.FromResult(result);
@@ -125,8 +183,21 @@ namespace SimulationServer
 
         public override Task<GetComponentJsonResponse> GetComponentJson(GetComponentJsonRequest request, ServerCallContext context)
         {
-            (string json, ulong tick) = simulation.GetComponentJson(request.Eid, request.ComponentName);
-            return Task.FromResult(new GetComponentJsonResponse { Json = json });
+            ulong tick;
+            string json;
+
+            readerWriterLock.EnterReadLock();
+            try
+            {
+                json = simulation.GetComponentJson(request.Eid, request.ComponentName);
+                tick = currentTick;
+            }
+            finally
+            {
+                readerWriterLock.ExitReadLock();
+            }
+
+            return Task.FromResult(new GetComponentJsonResponse { Json = json, Tick = tick });
         }
 
         public override Task<GetComponentNamesResponse> GetComponentNames(GetComponentNamesRequest request, ServerCallContext context)
@@ -139,7 +210,20 @@ namespace SimulationServer
 
         public override Task<GetEntityComponentNamesResponse> GetEntityComponentNames(GetEntityComponentNamesRequest request, ServerCallContext context)
         {
-            (List<string> names, ulong tick) = simulation.GetEntityComponentNames(request.Eid);
+            ulong tick;
+            List<string> names;
+
+            readerWriterLock.EnterReadLock();
+            try
+            {
+                names = simulation.GetEntityComponentNames(request.Eid);
+                tick = currentTick;
+            }
+            finally
+            {
+                readerWriterLock.ExitReadLock();
+            }
+
             GetEntityComponentNamesResponse result = new GetEntityComponentNamesResponse { Tick = tick };
             result.ComponentNames.Add(names);
             return Task.FromResult(result);
@@ -175,13 +259,37 @@ namespace SimulationServer
 
         public override Task<GetSingletonJsonResponse> GetSingletonJson(GetSingletonJsonRequest request, ServerCallContext context)
         {
-            (string json, ulong tick) = simulation.GetSingletonJson(request.SingletonName);
+            ulong tick;
+            string json;
+
+            readerWriterLock.EnterReadLock();
+            try
+            {
+                json = simulation.GetSingletonJson(request.SingletonName);
+                tick = currentTick;
+            }
+            finally
+            {
+                readerWriterLock.ExitReadLock();
+            }
+
             return Task.FromResult(new GetSingletonJsonResponse { Json = json, Tick = tick });
         }
 
         public override Task<GetSingletonNamesResponse> GetSingletonNames(GetSingletonNamesRequest request, ServerCallContext context)
         {
-            List<string> names = simulation.GetSingletonNames();
+            List<string> names;
+
+            readerWriterLock.EnterReadLock();
+            try
+            {
+                names = simulation.GetSingletonNames();
+            }
+            finally
+            {
+                readerWriterLock.ExitReadLock();
+            }
+
             GetSingletonNamesResponse result = new GetSingletonNamesResponse();
             result.SingletonNames.Add(names);
             return Task.FromResult(result);
@@ -189,51 +297,106 @@ namespace SimulationServer
 
         public override Task<GetStateJsonResponse> GetStateJson(GetStateJsonRequest request, ServerCallContext context)
         {
-            (string json, ulong tick) = simulation.GetStateJson();
+            ulong tick;
+            string json;
+
+            readerWriterLock.EnterReadLock();
+            try
+            {
+                json = simulation.GetStateJson();
+                tick = currentTick;
+            }
+            finally
+            {
+                readerWriterLock.ExitReadLock();
+            }
+
             return Task.FromResult(new GetStateJsonResponse { Json = json, Tick = tick });
         }
 
         public override Task<GetTickResponse> GetTick(GetTickRequest request, ServerCallContext context)
         {
-            ulong tick = simulation.GetTick();
-            return Task.FromResult(new GetTickResponse { Tick = tick });
+            return Task.FromResult(new GetTickResponse { Tick = currentTick });
         }
 
         public override Task<IsRunningResponse> IsRunning(IsRunningRequest request, ServerCallContext context)
         {
-            bool is_running = simulation.IsRunning();
-            return Task.FromResult(new IsRunningResponse { Running = is_running });
+            return Task.FromResult(new IsRunningResponse { Running = simulationRunning });
         }
 
         public override Task<RemoveComponentResponse> RemoveComponent(RemoveComponentRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            simulation.RemoveComponent(request.Eid, request.ComponentName);
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                simulation.RemoveComponent(request.Eid, request.ComponentName);
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
+            
             return Task.FromResult(new RemoveComponentResponse { });
         }
 
         public override Task<ReplaceComponentResponse> ReplaceComponent(ReplaceComponentRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            simulation.ReplaceComponent(request.Eid, request.ComponentName, request.Json);
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                simulation.ReplaceComponent(request.Eid, request.ComponentName, request.Json);
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
+
             return Task.FromResult(new ReplaceComponentResponse { });
         }
 
         public override Task<SetSingletonJsonResponse> SetSingletonJson(SetSingletonJsonRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            simulation.SetSingletonJson(request.SingletonName, request.Json);
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                simulation.SetSingletonJson(request.SingletonName, request.Json);
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
+            
             return Task.FromResult(new SetSingletonJsonResponse { });
         }
 
         public override Task<SetStateJsonResponse> SetStateJson(SetStateJsonRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            simulation.SetStateJson(request.Json);
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                simulation.SetStateJson(request.Json);
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
+            
             return Task.FromResult(new SetStateJsonResponse { });
         }
 
@@ -253,15 +416,39 @@ namespace SimulationServer
 
         public override Task<GetStateBinaryResponse> GetStateBinary(GetStateBinaryRequest request, ServerCallContext context)
         {
-            (byte[] bin, ulong tick) = simulation.GetStateBinary();
+            ulong tick;
+            byte[] bin;
+
+            readerWriterLock.EnterReadLock();
+            try
+            {
+                bin = simulation.GetStateBinary();
+                tick = currentTick;
+            }
+            finally
+            {
+                readerWriterLock.ExitReadLock();
+            }
+
             return Task.FromResult(new GetStateBinaryResponse { Binary = Google.Protobuf.ByteString.CopyFrom(bin), Tick = tick });
         }
 
         public override Task<SetStateBinaryResponse> SetStateBinary(SetStateBinaryRequest request, ServerCallContext context)
         {
             AssertCalledByEditor(context);
+            AssertNotRunning(context);
 
-            simulation.SetStateBinary(request.Binary.ToByteArray());
+            readerWriterLock.EnterWriteLock();
+            try
+            {
+                AssertNotRunning(context);
+                simulation.SetStateBinary(request.Binary.ToByteArray());
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
+            }
+            
             return Task.FromResult(new SetStateBinaryResponse { });
         }
 
@@ -349,7 +536,7 @@ namespace SimulationServer
                             }
                         case "perf":
                             {
-                                if (simulation.IsRunning())
+                                if (simulationRunning)
                                 {
                                     err = "'perf' can only be used while the simulation isn't running.";
                                 }
@@ -435,25 +622,33 @@ namespace SimulationServer
 
         private void StartSimulationImpl(ulong p_stopAtTick = 0)
         {
-            stopAtTick = p_stopAtTick;
-            if (!simulation.IsRunning() && (stopAtTick == 0 || simulation.GetTick() < stopAtTick))
+            lock (simulation)
             {
-                performanceStartTick = simulation.GetTick();
-                performanceStopwatch.Restart();
-                simulation.StartSimulation();
-                SendRunnerUpdateEvent(performanceStartTick, true);
+                stopAtTick = p_stopAtTick;
+                if (!simulationRunning && (stopAtTick == 0 || currentTick < stopAtTick))
+                {
+                    performanceStartTick = currentTick;
+                    simulationThread = new Thread(new ThreadStart(RunSimulation));
+                    simulationRunning = true;
+                    performanceStopwatch.Restart();
+                    simulationThread.Start();
+                    SendRunnerUpdateEvent(performanceStartTick, true);
+                }
             }
         }
 
         private void StopSimulationImpl()
         {
-            if (simulation.IsRunning())
+            lock (simulation)
             {
-                stopAtTick = 0;
-                simulation.StopSimulation();
-                performanceStopwatch.Stop();
-                performanceStopTick = simulation.GetTick();
-                SendRunnerUpdateEvent(performanceStopTick, false);
+                if (simulationRunning)
+                {
+                    simulationRunning = false;
+                    simulationThread.Join();
+                    performanceStopwatch.Stop();
+                    performanceStopTick = currentTick;
+                    SendRunnerUpdateEvent(performanceStopTick, false);
+                }
             }
         }
 
@@ -516,7 +711,7 @@ namespace SimulationServer
 
         private void AssertNotRunning(ServerCallContext context)
         {
-            if (simulation.IsRunning())
+            if (simulationRunning)
             {
                 string err = "Method can only be called while the simulation is not running.";
                 context.Status = new Status(StatusCode.FailedPrecondition, err);
