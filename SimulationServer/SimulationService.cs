@@ -42,7 +42,10 @@ namespace SimulationServer
         private ulong stopAtTick = 0;
         private string ownerToken = "";
         private string editorToken = "";
+
         private ReaderWriterLockSlim readerWriterLock = new ReaderWriterLockSlim();
+        private AutoResetEvent noReadersEvent = new AutoResetEvent(false);
+        private volatile int readerCount = 0;
 
         private Thread simulationThread;
         private bool simulationRunning = false;
@@ -67,10 +70,11 @@ namespace SimulationServer
                 });
             };
 
-            while (simulationRunning)
+
+            readerWriterLock.EnterWriteLock();
+            try
             {
-                readerWriterLock.EnterWriteLock();
-                try
+                while (simulationRunning)
                 {
                     currentTick = simulation.Tick();
                     simulation.GetEventsLastTick(sim_event_handler);
@@ -95,11 +99,18 @@ namespace SimulationServer
                     {
                         simulationRunning = false;
                     }
+
+                    if (readerCount > 0)
+                    {
+                        readerWriterLock.ExitWriteLock();
+                        noReadersEvent.WaitOne();
+                        readerWriterLock.EnterWriteLock();
+                    }
                 }
-                finally
-                {
-                    readerWriterLock.ExitWriteLock();
-                }
+            }
+            finally
+            {
+                readerWriterLock.ExitWriteLock();
             }
         }
 
@@ -165,7 +176,7 @@ namespace SimulationServer
             ulong tick;
             List<ulong> eids;
 
-            readerWriterLock.EnterReadLock();
+            StartReading();
             try
             {
                 eids = simulation.GetAllEntities();
@@ -173,7 +184,7 @@ namespace SimulationServer
             }
             finally
             {
-                readerWriterLock.ExitReadLock();
+                StopReading();
             }
 
             GetAllEntitiesResponse result = new GetAllEntitiesResponse { Tick = tick };
@@ -186,7 +197,7 @@ namespace SimulationServer
             ulong tick;
             string json;
 
-            readerWriterLock.EnterReadLock();
+            StartReading();
             try
             {
                 json = simulation.GetComponentJson(request.Eid, request.ComponentName);
@@ -194,7 +205,7 @@ namespace SimulationServer
             }
             finally
             {
-                readerWriterLock.ExitReadLock();
+                StopReading();
             }
 
             return Task.FromResult(new GetComponentJsonResponse { Json = json, Tick = tick });
@@ -213,7 +224,7 @@ namespace SimulationServer
             ulong tick;
             List<string> names;
 
-            readerWriterLock.EnterReadLock();
+            StartReading();
             try
             {
                 names = simulation.GetEntityComponentNames(request.Eid);
@@ -221,7 +232,7 @@ namespace SimulationServer
             }
             finally
             {
-                readerWriterLock.ExitReadLock();
+                StopReading();
             }
 
             GetEntityComponentNamesResponse result = new GetEntityComponentNamesResponse { Tick = tick };
@@ -262,7 +273,7 @@ namespace SimulationServer
             ulong tick;
             string json;
 
-            readerWriterLock.EnterReadLock();
+            StartReading();
             try
             {
                 json = simulation.GetSingletonJson(request.SingletonName);
@@ -270,7 +281,7 @@ namespace SimulationServer
             }
             finally
             {
-                readerWriterLock.ExitReadLock();
+                StopReading();
             }
 
             return Task.FromResult(new GetSingletonJsonResponse { Json = json, Tick = tick });
@@ -280,14 +291,14 @@ namespace SimulationServer
         {
             List<string> names;
 
-            readerWriterLock.EnterReadLock();
+            StartReading();
             try
             {
                 names = simulation.GetSingletonNames();
             }
             finally
             {
-                readerWriterLock.ExitReadLock();
+                StopReading();
             }
 
             GetSingletonNamesResponse result = new GetSingletonNamesResponse();
@@ -300,7 +311,7 @@ namespace SimulationServer
             ulong tick;
             string json;
 
-            readerWriterLock.EnterReadLock();
+            StartReading();
             try
             {
                 json = simulation.GetStateJson();
@@ -308,7 +319,7 @@ namespace SimulationServer
             }
             finally
             {
-                readerWriterLock.ExitReadLock();
+                StopReading();
             }
 
             return Task.FromResult(new GetStateJsonResponse { Json = json, Tick = tick });
@@ -419,7 +430,7 @@ namespace SimulationServer
             ulong tick;
             byte[] bin;
 
-            readerWriterLock.EnterReadLock();
+            StartReading();
             try
             {
                 bin = simulation.GetStateBinary();
@@ -427,7 +438,7 @@ namespace SimulationServer
             }
             finally
             {
-                readerWriterLock.ExitReadLock();
+                StopReading();
             }
 
             return Task.FromResult(new GetStateBinaryResponse { Binary = Google.Protobuf.ByteString.CopyFrom(bin), Tick = tick });
@@ -477,7 +488,15 @@ namespace SimulationServer
                                     break;
                                 }
 
-                                (err, output) = simulation.RunCommand(args.Skip(1).ToArray());
+                                readerWriterLock.EnterWriteLock();
+                                try
+                                {
+                                    (err, output) = simulation.RunCommand(args.Skip(1).ToArray());
+                                }
+                                finally
+                                {
+                                    readerWriterLock.ExitWriteLock();
+                                }
                                 break;
                             }
                         case "run":
@@ -716,6 +735,21 @@ namespace SimulationServer
                 string err = "Method can only be called while the simulation is not running.";
                 context.Status = new Status(StatusCode.FailedPrecondition, err);
                 throw new InvalidOperationException(err);
+            }
+        }
+
+        private void StartReading()
+        {
+            Interlocked.Increment(ref readerCount);
+            readerWriterLock.EnterReadLock();
+        }
+
+        private void StopReading()
+        {
+            readerWriterLock.ExitReadLock();
+            if (Interlocked.Decrement(ref readerCount) == 0)
+            {
+                noReadersEvent.Set();
             }
         }
     }
