@@ -11,6 +11,10 @@ from weakref import WeakValueDictionary
 import pyglet
 
 
+def _get_asset_path(asset):
+    return "../assets/" + asset
+
+
 class RenderData:
     __slots__ = ('x', 'y', 'image_path', 'color')
 
@@ -89,9 +93,17 @@ def window_app(address, token):
             eid = pos["EID"]
             pos_com = pos["Com"]
             if eid in predators:
-                frame_data[eid] = RenderData(pos_com["x"], pos_com["y"], 'assets/PredatorEntity.png', (255, 0, 0))
+                frame_data[eid] = RenderData(
+                    pos_com["x"],
+                    pos_com["y"],
+                    _get_asset_path('PredatorEntity.png'),
+                    (255, 0, 0))
             else:
-                frame_data[eid] = RenderData(pos_com["x"], pos_com["y"], 'assets/DefaultEntity.png', (0, 200, 50))
+                frame_data[eid] = RenderData(
+                    pos_com["x"],
+                    pos_com["y"],
+                    _get_asset_path('DefaultEntity.png'),
+                    (0, 200, 50))
         window.update_frame_data(frame_data)
 
     try:

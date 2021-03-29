@@ -13,7 +13,7 @@ RpcError = grpc.RpcError
 
 class SimulationProcess:
     _simulation_server_path = str(Path(__file__).parent /
-                                  r'.\SimulationServer\bin\x64\Release\netcoreapp3.1\SimulationServer.exe')
+                                  r'..\SimulationServer\bin\x64\Release\netcoreapp3.1\SimulationServer.exe')
 
     @staticmethod
     def simple_convert(input_file: str,
