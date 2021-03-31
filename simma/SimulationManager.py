@@ -8,7 +8,7 @@ import re
 from threading import Thread, RLock
 from typing import Optional, List
 from bisect import insort
-from simrunner import SimulationProcess, SimulationClient
+from simma.simrunner import SimulationProcess, SimulationClient
 from dataclasses import dataclass
 import sys
 from datetime import datetime
@@ -17,7 +17,7 @@ import shutil
 import subprocess
 import os
 import sqlite3
-import gwsignal
+from simma import gwsignal
 from secrets import token_urlsafe
 from contextlib import contextmanager, closing
 

@@ -5,15 +5,14 @@ from subprocess import Popen, PIPE
 from pathlib import Path
 
 import grpc
-import simulation_pb2 as sim
-import simulation_pb2_grpc as sim_grpc
+import simma.simulation_pb2 as sim
+import simma.simulation_pb2_grpc as sim_grpc
 
 RpcError = grpc.RpcError
 
 
 class SimulationProcess:
-    _simulation_server_path = str(Path(__file__).parent /
-                                  r'..\SimulationServer\bin\x64\Release\netcoreapp3.1\SimulationServer.exe')
+    _simulation_server_path = str(Path(__file__).parent / r'lib/SimulationServer.exe')
 
     @staticmethod
     def simple_convert(input_file: str,

@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="protos\simulation.proto" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.12.3" />
     <PackageReference Include="Grpc" Version="2.30.0" />
     <PackageReference Include="Grpc.Tools" Version="2.30.0">
@@ -22,7 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="protos\simulation.proto" GrpcServices="Server" />
+    <Protobuf Include="..\protos\simma\simulation.proto" GrpcServices="Server">
+      <Link>simulation.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
 </Project>

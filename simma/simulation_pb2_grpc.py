@@ -2,11 +2,11 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import simulation_pb2 as simulation__pb2
+from simma import simulation_pb2 as simma_dot_simulation__pb2
 
 
 class SimulationStub(object):
-    """python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
+    """python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/simulation.proto
 
     """
 
@@ -17,129 +17,129 @@ class SimulationStub(object):
             channel: A grpc.Channel.
         """
         self.GetTick = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetTick',
-                request_serializer=simulation__pb2.GetTickRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetTickResponse.FromString,
+                '/simma.Simulation/GetTick',
+                request_serializer=simma_dot_simulation__pb2.GetTickRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetTickResponse.FromString,
                 )
         self.GetStateJson = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetStateJson',
-                request_serializer=simulation__pb2.GetStateJsonRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetStateJsonResponse.FromString,
+                '/simma.Simulation/GetStateJson',
+                request_serializer=simma_dot_simulation__pb2.GetStateJsonRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetStateJsonResponse.FromString,
                 )
         self.SetStateJson = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/SetStateJson',
-                request_serializer=simulation__pb2.SetStateJsonRequest.SerializeToString,
-                response_deserializer=simulation__pb2.SetStateJsonResponse.FromString,
+                '/simma.Simulation/SetStateJson',
+                request_serializer=simma_dot_simulation__pb2.SetStateJsonRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.SetStateJsonResponse.FromString,
                 )
         self.CreateEntity = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/CreateEntity',
-                request_serializer=simulation__pb2.CreateEntityRequest.SerializeToString,
-                response_deserializer=simulation__pb2.CreateEntityResponse.FromString,
+                '/simma.Simulation/CreateEntity',
+                request_serializer=simma_dot_simulation__pb2.CreateEntityRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.CreateEntityResponse.FromString,
                 )
         self.DestroyEntity = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/DestroyEntity',
-                request_serializer=simulation__pb2.DestroyEntityRequest.SerializeToString,
-                response_deserializer=simulation__pb2.DestroyEntityResponse.FromString,
+                '/simma.Simulation/DestroyEntity',
+                request_serializer=simma_dot_simulation__pb2.DestroyEntityRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.DestroyEntityResponse.FromString,
                 )
         self.GetAllEntities = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetAllEntities',
-                request_serializer=simulation__pb2.GetAllEntitesRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetAllEntitiesResponse.FromString,
+                '/simma.Simulation/GetAllEntities',
+                request_serializer=simma_dot_simulation__pb2.GetAllEntitesRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetAllEntitiesResponse.FromString,
                 )
         self.StartSimulation = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/StartSimulation',
-                request_serializer=simulation__pb2.StartSimulationRequest.SerializeToString,
-                response_deserializer=simulation__pb2.StartSimulationResponse.FromString,
+                '/simma.Simulation/StartSimulation',
+                request_serializer=simma_dot_simulation__pb2.StartSimulationRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.StartSimulationResponse.FromString,
                 )
         self.StopSimulation = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/StopSimulation',
-                request_serializer=simulation__pb2.StopSimulationRequest.SerializeToString,
-                response_deserializer=simulation__pb2.StopSimulationResponse.FromString,
+                '/simma.Simulation/StopSimulation',
+                request_serializer=simma_dot_simulation__pb2.StopSimulationRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.StopSimulationResponse.FromString,
                 )
         self.IsRunning = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/IsRunning',
-                request_serializer=simulation__pb2.IsRunningRequest.SerializeToString,
-                response_deserializer=simulation__pb2.IsRunningResponse.FromString,
+                '/simma.Simulation/IsRunning',
+                request_serializer=simma_dot_simulation__pb2.IsRunningRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.IsRunningResponse.FromString,
                 )
         self.AssignComponent = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/AssignComponent',
-                request_serializer=simulation__pb2.AssignComponentRequest.SerializeToString,
-                response_deserializer=simulation__pb2.AssignComponentResponse.FromString,
+                '/simma.Simulation/AssignComponent',
+                request_serializer=simma_dot_simulation__pb2.AssignComponentRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.AssignComponentResponse.FromString,
                 )
         self.GetComponentJson = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetComponentJson',
-                request_serializer=simulation__pb2.GetComponentJsonRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetComponentJsonResponse.FromString,
+                '/simma.Simulation/GetComponentJson',
+                request_serializer=simma_dot_simulation__pb2.GetComponentJsonRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetComponentJsonResponse.FromString,
                 )
         self.RemoveComponent = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/RemoveComponent',
-                request_serializer=simulation__pb2.RemoveComponentRequest.SerializeToString,
-                response_deserializer=simulation__pb2.RemoveComponentResponse.FromString,
+                '/simma.Simulation/RemoveComponent',
+                request_serializer=simma_dot_simulation__pb2.RemoveComponentRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.RemoveComponentResponse.FromString,
                 )
         self.ReplaceComponent = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/ReplaceComponent',
-                request_serializer=simulation__pb2.ReplaceComponentRequest.SerializeToString,
-                response_deserializer=simulation__pb2.ReplaceComponentResponse.FromString,
+                '/simma.Simulation/ReplaceComponent',
+                request_serializer=simma_dot_simulation__pb2.ReplaceComponentRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.ReplaceComponentResponse.FromString,
                 )
         self.GetComponentNames = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetComponentNames',
-                request_serializer=simulation__pb2.GetComponentNamesRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetComponentNamesResponse.FromString,
+                '/simma.Simulation/GetComponentNames',
+                request_serializer=simma_dot_simulation__pb2.GetComponentNamesRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetComponentNamesResponse.FromString,
                 )
         self.GetEntityComponentNames = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetEntityComponentNames',
-                request_serializer=simulation__pb2.GetEntityComponentNamesRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetEntityComponentNamesResponse.FromString,
+                '/simma.Simulation/GetEntityComponentNames',
+                request_serializer=simma_dot_simulation__pb2.GetEntityComponentNamesRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetEntityComponentNamesResponse.FromString,
                 )
         self.GetSingletonJson = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetSingletonJson',
-                request_serializer=simulation__pb2.GetSingletonJsonRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetSingletonJsonResponse.FromString,
+                '/simma.Simulation/GetSingletonJson',
+                request_serializer=simma_dot_simulation__pb2.GetSingletonJsonRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetSingletonJsonResponse.FromString,
                 )
         self.SetSingletonJson = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/SetSingletonJson',
-                request_serializer=simulation__pb2.SetSingletonJsonRequest.SerializeToString,
-                response_deserializer=simulation__pb2.SetSingletonJsonResponse.FromString,
+                '/simma.Simulation/SetSingletonJson',
+                request_serializer=simma_dot_simulation__pb2.SetSingletonJsonRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.SetSingletonJsonResponse.FromString,
                 )
         self.GetSingletonNames = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetSingletonNames',
-                request_serializer=simulation__pb2.GetSingletonNamesRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetSingletonNamesResponse.FromString,
+                '/simma.Simulation/GetSingletonNames',
+                request_serializer=simma_dot_simulation__pb2.GetSingletonNamesRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetSingletonNamesResponse.FromString,
                 )
         self.GetEvents = channel.unary_stream(
-                '/PyGridWorld.SimulationServer.Simulation/GetEvents',
-                request_serializer=simulation__pb2.GetEventsRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetEventsResponse.FromString,
+                '/simma.Simulation/GetEvents',
+                request_serializer=simma_dot_simulation__pb2.GetEventsRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetEventsResponse.FromString,
                 )
         self.GetStateBinary = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/GetStateBinary',
-                request_serializer=simulation__pb2.GetStateBinaryRequest.SerializeToString,
-                response_deserializer=simulation__pb2.GetStateBinaryResponse.FromString,
+                '/simma.Simulation/GetStateBinary',
+                request_serializer=simma_dot_simulation__pb2.GetStateBinaryRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.GetStateBinaryResponse.FromString,
                 )
         self.SetStateBinary = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/SetStateBinary',
-                request_serializer=simulation__pb2.SetStateBinaryRequest.SerializeToString,
-                response_deserializer=simulation__pb2.SetStateBinaryResponse.FromString,
+                '/simma.Simulation/SetStateBinary',
+                request_serializer=simma_dot_simulation__pb2.SetStateBinaryRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.SetStateBinaryResponse.FromString,
                 )
         self.RunCommand = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/RunCommand',
-                request_serializer=simulation__pb2.RunCommandRequest.SerializeToString,
-                response_deserializer=simulation__pb2.RunCommandResponse.FromString,
+                '/simma.Simulation/RunCommand',
+                request_serializer=simma_dot_simulation__pb2.RunCommandRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.RunCommandResponse.FromString,
                 )
         self.SetEditorToken = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/SetEditorToken',
-                request_serializer=simulation__pb2.SetEditorTokenRequest.SerializeToString,
-                response_deserializer=simulation__pb2.SetEditorTokenResponse.FromString,
+                '/simma.Simulation/SetEditorToken',
+                request_serializer=simma_dot_simulation__pb2.SetEditorTokenRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.SetEditorTokenResponse.FromString,
                 )
         self.IsEditing = channel.unary_unary(
-                '/PyGridWorld.SimulationServer.Simulation/IsEditing',
-                request_serializer=simulation__pb2.IsEditingRequest.SerializeToString,
-                response_deserializer=simulation__pb2.IsEditingResponse.FromString,
+                '/simma.Simulation/IsEditing',
+                request_serializer=simma_dot_simulation__pb2.IsEditingRequest.SerializeToString,
+                response_deserializer=simma_dot_simulation__pb2.IsEditingResponse.FromString,
                 )
 
 
 class SimulationServicer(object):
-    """python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
+    """python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/simulation.proto
 
     """
 
@@ -292,133 +292,133 @@ def add_SimulationServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetTick': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTick,
-                    request_deserializer=simulation__pb2.GetTickRequest.FromString,
-                    response_serializer=simulation__pb2.GetTickResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetTickRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetTickResponse.SerializeToString,
             ),
             'GetStateJson': grpc.unary_unary_rpc_method_handler(
                     servicer.GetStateJson,
-                    request_deserializer=simulation__pb2.GetStateJsonRequest.FromString,
-                    response_serializer=simulation__pb2.GetStateJsonResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetStateJsonRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetStateJsonResponse.SerializeToString,
             ),
             'SetStateJson': grpc.unary_unary_rpc_method_handler(
                     servicer.SetStateJson,
-                    request_deserializer=simulation__pb2.SetStateJsonRequest.FromString,
-                    response_serializer=simulation__pb2.SetStateJsonResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.SetStateJsonRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.SetStateJsonResponse.SerializeToString,
             ),
             'CreateEntity': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateEntity,
-                    request_deserializer=simulation__pb2.CreateEntityRequest.FromString,
-                    response_serializer=simulation__pb2.CreateEntityResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.CreateEntityRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.CreateEntityResponse.SerializeToString,
             ),
             'DestroyEntity': grpc.unary_unary_rpc_method_handler(
                     servicer.DestroyEntity,
-                    request_deserializer=simulation__pb2.DestroyEntityRequest.FromString,
-                    response_serializer=simulation__pb2.DestroyEntityResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.DestroyEntityRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.DestroyEntityResponse.SerializeToString,
             ),
             'GetAllEntities': grpc.unary_unary_rpc_method_handler(
                     servicer.GetAllEntities,
-                    request_deserializer=simulation__pb2.GetAllEntitesRequest.FromString,
-                    response_serializer=simulation__pb2.GetAllEntitiesResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetAllEntitesRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetAllEntitiesResponse.SerializeToString,
             ),
             'StartSimulation': grpc.unary_unary_rpc_method_handler(
                     servicer.StartSimulation,
-                    request_deserializer=simulation__pb2.StartSimulationRequest.FromString,
-                    response_serializer=simulation__pb2.StartSimulationResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.StartSimulationRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.StartSimulationResponse.SerializeToString,
             ),
             'StopSimulation': grpc.unary_unary_rpc_method_handler(
                     servicer.StopSimulation,
-                    request_deserializer=simulation__pb2.StopSimulationRequest.FromString,
-                    response_serializer=simulation__pb2.StopSimulationResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.StopSimulationRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.StopSimulationResponse.SerializeToString,
             ),
             'IsRunning': grpc.unary_unary_rpc_method_handler(
                     servicer.IsRunning,
-                    request_deserializer=simulation__pb2.IsRunningRequest.FromString,
-                    response_serializer=simulation__pb2.IsRunningResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.IsRunningRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.IsRunningResponse.SerializeToString,
             ),
             'AssignComponent': grpc.unary_unary_rpc_method_handler(
                     servicer.AssignComponent,
-                    request_deserializer=simulation__pb2.AssignComponentRequest.FromString,
-                    response_serializer=simulation__pb2.AssignComponentResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.AssignComponentRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.AssignComponentResponse.SerializeToString,
             ),
             'GetComponentJson': grpc.unary_unary_rpc_method_handler(
                     servicer.GetComponentJson,
-                    request_deserializer=simulation__pb2.GetComponentJsonRequest.FromString,
-                    response_serializer=simulation__pb2.GetComponentJsonResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetComponentJsonRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetComponentJsonResponse.SerializeToString,
             ),
             'RemoveComponent': grpc.unary_unary_rpc_method_handler(
                     servicer.RemoveComponent,
-                    request_deserializer=simulation__pb2.RemoveComponentRequest.FromString,
-                    response_serializer=simulation__pb2.RemoveComponentResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.RemoveComponentRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.RemoveComponentResponse.SerializeToString,
             ),
             'ReplaceComponent': grpc.unary_unary_rpc_method_handler(
                     servicer.ReplaceComponent,
-                    request_deserializer=simulation__pb2.ReplaceComponentRequest.FromString,
-                    response_serializer=simulation__pb2.ReplaceComponentResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.ReplaceComponentRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.ReplaceComponentResponse.SerializeToString,
             ),
             'GetComponentNames': grpc.unary_unary_rpc_method_handler(
                     servicer.GetComponentNames,
-                    request_deserializer=simulation__pb2.GetComponentNamesRequest.FromString,
-                    response_serializer=simulation__pb2.GetComponentNamesResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetComponentNamesRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetComponentNamesResponse.SerializeToString,
             ),
             'GetEntityComponentNames': grpc.unary_unary_rpc_method_handler(
                     servicer.GetEntityComponentNames,
-                    request_deserializer=simulation__pb2.GetEntityComponentNamesRequest.FromString,
-                    response_serializer=simulation__pb2.GetEntityComponentNamesResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetEntityComponentNamesRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetEntityComponentNamesResponse.SerializeToString,
             ),
             'GetSingletonJson': grpc.unary_unary_rpc_method_handler(
                     servicer.GetSingletonJson,
-                    request_deserializer=simulation__pb2.GetSingletonJsonRequest.FromString,
-                    response_serializer=simulation__pb2.GetSingletonJsonResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetSingletonJsonRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetSingletonJsonResponse.SerializeToString,
             ),
             'SetSingletonJson': grpc.unary_unary_rpc_method_handler(
                     servicer.SetSingletonJson,
-                    request_deserializer=simulation__pb2.SetSingletonJsonRequest.FromString,
-                    response_serializer=simulation__pb2.SetSingletonJsonResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.SetSingletonJsonRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.SetSingletonJsonResponse.SerializeToString,
             ),
             'GetSingletonNames': grpc.unary_unary_rpc_method_handler(
                     servicer.GetSingletonNames,
-                    request_deserializer=simulation__pb2.GetSingletonNamesRequest.FromString,
-                    response_serializer=simulation__pb2.GetSingletonNamesResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetSingletonNamesRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetSingletonNamesResponse.SerializeToString,
             ),
             'GetEvents': grpc.unary_stream_rpc_method_handler(
                     servicer.GetEvents,
-                    request_deserializer=simulation__pb2.GetEventsRequest.FromString,
-                    response_serializer=simulation__pb2.GetEventsResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetEventsRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetEventsResponse.SerializeToString,
             ),
             'GetStateBinary': grpc.unary_unary_rpc_method_handler(
                     servicer.GetStateBinary,
-                    request_deserializer=simulation__pb2.GetStateBinaryRequest.FromString,
-                    response_serializer=simulation__pb2.GetStateBinaryResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.GetStateBinaryRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.GetStateBinaryResponse.SerializeToString,
             ),
             'SetStateBinary': grpc.unary_unary_rpc_method_handler(
                     servicer.SetStateBinary,
-                    request_deserializer=simulation__pb2.SetStateBinaryRequest.FromString,
-                    response_serializer=simulation__pb2.SetStateBinaryResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.SetStateBinaryRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.SetStateBinaryResponse.SerializeToString,
             ),
             'RunCommand': grpc.unary_unary_rpc_method_handler(
                     servicer.RunCommand,
-                    request_deserializer=simulation__pb2.RunCommandRequest.FromString,
-                    response_serializer=simulation__pb2.RunCommandResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.RunCommandRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.RunCommandResponse.SerializeToString,
             ),
             'SetEditorToken': grpc.unary_unary_rpc_method_handler(
                     servicer.SetEditorToken,
-                    request_deserializer=simulation__pb2.SetEditorTokenRequest.FromString,
-                    response_serializer=simulation__pb2.SetEditorTokenResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.SetEditorTokenRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.SetEditorTokenResponse.SerializeToString,
             ),
             'IsEditing': grpc.unary_unary_rpc_method_handler(
                     servicer.IsEditing,
-                    request_deserializer=simulation__pb2.IsEditingRequest.FromString,
-                    response_serializer=simulation__pb2.IsEditingResponse.SerializeToString,
+                    request_deserializer=simma_dot_simulation__pb2.IsEditingRequest.FromString,
+                    response_serializer=simma_dot_simulation__pb2.IsEditingResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'PyGridWorld.SimulationServer.Simulation', rpc_method_handlers)
+            'simma.Simulation', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
 class Simulation(object):
-    """python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
+    """python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/simulation.proto
 
     """
 
@@ -433,9 +433,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetTick',
-            simulation__pb2.GetTickRequest.SerializeToString,
-            simulation__pb2.GetTickResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetTick',
+            simma_dot_simulation__pb2.GetTickRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetTickResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -450,9 +450,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetStateJson',
-            simulation__pb2.GetStateJsonRequest.SerializeToString,
-            simulation__pb2.GetStateJsonResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetStateJson',
+            simma_dot_simulation__pb2.GetStateJsonRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetStateJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -467,9 +467,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/SetStateJson',
-            simulation__pb2.SetStateJsonRequest.SerializeToString,
-            simulation__pb2.SetStateJsonResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/SetStateJson',
+            simma_dot_simulation__pb2.SetStateJsonRequest.SerializeToString,
+            simma_dot_simulation__pb2.SetStateJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -484,9 +484,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/CreateEntity',
-            simulation__pb2.CreateEntityRequest.SerializeToString,
-            simulation__pb2.CreateEntityResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/CreateEntity',
+            simma_dot_simulation__pb2.CreateEntityRequest.SerializeToString,
+            simma_dot_simulation__pb2.CreateEntityResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -501,9 +501,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/DestroyEntity',
-            simulation__pb2.DestroyEntityRequest.SerializeToString,
-            simulation__pb2.DestroyEntityResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/DestroyEntity',
+            simma_dot_simulation__pb2.DestroyEntityRequest.SerializeToString,
+            simma_dot_simulation__pb2.DestroyEntityResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -518,9 +518,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetAllEntities',
-            simulation__pb2.GetAllEntitesRequest.SerializeToString,
-            simulation__pb2.GetAllEntitiesResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetAllEntities',
+            simma_dot_simulation__pb2.GetAllEntitesRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetAllEntitiesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -535,9 +535,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/StartSimulation',
-            simulation__pb2.StartSimulationRequest.SerializeToString,
-            simulation__pb2.StartSimulationResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/StartSimulation',
+            simma_dot_simulation__pb2.StartSimulationRequest.SerializeToString,
+            simma_dot_simulation__pb2.StartSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -552,9 +552,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/StopSimulation',
-            simulation__pb2.StopSimulationRequest.SerializeToString,
-            simulation__pb2.StopSimulationResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/StopSimulation',
+            simma_dot_simulation__pb2.StopSimulationRequest.SerializeToString,
+            simma_dot_simulation__pb2.StopSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -569,9 +569,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/IsRunning',
-            simulation__pb2.IsRunningRequest.SerializeToString,
-            simulation__pb2.IsRunningResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/IsRunning',
+            simma_dot_simulation__pb2.IsRunningRequest.SerializeToString,
+            simma_dot_simulation__pb2.IsRunningResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -586,9 +586,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/AssignComponent',
-            simulation__pb2.AssignComponentRequest.SerializeToString,
-            simulation__pb2.AssignComponentResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/AssignComponent',
+            simma_dot_simulation__pb2.AssignComponentRequest.SerializeToString,
+            simma_dot_simulation__pb2.AssignComponentResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -603,9 +603,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetComponentJson',
-            simulation__pb2.GetComponentJsonRequest.SerializeToString,
-            simulation__pb2.GetComponentJsonResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetComponentJson',
+            simma_dot_simulation__pb2.GetComponentJsonRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetComponentJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -620,9 +620,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/RemoveComponent',
-            simulation__pb2.RemoveComponentRequest.SerializeToString,
-            simulation__pb2.RemoveComponentResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/RemoveComponent',
+            simma_dot_simulation__pb2.RemoveComponentRequest.SerializeToString,
+            simma_dot_simulation__pb2.RemoveComponentResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -637,9 +637,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/ReplaceComponent',
-            simulation__pb2.ReplaceComponentRequest.SerializeToString,
-            simulation__pb2.ReplaceComponentResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/ReplaceComponent',
+            simma_dot_simulation__pb2.ReplaceComponentRequest.SerializeToString,
+            simma_dot_simulation__pb2.ReplaceComponentResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -654,9 +654,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetComponentNames',
-            simulation__pb2.GetComponentNamesRequest.SerializeToString,
-            simulation__pb2.GetComponentNamesResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetComponentNames',
+            simma_dot_simulation__pb2.GetComponentNamesRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetComponentNamesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -671,9 +671,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetEntityComponentNames',
-            simulation__pb2.GetEntityComponentNamesRequest.SerializeToString,
-            simulation__pb2.GetEntityComponentNamesResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetEntityComponentNames',
+            simma_dot_simulation__pb2.GetEntityComponentNamesRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetEntityComponentNamesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -688,9 +688,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetSingletonJson',
-            simulation__pb2.GetSingletonJsonRequest.SerializeToString,
-            simulation__pb2.GetSingletonJsonResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetSingletonJson',
+            simma_dot_simulation__pb2.GetSingletonJsonRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetSingletonJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -705,9 +705,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/SetSingletonJson',
-            simulation__pb2.SetSingletonJsonRequest.SerializeToString,
-            simulation__pb2.SetSingletonJsonResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/SetSingletonJson',
+            simma_dot_simulation__pb2.SetSingletonJsonRequest.SerializeToString,
+            simma_dot_simulation__pb2.SetSingletonJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -722,9 +722,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetSingletonNames',
-            simulation__pb2.GetSingletonNamesRequest.SerializeToString,
-            simulation__pb2.GetSingletonNamesResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetSingletonNames',
+            simma_dot_simulation__pb2.GetSingletonNamesRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetSingletonNamesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -739,9 +739,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/PyGridWorld.SimulationServer.Simulation/GetEvents',
-            simulation__pb2.GetEventsRequest.SerializeToString,
-            simulation__pb2.GetEventsResponse.FromString,
+        return grpc.experimental.unary_stream(request, target, '/simma.Simulation/GetEvents',
+            simma_dot_simulation__pb2.GetEventsRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetEventsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -756,9 +756,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/GetStateBinary',
-            simulation__pb2.GetStateBinaryRequest.SerializeToString,
-            simulation__pb2.GetStateBinaryResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetStateBinary',
+            simma_dot_simulation__pb2.GetStateBinaryRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetStateBinaryResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -773,9 +773,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/SetStateBinary',
-            simulation__pb2.SetStateBinaryRequest.SerializeToString,
-            simulation__pb2.SetStateBinaryResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/SetStateBinary',
+            simma_dot_simulation__pb2.SetStateBinaryRequest.SerializeToString,
+            simma_dot_simulation__pb2.SetStateBinaryResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -790,9 +790,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/RunCommand',
-            simulation__pb2.RunCommandRequest.SerializeToString,
-            simulation__pb2.RunCommandResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/RunCommand',
+            simma_dot_simulation__pb2.RunCommandRequest.SerializeToString,
+            simma_dot_simulation__pb2.RunCommandResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -807,9 +807,9 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/SetEditorToken',
-            simulation__pb2.SetEditorTokenRequest.SerializeToString,
-            simulation__pb2.SetEditorTokenResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/SetEditorToken',
+            simma_dot_simulation__pb2.SetEditorTokenRequest.SerializeToString,
+            simma_dot_simulation__pb2.SetEditorTokenResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -824,8 +824,8 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/PyGridWorld.SimulationServer.Simulation/IsEditing',
-            simulation__pb2.IsEditingRequest.SerializeToString,
-            simulation__pb2.IsEditingResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/simma.Simulation/IsEditing',
+            simma_dot_simulation__pb2.IsEditingRequest.SerializeToString,
+            simma_dot_simulation__pb2.IsEditingResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

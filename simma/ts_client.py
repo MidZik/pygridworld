@@ -1,7 +1,7 @@
 import grpc
 
-import TimelinesService_pb2 as ts
-import TimelinesService_pb2_grpc as ts_grpc
+import simma.TimelinesService_pb2 as ts
+import simma.TimelinesService_pb2_grpc as ts_grpc
 from collections import namedtuple
 from queue import Queue
 

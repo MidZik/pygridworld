@@ -2,11 +2,11 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import TimelinesService_pb2 as TimelinesService__pb2
+from simma import TimelinesService_pb2 as simma_dot_TimelinesService__pb2
 
 
 class TimelineServiceStub(object):
-    """python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
+    """python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/TimelinesService.proto
 
     """
 
@@ -18,83 +18,83 @@ class TimelineServiceStub(object):
         """
         self.GetTimelines = channel.unary_unary(
                 '/PyGridWorld.TimelineService/GetTimelines',
-                request_serializer=TimelinesService__pb2.TimelinesRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.TimelinesResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.TimelinesRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.TimelinesResponse.FromString,
                 )
         self.GetTimelineTicks = channel.unary_unary(
                 '/PyGridWorld.TimelineService/GetTimelineTicks',
-                request_serializer=TimelinesService__pb2.TimelineTicksRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.TimelineTicksResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.TimelineTicksRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.TimelineTicksResponse.FromString,
                 )
         self.GetTimelineData = channel.unary_stream(
                 '/PyGridWorld.TimelineService/GetTimelineData',
-                request_serializer=TimelinesService__pb2.TimelineDataRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.TimelineDataResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.TimelineDataRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.TimelineDataResponse.FromString,
                 )
         self.GetTimelineJson = channel.unary_stream(
                 '/PyGridWorld.TimelineService/GetTimelineJson',
-                request_serializer=TimelinesService__pb2.TimelineJsonRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.TimelineJsonResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.TimelineJsonRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.TimelineJsonResponse.FromString,
                 )
         self.GetTimelineEvents = channel.unary_stream(
                 '/PyGridWorld.TimelineService/GetTimelineEvents',
-                request_serializer=TimelinesService__pb2.TimelineEventsRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.TimelineEventsResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.TimelineEventsRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.TimelineEventsResponse.FromString,
                 )
         self.GetOrStartSimulation = channel.unary_unary(
                 '/PyGridWorld.TimelineService/GetOrStartSimulation',
-                request_serializer=TimelinesService__pb2.GetOrStartSimulationRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.GetOrStartSimulationResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.GetOrStartSimulationRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.GetOrStartSimulationResponse.FromString,
                 )
         self.StopSimulation = channel.unary_unary(
                 '/PyGridWorld.TimelineService/StopSimulation',
-                request_serializer=TimelinesService__pb2.StopSimulationRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.StopSimulationResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.StopSimulationRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.StopSimulationResponse.FromString,
                 )
         self.MoveSimToTick = channel.unary_unary(
                 '/PyGridWorld.TimelineService/MoveSimToTick',
-                request_serializer=TimelinesService__pb2.MoveSimToTickRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.MoveSimToTickResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.MoveSimToTickRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.MoveSimToTickResponse.FromString,
                 )
         self.EditSimulation = channel.stream_stream(
                 '/PyGridWorld.TimelineService/EditSimulation',
-                request_serializer=TimelinesService__pb2.EditSimulationRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.EditSimulationResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.EditSimulationRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.EditSimulationResponse.FromString,
                 )
         self.ModifyTimelineTags = channel.unary_unary(
                 '/PyGridWorld.TimelineService/ModifyTimelineTags',
-                request_serializer=TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
                 )
         self.CreateTimeline = channel.unary_unary(
                 '/PyGridWorld.TimelineService/CreateTimeline',
-                request_serializer=TimelinesService__pb2.CreateTimelineRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.CreateTimelineResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.CreateTimelineRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.CreateTimelineResponse.FromString,
                 )
         self.CloneTimeline = channel.unary_unary(
                 '/PyGridWorld.TimelineService/CloneTimeline',
-                request_serializer=TimelinesService__pb2.CloneTimelineRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.CloneTimelineResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.CloneTimelineRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.CloneTimelineResponse.FromString,
                 )
         self.CreateTimelineFromSimulation = channel.unary_unary(
                 '/PyGridWorld.TimelineService/CreateTimelineFromSimulation',
-                request_serializer=TimelinesService__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.CreateTimelineFromSimulationResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.CreateTimelineFromSimulationResponse.FromString,
                 )
         self.DeleteTimeline = channel.unary_unary(
                 '/PyGridWorld.TimelineService/DeleteTimeline',
-                request_serializer=TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.DeleteTimelineResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.DeleteTimelineResponse.FromString,
                 )
         self.GetTimelineDetails = channel.unary_unary(
                 '/PyGridWorld.TimelineService/GetTimelineDetails',
-                request_serializer=TimelinesService__pb2.GetTimelineDetailsRequest.SerializeToString,
-                response_deserializer=TimelinesService__pb2.GetTimelineDetailsResponse.FromString,
+                request_serializer=simma_dot_TimelinesService__pb2.GetTimelineDetailsRequest.SerializeToString,
+                response_deserializer=simma_dot_TimelinesService__pb2.GetTimelineDetailsResponse.FromString,
                 )
 
 
 class TimelineServiceServicer(object):
-    """python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
+    """python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/TimelinesService.proto
 
     """
 
@@ -193,78 +193,78 @@ def add_TimelineServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetTimelines': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTimelines,
-                    request_deserializer=TimelinesService__pb2.TimelinesRequest.FromString,
-                    response_serializer=TimelinesService__pb2.TimelinesResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.TimelinesRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.TimelinesResponse.SerializeToString,
             ),
             'GetTimelineTicks': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTimelineTicks,
-                    request_deserializer=TimelinesService__pb2.TimelineTicksRequest.FromString,
-                    response_serializer=TimelinesService__pb2.TimelineTicksResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.TimelineTicksRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.TimelineTicksResponse.SerializeToString,
             ),
             'GetTimelineData': grpc.unary_stream_rpc_method_handler(
                     servicer.GetTimelineData,
-                    request_deserializer=TimelinesService__pb2.TimelineDataRequest.FromString,
-                    response_serializer=TimelinesService__pb2.TimelineDataResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.TimelineDataRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.TimelineDataResponse.SerializeToString,
             ),
             'GetTimelineJson': grpc.unary_stream_rpc_method_handler(
                     servicer.GetTimelineJson,
-                    request_deserializer=TimelinesService__pb2.TimelineJsonRequest.FromString,
-                    response_serializer=TimelinesService__pb2.TimelineJsonResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.TimelineJsonRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.TimelineJsonResponse.SerializeToString,
             ),
             'GetTimelineEvents': grpc.unary_stream_rpc_method_handler(
                     servicer.GetTimelineEvents,
-                    request_deserializer=TimelinesService__pb2.TimelineEventsRequest.FromString,
-                    response_serializer=TimelinesService__pb2.TimelineEventsResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.TimelineEventsRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.TimelineEventsResponse.SerializeToString,
             ),
             'GetOrStartSimulation': grpc.unary_unary_rpc_method_handler(
                     servicer.GetOrStartSimulation,
-                    request_deserializer=TimelinesService__pb2.GetOrStartSimulationRequest.FromString,
-                    response_serializer=TimelinesService__pb2.GetOrStartSimulationResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.GetOrStartSimulationRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.GetOrStartSimulationResponse.SerializeToString,
             ),
             'StopSimulation': grpc.unary_unary_rpc_method_handler(
                     servicer.StopSimulation,
-                    request_deserializer=TimelinesService__pb2.StopSimulationRequest.FromString,
-                    response_serializer=TimelinesService__pb2.StopSimulationResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.StopSimulationRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.StopSimulationResponse.SerializeToString,
             ),
             'MoveSimToTick': grpc.unary_unary_rpc_method_handler(
                     servicer.MoveSimToTick,
-                    request_deserializer=TimelinesService__pb2.MoveSimToTickRequest.FromString,
-                    response_serializer=TimelinesService__pb2.MoveSimToTickResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.MoveSimToTickRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.MoveSimToTickResponse.SerializeToString,
             ),
             'EditSimulation': grpc.stream_stream_rpc_method_handler(
                     servicer.EditSimulation,
-                    request_deserializer=TimelinesService__pb2.EditSimulationRequest.FromString,
-                    response_serializer=TimelinesService__pb2.EditSimulationResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.EditSimulationRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.EditSimulationResponse.SerializeToString,
             ),
             'ModifyTimelineTags': grpc.unary_unary_rpc_method_handler(
                     servicer.ModifyTimelineTags,
-                    request_deserializer=TimelinesService__pb2.ModifyTimelineTagsRequest.FromString,
-                    response_serializer=TimelinesService__pb2.ModifyTimelineTagsResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.ModifyTimelineTagsRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.ModifyTimelineTagsResponse.SerializeToString,
             ),
             'CreateTimeline': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateTimeline,
-                    request_deserializer=TimelinesService__pb2.CreateTimelineRequest.FromString,
-                    response_serializer=TimelinesService__pb2.CreateTimelineResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.CreateTimelineRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.CreateTimelineResponse.SerializeToString,
             ),
             'CloneTimeline': grpc.unary_unary_rpc_method_handler(
                     servicer.CloneTimeline,
-                    request_deserializer=TimelinesService__pb2.CloneTimelineRequest.FromString,
-                    response_serializer=TimelinesService__pb2.CloneTimelineResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.CloneTimelineRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.CloneTimelineResponse.SerializeToString,
             ),
             'CreateTimelineFromSimulation': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateTimelineFromSimulation,
-                    request_deserializer=TimelinesService__pb2.CreateTimelineFromSimulationRequest.FromString,
-                    response_serializer=TimelinesService__pb2.CreateTimelineFromSimulationResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.CreateTimelineFromSimulationRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.CreateTimelineFromSimulationResponse.SerializeToString,
             ),
             'DeleteTimeline': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteTimeline,
-                    request_deserializer=TimelinesService__pb2.DeleteTimelineRequest.FromString,
-                    response_serializer=TimelinesService__pb2.DeleteTimelineResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.DeleteTimelineRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.DeleteTimelineResponse.SerializeToString,
             ),
             'GetTimelineDetails': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTimelineDetails,
-                    request_deserializer=TimelinesService__pb2.GetTimelineDetailsRequest.FromString,
-                    response_serializer=TimelinesService__pb2.GetTimelineDetailsResponse.SerializeToString,
+                    request_deserializer=simma_dot_TimelinesService__pb2.GetTimelineDetailsRequest.FromString,
+                    response_serializer=simma_dot_TimelinesService__pb2.GetTimelineDetailsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -274,7 +274,7 @@ def add_TimelineServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class TimelineService(object):
-    """python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
+    """python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/TimelinesService.proto
 
     """
 
@@ -290,8 +290,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelines',
-            TimelinesService__pb2.TimelinesRequest.SerializeToString,
-            TimelinesService__pb2.TimelinesResponse.FromString,
+            simma_dot_TimelinesService__pb2.TimelinesRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.TimelinesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -307,8 +307,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelineTicks',
-            TimelinesService__pb2.TimelineTicksRequest.SerializeToString,
-            TimelinesService__pb2.TimelineTicksResponse.FromString,
+            simma_dot_TimelinesService__pb2.TimelineTicksRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.TimelineTicksResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -324,8 +324,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/PyGridWorld.TimelineService/GetTimelineData',
-            TimelinesService__pb2.TimelineDataRequest.SerializeToString,
-            TimelinesService__pb2.TimelineDataResponse.FromString,
+            simma_dot_TimelinesService__pb2.TimelineDataRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.TimelineDataResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -341,8 +341,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/PyGridWorld.TimelineService/GetTimelineJson',
-            TimelinesService__pb2.TimelineJsonRequest.SerializeToString,
-            TimelinesService__pb2.TimelineJsonResponse.FromString,
+            simma_dot_TimelinesService__pb2.TimelineJsonRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.TimelineJsonResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -358,8 +358,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/PyGridWorld.TimelineService/GetTimelineEvents',
-            TimelinesService__pb2.TimelineEventsRequest.SerializeToString,
-            TimelinesService__pb2.TimelineEventsResponse.FromString,
+            simma_dot_TimelinesService__pb2.TimelineEventsRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.TimelineEventsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -375,8 +375,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetOrStartSimulation',
-            TimelinesService__pb2.GetOrStartSimulationRequest.SerializeToString,
-            TimelinesService__pb2.GetOrStartSimulationResponse.FromString,
+            simma_dot_TimelinesService__pb2.GetOrStartSimulationRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.GetOrStartSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -392,8 +392,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/StopSimulation',
-            TimelinesService__pb2.StopSimulationRequest.SerializeToString,
-            TimelinesService__pb2.StopSimulationResponse.FromString,
+            simma_dot_TimelinesService__pb2.StopSimulationRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.StopSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -409,8 +409,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/MoveSimToTick',
-            TimelinesService__pb2.MoveSimToTickRequest.SerializeToString,
-            TimelinesService__pb2.MoveSimToTickResponse.FromString,
+            simma_dot_TimelinesService__pb2.MoveSimToTickRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.MoveSimToTickResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -426,8 +426,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.stream_stream(request_iterator, target, '/PyGridWorld.TimelineService/EditSimulation',
-            TimelinesService__pb2.EditSimulationRequest.SerializeToString,
-            TimelinesService__pb2.EditSimulationResponse.FromString,
+            simma_dot_TimelinesService__pb2.EditSimulationRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.EditSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -443,8 +443,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/ModifyTimelineTags',
-            TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
-            TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
+            simma_dot_TimelinesService__pb2.ModifyTimelineTagsRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.ModifyTimelineTagsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -460,8 +460,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/CreateTimeline',
-            TimelinesService__pb2.CreateTimelineRequest.SerializeToString,
-            TimelinesService__pb2.CreateTimelineResponse.FromString,
+            simma_dot_TimelinesService__pb2.CreateTimelineRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.CreateTimelineResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -477,8 +477,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/CloneTimeline',
-            TimelinesService__pb2.CloneTimelineRequest.SerializeToString,
-            TimelinesService__pb2.CloneTimelineResponse.FromString,
+            simma_dot_TimelinesService__pb2.CloneTimelineRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.CloneTimelineResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -494,8 +494,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/CreateTimelineFromSimulation',
-            TimelinesService__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
-            TimelinesService__pb2.CreateTimelineFromSimulationResponse.FromString,
+            simma_dot_TimelinesService__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.CreateTimelineFromSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -511,8 +511,8 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/DeleteTimeline',
-            TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
-            TimelinesService__pb2.DeleteTimelineResponse.FromString,
+            simma_dot_TimelinesService__pb2.DeleteTimelineRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.DeleteTimelineResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -528,7 +528,7 @@ class TimelineService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/PyGridWorld.TimelineService/GetTimelineDetails',
-            TimelinesService__pb2.GetTimelineDetailsRequest.SerializeToString,
-            TimelinesService__pb2.GetTimelineDetailsResponse.FromString,
+            simma_dot_TimelinesService__pb2.GetTimelineDetailsRequest.SerializeToString,
+            simma_dot_TimelinesService__pb2.GetTimelineDetailsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -84,7 +84,7 @@ namespace SimulationServer
 
                     Server server = new Server
                     {
-                        Services = { PyGridWorld.SimulationServer.Simulation.BindService(new SimulationService(wrapper, ownerToken.Value())) },
+                        Services = { Simma.Simulation.BindService(new SimulationService(wrapper, ownerToken.Value())) },
                         Ports = { new ServerPort("localhost", server_port, ServerCredentials.Insecure) }
                     };
 

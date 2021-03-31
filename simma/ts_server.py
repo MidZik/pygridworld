@@ -1,10 +1,10 @@
 import grpc
 from concurrent import futures
 
-import SimulationManager as sm
-import simrunner as sr
-import TimelinesService_pb2 as ts
-import TimelinesService_pb2_grpc as ts_grpc
+import simma.SimulationManager as sm
+import simma.simrunner as sr
+import simma.TimelinesService_pb2 as ts
+import simma.TimelinesService_pb2_grpc as ts_grpc
 
 import traceback
 

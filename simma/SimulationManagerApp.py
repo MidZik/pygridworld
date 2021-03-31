@@ -1,17 +1,17 @@
 """
 @author: Matt Idzik (MidZik)
 """
-import SimulationManager as sm
-from GUI import create_gui_process
-import window
-import command_prompt_dock_widget as cmd
+import simma.SimulationManager as sm
+from simma.GUI import create_gui_process
+from simma import window
+import simma.command_prompt_dock_widget as cmd
 from typing import Optional, Dict
 from PySide2 import QtCore, QtWidgets, QtGui
 from pathlib import Path
 import json
 from collections import deque
 from weakref import WeakKeyDictionary
-from ts_server import Server
+from simma.ts_server import Server
 from PySide2.QtWidgets import QFileDialog
 import shlex
 
@@ -959,7 +959,11 @@ class App(QtCore.QObject):
         return self._app.exec_()
 
 
-if __name__ == "__main__":
+def main():
     import sys
     app = App(sys.argv)
     app.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package PyGridWorld.SimulationServer;
+package simma;
 
-// python -m grpc_tools.protoc -I./SimulationServer/protos --python_out=. --grpc_python_out=. ./SimulationServer/protos/simulation.proto
+// python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/simulation.proto
 
 service Simulation {
     rpc GetTick(GetTickRequest) returns (GetTickResponse);

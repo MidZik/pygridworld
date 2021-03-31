@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package PyGridWorld;
 
-// python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/TimelinesService.proto
+// python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/TimelinesService.proto
 
 service TimelineService {
     rpc GetTimelines (TimelinesRequest) returns (TimelinesResponse) {}
