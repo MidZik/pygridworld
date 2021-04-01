@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import setuptools
 from distutils.command.build import build as _build
+from shutil import which
 
 
 sln_files = [r"./SimulationServer/SimulationServer.sln"]
@@ -27,6 +28,9 @@ class BuildDotnetCommand(Command):
         pass
 
     def run(self) -> None:
+        if which('dotnet') is None:
+            raise RuntimeError("'dotnet' command is missing. Ensure that the .NET Core SDK is installed.")
+
         for file in sln_files:
             path = Path(file).resolve(True)
 
@@ -65,6 +69,12 @@ setuptools.setup(
     },
     include_package_data=True,
     setup_requires=['setuptools_git >= 0.3'],
+    install_requires=[
+        'PySide2>=5.13',
+        'pyglet>=1.5.14',
+        'grpcio>=1.33.2',
+        'protobuf>=3.14'
+    ],
     entry_points={
         'console_scripts': ['simma-app=simma.SimulationManagerApp:main']
     },
