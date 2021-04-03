@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Platforms>x64</Platforms>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,5 +23,9 @@
       <Link>simulation.proto</Link>
     </Protobuf>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if '$(PublishLibAfterBuild)' == 'false' (&#xD;&#xA;    echo Not publishing to inplace simma\lib&#xD;&#xA;) else (&#xD;&#xA;    dotnet publish -c $(ConfigurationName) -o &quot;$(SolutionDir)..\simma\lib&quot; --no-self-contained --no-build&#xD;&#xA;)" />
+  </Target>
 
 </Project>

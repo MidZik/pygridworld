@@ -4,17 +4,12 @@ from pathlib import Path
 import subprocess
 import setuptools
 from distutils.command.build import build as _build
+from setuptools.command.develop import develop as _develop
 from shutil import which
+import os
 
 
 sln_files = [r"./SimulationServer/SimulationServer.sln"]
-
-
-def glob_fix(package_name, glob):
-    # this assumes setup.py lives in the folder that contains the package
-    package_path = Path(f'./{package_name}').resolve()
-    return [str(path.relative_to(package_path))
-            for path in package_path.glob(glob)]
 
 
 class BuildDotnetCommand(Command):
@@ -22,10 +17,13 @@ class BuildDotnetCommand(Command):
     user_options = []
 
     def initialize_options(self) -> None:
-        pass
+        self.build_lib = None
+        self.inplace = False
 
     def finalize_options(self) -> None:
-        pass
+        build = self.distribution.get_command_obj("build")
+        build.ensure_finalized()
+        self.build_lib = os.path.join(build.build_lib, r'simma\lib')
 
     def run(self) -> None:
         if which('dotnet') is None:
@@ -38,13 +36,25 @@ class BuildDotnetCommand(Command):
                 f"Building solution {path}...",
                 level=log.INFO)
 
-            cmd = [
-                'dotnet',
-                'build',
-                str(path),
-                '-c', 'Release',
-                '-o', 'simma/lib/',
-            ]
+            if not self.inplace:
+                cmd = [
+                    'dotnet',
+                    'publish',
+                    str(path),
+                    '-c', 'Release',
+                    '-o', self.build_lib,
+                    '-r', 'win-x64',
+                    '--no-self-contained',
+                    '-p:PublishLibAfterBuild=false'
+                ]
+            else:
+                cmd = [
+                    'dotnet',
+                    'build',
+                    str(path),
+                    '-c', 'Release',
+                    '-o', self.build_lib
+                ]
 
             subprocess.check_call(cmd)
 
@@ -53,10 +63,19 @@ class Build(_build):
     sub_commands = _build.sub_commands + [('build_dotnet', None)]
 
 
+class Develop(_develop):
+    def install_for_development(self):
+        self.reinitialize_command("build_dotnet", inplace=True)
+        self.run_command("build_dotnet")
+
+        return super().install_for_development()
+
+
 setuptools.setup(
     cmdclass={
         'build_dotnet': BuildDotnetCommand,
-        'build': Build
+        'build': Build,
+        'develop': Develop
     },
     name='simma',
     version='0.1',
@@ -64,9 +83,6 @@ setuptools.setup(
     author='Matt Idzik',
     author_email='matt.idzik1@gmail.com',
     packages=setuptools.find_packages(),
-    package_data={
-        'simma': [*glob_fix('simma', 'lib/**/*')]
-    },
     include_package_data=True,
     setup_requires=['setuptools_git >= 0.3'],
     install_requires=[
