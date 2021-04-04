@@ -2,9 +2,9 @@
 @author: Matt Idzik (MidZik)
 """
 import simma.SimulationManager as sm
-from simma.GUI import create_gui_process
-from simma import window
-import simma.command_prompt_dock_widget as cmd
+from simma.gui.GUI import create_gui_process
+from simma.gui import window
+import simma.gui.command_prompt_dock_widget as cmd
 from typing import Optional, Dict
 from PySide2 import QtCore, QtWidgets, QtGui
 from pathlib import Path
