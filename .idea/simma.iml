@@ -3,6 +3,10 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/simma/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/SimulationServer" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/simma.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/.eggs" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9 (simma)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
