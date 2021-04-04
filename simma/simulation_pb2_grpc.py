@@ -43,7 +43,7 @@ class SimulationStub(object):
                 )
         self.GetAllEntities = channel.unary_unary(
                 '/simma.Simulation/GetAllEntities',
-                request_serializer=simma_dot_simulation__pb2.GetAllEntitesRequest.SerializeToString,
+                request_serializer=simma_dot_simulation__pb2.GetAllEntitiesRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetAllEntitiesResponse.FromString,
                 )
         self.StartSimulation = channel.unary_unary(
@@ -317,7 +317,7 @@ def add_SimulationServicer_to_server(servicer, server):
             ),
             'GetAllEntities': grpc.unary_unary_rpc_method_handler(
                     servicer.GetAllEntities,
-                    request_deserializer=simma_dot_simulation__pb2.GetAllEntitesRequest.FromString,
+                    request_deserializer=simma_dot_simulation__pb2.GetAllEntitiesRequest.FromString,
                     response_serializer=simma_dot_simulation__pb2.GetAllEntitiesResponse.SerializeToString,
             ),
             'StartSimulation': grpc.unary_unary_rpc_method_handler(
@@ -519,7 +519,7 @@ class Simulation(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/simma.Simulation/GetAllEntities',
-            simma_dot_simulation__pb2.GetAllEntitesRequest.SerializeToString,
+            simma_dot_simulation__pb2.GetAllEntitiesRequest.SerializeToString,
             simma_dot_simulation__pb2.GetAllEntitiesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

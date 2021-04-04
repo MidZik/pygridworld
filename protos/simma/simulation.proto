@@ -10,7 +10,7 @@ service Simulation {
     rpc SetStateJson(SetStateJsonRequest) returns (SetStateJsonResponse);
     rpc CreateEntity(CreateEntityRequest) returns (CreateEntityResponse);
     rpc DestroyEntity(DestroyEntityRequest) returns (DestroyEntityResponse);
-    rpc GetAllEntities(GetAllEntitesRequest) returns (GetAllEntitiesResponse);
+    rpc GetAllEntities(GetAllEntitiesRequest) returns (GetAllEntitiesResponse);
     rpc StartSimulation(StartSimulationRequest) returns (StartSimulationResponse);
     rpc StopSimulation(StopSimulationRequest) returns (StopSimulationResponse);
     rpc IsRunning(IsRunningRequest) returns (IsRunningResponse);
@@ -67,7 +67,7 @@ message DestroyEntityRequest {
 message DestroyEntityResponse {
 }
 
-message GetAllEntitesRequest {
+message GetAllEntitiesRequest {
 }
 
 message GetAllEntitiesResponse {

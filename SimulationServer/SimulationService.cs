@@ -171,7 +171,7 @@ namespace SimulationServer
             return Task.FromResult(new DestroyEntityResponse { });
         }
 
-        public override Task<GetAllEntitiesResponse> GetAllEntities(GetAllEntitesRequest request, ServerCallContext context)
+        public override Task<GetAllEntitiesResponse> GetAllEntities(GetAllEntitiesRequest request, ServerCallContext context)
         {
             ulong tick;
             List<ulong> eids;

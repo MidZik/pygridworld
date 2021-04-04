@@ -207,7 +207,7 @@ class SimulationClient:
 
     def get_all_entities(self):
         stub = sim_grpc.SimulationStub(self._channel)
-        request = sim.GetAllEntitesRequest()
+        request = sim.GetAllEntitiesRequest()
         response = stub.GetAllEntities(request, metadata=self._create_metadata())
         return response.eids, response.tick
 
