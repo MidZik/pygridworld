@@ -4,7 +4,7 @@ Created on Fri May  3 18:24:23 2019
 
 @author: Matt Idzik (MidZik)
 """
-from simma.simrunner import SimulationClient, RpcError
+from simma.sim_client import SimulationClient, RpcError
 import json
 from multiprocessing import Process
 from weakref import WeakValueDictionary
