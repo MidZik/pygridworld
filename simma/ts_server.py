@@ -318,18 +318,34 @@ class Service(ts_grpc.TimelineServiceServicer):
         return response
 
 
-class Server:
-    def __init__(self, project_to_serve, address='[::]:4969'):
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
-        self.server = server
-        ts_grpc.add_TimelineServiceServicer_to_server(Service(project_to_serve), server)
-        server.add_insecure_port(address)
+def make_server(project_to_serve, address='[::]:4969'):
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
+    ts_grpc.add_TimelineServiceServicer_to_server(Service(project_to_serve), server)
+    server.add_insecure_port(address)
+    return server
 
-    def start(self):
-        self.server.start()
 
-    def stop(self, grace=0):
-        self.server.stop(grace)
+def main():
+    import argparse
+    from pathlib import Path
 
-    def __del__(self):
-        self.stop()
+    parser = argparse.ArgumentParser(description="Run a simma project server.")
+    parser.add_argument('project_path', type=Path, nargs='?', default=Path.cwd())
+
+    args = parser.parse_args()
+
+    project_path = args.project_path.resolve(True)
+    project = sm.TimelinesProject.load_project(project_path)
+    server = make_server(project)
+    print(f"Starting server with project {project_path}")
+    server.start()
+    try:
+        server.wait_for_termination()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        print(f"Server terminated")
+
+
+if __name__ == "__main__":
+    main()

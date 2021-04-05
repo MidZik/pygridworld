@@ -11,7 +11,7 @@ from pathlib import Path
 import json
 from collections import deque
 from weakref import WeakKeyDictionary
-from simma.ts_server import Server
+from simma.ts_server import make_server
 from PySide2.QtWidgets import QFileDialog
 import shlex
 
@@ -337,7 +337,7 @@ class App(QtCore.QObject):
         self._project = sm.TimelinesProject.load_project(project_dir)
         if self._server is not None:
             self._server.stop()
-        self._server = Server(self._project)
+        self._server = make_server(self._project)
         self._server.start()
 
         self._timeline_tree_widget_map = WeakKeyDictionary()
