@@ -12,7 +12,7 @@ import pyglet
 
 
 def _get_asset_path(asset):
-    return "../../assets/" + asset
+    return "../assets/" + asset
 
 
 class RenderData:
