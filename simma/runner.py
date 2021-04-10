@@ -9,7 +9,7 @@ from subprocess import PIPE, DEVNULL
 from pathlib import Path
 from typing import Optional
 
-from simma.sim_client import SimulationClient
+from simma.runner_client import RunnerClient
 
 _simulation_server_path = str(Path(__file__).parent / r'lib/SimulationServer.exe')
 
@@ -179,7 +179,7 @@ class BinaryRunner:
             line = await process.stdout.readline()
             self._port = int(line)
 
-            self._channel = SimulationClient.make_channel(self.get_server_address())
+            self._channel = RunnerClient.make_channel(self.get_server_address())
 
     async def stop(self):
         async with self._lock:
@@ -195,4 +195,4 @@ class BinaryRunner:
         return f'localhost:{self._port}'
 
     def make_client(self, token=""):
-        return SimulationClient(self._channel, token)
+        return RunnerClient(self._channel, token)
