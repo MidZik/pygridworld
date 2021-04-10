@@ -186,13 +186,20 @@ class Process:
             if self._process.returncode is not None:
                 self._channel.close()
                 self._channel = None
+                self._port = None
                 await self._process.communicate(b"exit\n")
 
     def get_port(self):
-        return self._port
+        if self._port:
+            return self._port
+        else:
+            raise RuntimeError("Cannot get port: process not ready.")
 
     def get_server_address(self):
-        return f'localhost:{self._port}'
+        return f'localhost:{self.get_port()}'
 
     def make_client(self, token=""):
-        return Client(self._channel, token)
+        if self._channel is not None:
+            return Client(self._channel, token)
+        else:
+            raise RuntimeError("Cannot make client: process not ready.")
