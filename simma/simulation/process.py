@@ -9,9 +9,9 @@ from subprocess import PIPE, DEVNULL
 from pathlib import Path
 from typing import Optional
 
-from simma.runner_client import RunnerClient
+from simma.simulation.client import Client
 
-_simulation_server_path = str(Path(__file__).parent / r'lib/SimulationServer.exe')
+_simulation_server_path = str(Path(__file__).parent.parent / r'lib/SimulationServer.exe')
 
 
 async def simple_convert(input_file: str,
@@ -150,7 +150,7 @@ async def create_default(output_file: str,
         raise RuntimeError("Creating default state file failed.")
 
 
-class BinaryRunner:
+class Process:
     def __init__(self, simulation_library_path):
         self._simulation_library_path = simulation_library_path
 
@@ -179,7 +179,7 @@ class BinaryRunner:
             line = await process.stdout.readline()
             self._port = int(line)
 
-            self._channel = RunnerClient.make_channel(self.get_server_address())
+            self._channel = Client.make_channel(self.get_server_address())
 
     async def stop(self):
         async with self._lock:
@@ -195,4 +195,4 @@ class BinaryRunner:
         return f'localhost:{self._port}'
 
     def make_client(self, token=""):
-        return RunnerClient(self._channel, token)
+        return Client(self._channel, token)

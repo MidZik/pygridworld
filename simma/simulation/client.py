@@ -26,7 +26,7 @@ class Event:
         return self.name.startswith(namespace)
 
 
-class RunnerClient:
+class Client:
     @staticmethod
     async def make_channel(address):
         return await grpc.aio.insecure_channel(address)
