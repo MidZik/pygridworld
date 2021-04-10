@@ -6,12 +6,45 @@
 
 import asyncio
 from subprocess import PIPE, DEVNULL
-from typing import Optional
 
 from simma.simulation.client import Client
 from simma import LIB_PATH
 
-_simulation_server_path = str(LIB_PATH / r'SimulationServer.exe')
+_SIMULATION_SERVER_PATH = str(LIB_PATH / r'SimulationServer.exe')
+
+
+class Process:
+    def __init__(self, process, address):
+        self._process: asyncio.subprocess.Process = process
+        self._address = address
+        self._channel = Client.make_channel(address)
+
+    async def stop(self, grace=None):
+        await self._channel.close(grace)
+        await self._process.communicate(b"exit\n")
+
+    def make_client(self, token=""):
+        return Client(self._channel, token)
+
+
+async def start_simulation_process(simulation_library_path, owner_token):
+    process = await asyncio.create_subprocess_exec(
+        _SIMULATION_SERVER_PATH,
+        'serve',
+        '-o', owner_token,
+        str(simulation_library_path),
+        stdin=PIPE,
+        stdout=PIPE
+    )
+
+    process.stdin.write(b"port\n")
+    await process.stdin.drain()
+    line = await process.stdout.readline()
+
+    port = int(line)
+    address = f'localhost:{port}'
+
+    return Process(process, address)
 
 
 async def simple_convert(input_file: str,
@@ -41,7 +74,7 @@ async def simple_convert(input_file: str,
     if output_sim_path:
         args.extend(('-os', output_sim_path))
     process = await asyncio.create_subprocess_exec(
-        _simulation_server_path,
+        _SIMULATION_SERVER_PATH,
         *args,
         stdin=DEVNULL,
         stdout=DEVNULL
@@ -78,7 +111,7 @@ async def convert_multiple(input_files,
     if output_sim_path:
         args.extend(('-os', output_sim_path))
     process = await asyncio.create_subprocess_exec(
-        _simulation_server_path,
+        _SIMULATION_SERVER_PATH,
         *args,
         stdin=PIPE,
         stdout=DEVNULL
@@ -114,7 +147,7 @@ async def convert_multiple_generator(input_format: str,
     if output_sim_path:
         args.extend(('-os', output_sim_path))
     process = await asyncio.create_subprocess_exec(
-        _simulation_server_path,
+        _SIMULATION_SERVER_PATH,
         *args,
         stdin=PIPE,
         stdout=PIPE
@@ -140,7 +173,7 @@ async def create_default(output_file: str,
         '-os', output_sim_path
     ]
     process = await asyncio.create_subprocess_exec(
-        _simulation_server_path,
+        _SIMULATION_SERVER_PATH,
         *args,
         stdin=DEVNULL,
         stdout=DEVNULL
@@ -149,58 +182,3 @@ async def create_default(output_file: str,
     if process.returncode != 0:
         raise RuntimeError("Creating default state file failed.")
 
-
-class Process:
-    def __init__(self, simulation_library_path):
-        self._simulation_library_path = simulation_library_path
-
-        self._process: Optional[asyncio.subprocess.Process] = None
-        self._port = None
-        self._channel = None
-        self._lock = asyncio.Lock()
-
-    async def start(self, owner_token=""):
-        async with self._lock:
-            if self._process is not None:
-                return
-
-            process = await asyncio.create_subprocess_exec(
-                _simulation_server_path,
-                'serve',
-                '-o', owner_token,
-                str(self._simulation_library_path),
-                stdin=PIPE,
-                stdout=PIPE
-            )
-            self._process = process
-
-            process.stdin.write(b"port\n")
-            await process.stdin.drain()
-            line = await process.stdout.readline()
-            self._port = int(line)
-
-            self._channel = Client.make_channel(self.get_server_address())
-
-    async def stop(self):
-        async with self._lock:
-            if self._process is not None:
-                self._channel.close()
-                self._channel = None
-                self._port = None
-                await self._process.communicate(b"exit\n")
-                self._process = None
-
-    def get_port(self):
-        if self._port:
-            return self._port
-        else:
-            raise RuntimeError("Cannot get port: process not ready.")
-
-    def get_server_address(self):
-        return f'localhost:{self.get_port()}'
-
-    def make_client(self, token=""):
-        if self._channel is not None:
-            return Client(self._channel, token)
-        else:
-            raise RuntimeError("Cannot make client: process not ready.")
