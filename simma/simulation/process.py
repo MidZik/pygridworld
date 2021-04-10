@@ -6,12 +6,12 @@
 
 import asyncio
 from subprocess import PIPE, DEVNULL
-from pathlib import Path
 from typing import Optional
 
 from simma.simulation.client import Client
+from simma import LIB_PATH
 
-_simulation_server_path = str(Path(__file__).parent.parent / r'lib/SimulationServer.exe')
+_simulation_server_path = str(LIB_PATH / r'SimulationServer.exe')
 
 
 async def simple_convert(input_file: str,
