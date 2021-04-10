@@ -183,11 +183,12 @@ class Process:
 
     async def stop(self):
         async with self._lock:
-            if self._process.returncode is not None:
+            if self._process is not None:
                 self._channel.close()
                 self._channel = None
                 self._port = None
                 await self._process.communicate(b"exit\n")
+                self._process = None
 
     def get_port(self):
         if self._port:
