@@ -28,8 +28,8 @@ class Event:
 
 class Client:
     @staticmethod
-    async def make_channel(address):
-        return await grpc.aio.insecure_channel(address)
+    def make_channel(address):
+        return grpc.aio.insecure_channel(address)
 
     def __init__(self, channel, token):
         self._channel = channel
