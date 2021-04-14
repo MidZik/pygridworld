@@ -14,39 +14,6 @@ _REGEX_POINT_NAME_EXP = re.compile(r'^tick-(?P<tick>\d+)\.point$')
 
 
 class TimelineData:
-    @staticmethod
-    async def create_new(path: Path):
-        path = path.resolve(False).absolute()
-        path.mkdir(exist_ok=False)
-        timeline_data = TimelineData(path)
-        async with timeline_data.get_db_conn() as db, _committing(db):
-            await db.execute('''
-                CREATE TABLE IF NOT EXISTS events (
-                    tick INTEGER NOT NULL,
-                    event_name TEXT,
-                    event_json TEXT,
-                    PRIMARY KEY(tick, event_name)
-                )''')
-            await db.execute('''
-                CREATE TABLE IF NOT EXISTS meta (
-                    id INTEGER PRIMARY KEY CHECK (id = 0),
-                    last_commit_timestamp TEXT
-                )''')
-            await db.execute('''
-                INSERT OR IGNORE INTO
-                meta(id, last_commit_timestamp)
-                VALUES(0,?)
-                ''', (datetime.utcnow().isoformat(),))
-            await db.commit()
-        return timeline_data
-
-    @staticmethod
-    async def load_existing(path: Path):
-        path = path.resolve(True)
-        timeline_data = TimelineData(path)
-        await timeline_data.load()
-        return timeline_data
-
     def __init__(self, path: Path):
         self.path: Path = path.resolve(False).absolute()
         self.ticks = []
