@@ -111,33 +111,33 @@ class ProjectTimeline:
 
     async def load(self):
         with self._config_path().open('r') as f:
-            data = json.load(f)
+            config = json.load(f)
 
-        uuid = data.get('uuid')
+        uuid = config.get('uuid')
         if uuid:
             uuid = UUID(uuid)
         self.uuid = uuid
 
-        parent_uuid = data.get('parent_uuid')
+        parent_uuid = config.get('parent_uuid')
         if parent_uuid:
             parent_uuid = UUID(parent_uuid)
         self.parent_uuid = parent_uuid
 
-        binary_uuid = data.get('binary_uuid')
+        binary_uuid = config.get('binary_uuid')
         if binary_uuid:
             binary_uuid = UUID(binary_uuid)
         self.binary_uuid = binary_uuid
 
-        tags = data.get('tags')
+        tags = config.get('tags')
         if tags:
-            self.tags = set(data['tags'])
+            self.tags = set(config['tags'])
         else:
             self.tags = set()
 
         await self.data.load()
 
     def save(self):
-        data = {
+        config = {
             'uuid': str(self.uuid) if self.uuid else None,
             'parent_uuid': str(self.parent_uuid) if self.parent_uuid else None,
             'binary_uuid': str(self.binary_uuid) if self.binary_uuid else None,
@@ -145,7 +145,7 @@ class ProjectTimeline:
         }
 
         with self._config_path().open('w') as f:
-            json.dump(data, f)
+            json.dump(config, f)
 
 
 @asynccontextmanager
