@@ -110,6 +110,10 @@ class TimelineData:
         if tick in self.ticks:
             return self._get_point_file_path(tick)
 
+    def get_head_point(self):
+        head_tick = self.ticks[0]
+        return head_tick, self._get_point_file_path(head_tick)
+
 
 class ProjectTimeline:
     def __init__(self, path: Path):
