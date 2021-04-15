@@ -147,6 +147,10 @@ class ProjectTimeline:
         with self._config_path().open('w') as f:
             json.dump(config, f)
 
+    def delete(self):
+        if self._config_path().exists():
+            shutil.rmtree(self.path)
+
 
 @asynccontextmanager
 async def _committing(db_conn: aiosqlite.Connection):
