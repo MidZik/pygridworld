@@ -1,13 +1,14 @@
 import asyncio
 from pathlib import Path
 from uuid import UUID
-from typing import Optional
+from typing import Optional, Union, Callable
 import json
 import re
 import aiosqlite
 from datetime import datetime
 from contextlib import asynccontextmanager
 from bisect import insort
+import shutil
 
 
 _REGEX_POINT_NAME_EXP = re.compile(r'^tick-(?P<tick>\d+)\.point$')
@@ -64,7 +65,16 @@ class TimelineData:
             tick = _parse_point_file(point_path.name)
             yield tick, point_path
 
-    async def add_binary_point(self, tick, binary, overwrite=False):
+    async def add_point(self, tick, state: Union[Path, bytes, Callable[[Path], None]], overwrite=False):
+        """Adds a state point.
+
+        :param tick: The tick of the state to add.
+        :param state: Either a path to the state file, the bytes of the state, or a callable that,
+            when given a path, places the bytes of the state into that path.
+        :param overwrite: If True, will overwrite any existing point at the same tick. Otherwise, will
+            ignore the add attempt.
+        :return:
+        """
         if (
             not overwrite
             and (
@@ -79,8 +89,15 @@ class TimelineData:
         temp_file = point_file.with_suffix('.ptemp')
         try:
             def do_write():
-                with temp_file.open('bw') as f:
-                    f.write(binary)
+                if isinstance(state, Path):
+                    shutil.copy(state, temp_file)
+                elif isinstance(state, bytes):
+                    with temp_file.open('bw') as f:
+                        f.write(state)
+                elif callable(state):
+                    state(temp_file)
+                else:
+                    raise TypeError("Cannot add point: provided state must be Path, bytes, or callable")
             await asyncio.to_thread(do_write)
             temp_file.rename(point_file)
             if tick not in self.ticks:
@@ -88,6 +105,10 @@ class TimelineData:
         finally:
             self._pending_ticks.remove(tick)
             temp_file.unlink(missing_ok=True)
+
+    def get_point(self, tick):
+        if tick in self.ticks:
+            return self._get_point_file_path(tick)
 
 
 class ProjectTimeline:
