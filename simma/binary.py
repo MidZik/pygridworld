@@ -7,6 +7,7 @@ from uuid import UUID
 import shutil
 from datetime import datetime
 import asyncio
+import subprocess
 
 from . import _utils
 
@@ -61,8 +62,26 @@ class ProjectBinary(BinaryProvider):
         try:
             binary_path = local_simbin.get_binary_path()
 
-            ProjectBinary._get_src_dir(path).mkdir()
-            ProjectBinary._get_bin_dir(path).mkdir()
+            src_dir = ProjectBinary._get_src_dir(path)
+            src_dir.mkdir()
+            bin_dir = ProjectBinary._get_bin_dir(path)
+            bin_dir.mkdir()
+
+            await asyncio.to_thread(shutil.copy2, binary_path, bin_dir)
+
+            if local_simbin.archive_method == 'git-archive-working':
+                archive_path = src_dir / 'code.tar.gz'
+                git = subprocess.Popen(('git', 'ls-files', '-o', '-c', '--exclude-standard'),
+                                       cwd=local_simbin.path.parent,
+                                       stdout=subprocess.PIPE)
+                subprocess.run(('tar', 'T', '-', '-czf', str(archive_path)),
+                               cwd=local_simbin.path.parent,
+                               stdin=git.stdout,
+                               check=True)
+                if git.wait():
+                    raise RuntimeError("git encountered an error.")
+            else:
+                raise ValueError(f"Source file has unknown archive method: {local_simbin.archive_method}")
 
             data = {
                 'uuid': str(uuid),
