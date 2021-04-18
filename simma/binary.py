@@ -146,3 +146,7 @@ class ProjectBinary(BinaryProvider):
     def get_description_summary(self):
         with ProjectBinary._get_description_path(self.path).open() as f:
             return f.readline(50).strip()
+
+    async def delete(self):
+        if ProjectBinary._get_config_path(self.path).exists():
+            await asyncio.to_thread(shutil.rmtree, self.path)
