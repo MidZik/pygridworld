@@ -210,6 +210,12 @@ class Timeline:
         point_path = self._get_point_path(tick)
         point_path.unlink(missing_ok=True)
 
+    async def get_metadata(self):
+        return await _utils.load_json(self.path / Timeline._METADATA_FILE_NAME)
+
+    async def set_metadata(self, metadata):
+        await _utils.dump_json(metadata, self.path / Timeline._METADATA_FILE_NAME)
+
     async def reset(self, head_tick: int, head_data_path: Path, metadata=None, *, transfer_mode='copy'):
         """ Deletes all data in the timeline and resets it to a new head point, with optionally
         new metadata to go along with it.
