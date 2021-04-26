@@ -207,13 +207,16 @@ class Timeline:
         await self.add_point(tick, move)
 
     async def delete_point(self, tick):
+        self._assert_ready()
         point_path = self._get_point_path(tick)
         point_path.unlink(missing_ok=True)
 
     async def get_metadata(self):
+        self._assert_ready()
         return await _utils.load_json(self.path / Timeline._METADATA_FILE_NAME)
 
     async def set_metadata(self, metadata):
+        self._assert_ready()
         await _utils.dump_json(metadata, self.path / Timeline._METADATA_FILE_NAME)
 
     async def reset(self, head_tick: int, head_data_path: Path, metadata=None, *, transfer_mode='copy'):
@@ -228,6 +231,7 @@ class Timeline:
             into the timeline (deleting it from its original location).
         :return:
         """
+        self._assert_ready()
         # phase 1, prepare the transaction
         prep_dir = self._transact_prep_dir_path()
         prep_dir.mkdir(exist_ok=False)
