@@ -31,7 +31,7 @@ def _add_suffix(path: Path, suffix: str):
 
 
 def temp_replace(path: Path):
-    """Creates a temporary file path on entry, which on exit will replace the given path.
+    """Creates a temporary file path on entry, which on exit will replace the given path if no exception occurs
 
     This function will not flush or sync for you."""
     temp_path = _add_suffix(path, ".temp")
