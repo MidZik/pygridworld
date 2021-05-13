@@ -1,11 +1,12 @@
 import asyncio
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional, Coroutine
 import re
 import aiosqlite
 from contextlib import asynccontextmanager
 import shutil
 from os import fsync
+from inspect import iscoroutinefunction
 
 from . import _utils
 
@@ -113,7 +114,7 @@ class Timeline:
         point_path = self._get_point_path(tick)
         return point_path.is_file()
 
-    async def add_point(self, tick, point_creator: Callable[[Path], None]):
+    async def add_point(self, tick, point_creator: Callable[[Path], Optional[Coroutine]]):
         """ Adds a new point to the timeline. Must come after the head point.
 
         :param tick: The tick of the point
@@ -129,7 +130,10 @@ class Timeline:
 
         self._in_progress_ticks.add(tick)
         try:
-            await asyncio.to_thread(point_creator, new_point_path)
+            if iscoroutinefunction(point_creator):
+                await point_creator(new_point_path)
+            else:
+                await asyncio.to_thread(point_creator, new_point_path)
         finally:
             self._in_progress_ticks.remove(tick)
 
