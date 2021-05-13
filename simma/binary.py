@@ -71,15 +71,17 @@ class ProjectBinary(BinaryProvider):
 
             if local_simbin.archive_method == 'git-archive-working':
                 archive_path = src_dir / 'code.tar.gz'
-                git = subprocess.Popen(('git', 'ls-files', '-o', '-c', '--exclude-standard'),
-                                       cwd=local_simbin.path.parent,
-                                       stdout=subprocess.PIPE)
-                subprocess.run(('tar', 'T', '-', '-czf', str(archive_path)),
-                               cwd=local_simbin.path.parent,
-                               stdin=git.stdout,
-                               check=True)
-                if git.wait():
+                git = await asyncio.create_subprocess_exec('git', 'ls-files', '-o', '-c', '--exclude-standard',
+                                                           cwd=local_simbin.path.parent,
+                                                           stdout=subprocess.PIPE)
+                tar = await asyncio.create_subprocess_exec('tar', 'T', '-', '-czf', str(archive_path),
+                                                           cwd=local_simbin.path.parent,
+                                                           stdin=git.stdout,
+                                                           check=True)
+                if await git.wait():
                     raise RuntimeError("git encountered an error.")
+                if await tar.wait():
+                    raise RuntimeError("tar encountered an error.")
             else:
                 raise ValueError(f"Source file has unknown archive method: {local_simbin.archive_method}")
 
