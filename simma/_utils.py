@@ -2,7 +2,13 @@ import asyncio
 import json
 from pathlib import Path
 import os
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
+
+
+T = TypeVar('T')
+
+
+fsync = os.fsync
 
 
 def _load_json(path: Path):
@@ -30,11 +36,13 @@ def _add_suffix(path: Path, suffix: str):
     return path.with_suffix(path.suffix + suffix)
 
 
-def temp_replace(path: Path):
+@contextmanager
+def temp_replace(path: Path, temp_path: Path = None):
     """Creates a temporary file path on entry, which on exit will replace the given path if no exception occurs
 
     This function will not flush or sync for you."""
-    temp_path = _add_suffix(path, ".temp")
+    if temp_path is None:
+        temp_path = _add_suffix(path, ".temp")
     try:
         yield temp_path
         temp_path.replace(path)
@@ -47,19 +55,25 @@ class RWLock:
     def __init__(self):
         self._write_lock = asyncio.Lock()
         self._allow_write = asyncio.Event()
+        self._allow_upgrade = asyncio.Event()
         self._allow_read = asyncio.Event()
         self._readers = 0
+        self._upgrader_id = 0
 
     @asynccontextmanager
     async def reading(self):
         await self._allow_read.wait()
         self._readers += 1
         self._allow_write.clear()
+        if self._readers > 1:
+            self._allow_upgrade.clear()
         try:
             yield
         finally:
             self._readers -= 1
-            if self._readers == 0:
+            if self._readers == 1:
+                self._allow_upgrade.set()
+            elif self._readers == 0:
                 self._allow_write.set()
 
     @asynccontextmanager
@@ -71,3 +85,25 @@ class RWLock:
                 yield
             finally:
                 self._allow_read.set()
+
+    def _make_upgrader(self):
+        self._upgrader_id += 1
+        my_upgrader_id = self._upgrader_id
+
+        @asynccontextmanager
+        async def upgrader():
+            if self._upgrader_id != my_upgrader_id:
+                raise RuntimeError("Tried to upgrade with expired upgrader.")
+            self._allow_read.clear()
+            await self._allow_upgrade.wait()
+            try:
+                yield
+            finally:
+                self._allow_read.set()
+
+        return upgrader
+
+    @asynccontextmanager
+    async def reading_upgradable(self):
+        async with self._write_lock, self.reading():
+            yield self._make_upgrader()
