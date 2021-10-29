@@ -2,12 +2,14 @@ from dataclasses import dataclass
 from pathlib import Path
 import json
 from typing import Optional
+from contextlib import asynccontextmanager
 from abc import ABC, abstractmethod
-from uuid import UUID
+from uuid import UUID, uuid4
 import shutil
 from datetime import datetime
 import asyncio
 import subprocess
+from weakref import WeakValueDictionary
 
 from . import _utils
 
@@ -46,105 +48,24 @@ class LocalSimbin(BinaryProvider):
     def get_binary_path(self) -> Path:
         return self.path.parent / self.binary_path
 
+    async def create_archive(self, destination: Path):
+        if destination.exists():
+            raise FileExistsError(f'Cannot create archive at destination {destination}: already exists.')
+        if self.archive_method == 'git-archive-working':
+            git = await asyncio.create_subprocess_exec('git', 'ls-files', '-o', '-c', '--exclude-standard',
+                                                       cwd=self.path.parent,
+                                                       stdout=subprocess.PIPE)
+            tar = await asyncio.create_subprocess_exec('tar', 'T', '-', '-czf', str(destination),
+                                                       cwd=self.path.parent,
+                                                       stdin=git.stdout)
+            if await git.wait():
+                raise RuntimeError("git encountered an error.")
+            if await tar.wait():
+                raise RuntimeError("tar encountered an error.")
+        else:
+            raise ValueError(f"Source file has unknown archive method: {self.archive_method}")
 
-@dataclass(frozen=True)
-class ProjectBinary(BinaryProvider):
-    """A simulation binary that is saved in the project."""
-    path: Path
-    uuid: UUID
-    simbin_name: str
-    binary: str
-    creation_timestamp: str
-
-    @staticmethod
-    async def create_from_local_simbin(path: Path, uuid: UUID, local_simbin: LocalSimbin):
-        path.mkdir(exist_ok=False)
-        try:
-            binary_path = local_simbin.get_binary_path()
-
-            src_dir = ProjectBinary._get_src_dir(path)
-            src_dir.mkdir()
-            bin_dir = ProjectBinary._get_bin_dir(path)
-            bin_dir.mkdir()
-
-            await asyncio.to_thread(shutil.copy2, binary_path, bin_dir)
-
-            if local_simbin.archive_method == 'git-archive-working':
-                archive_path = src_dir / 'code.tar.gz'
-                git = await asyncio.create_subprocess_exec('git', 'ls-files', '-o', '-c', '--exclude-standard',
-                                                           cwd=local_simbin.path.parent,
-                                                           stdout=subprocess.PIPE)
-                tar = await asyncio.create_subprocess_exec('tar', 'T', '-', '-czf', str(archive_path),
-                                                           cwd=local_simbin.path.parent,
-                                                           stdin=git.stdout,
-                                                           check=True)
-                if await git.wait():
-                    raise RuntimeError("git encountered an error.")
-                if await tar.wait():
-                    raise RuntimeError("tar encountered an error.")
-            else:
-                raise ValueError(f"Source file has unknown archive method: {local_simbin.archive_method}")
-
-            data = {
-                'uuid': str(uuid),
-                'simbin_name': local_simbin.name,
-                'binary': binary_path.name,
-                'creation_timestamp': str(datetime.today())
-            }
-
-            await _utils.dump_json(data, ProjectBinary._get_config_path(path))
-
-            project_binary = await ProjectBinary.load(path)
-
-            await asyncio.to_thread(project_binary.set_description, "")
-
-        except BaseException:
-            shutil.rmtree(path)
-            raise
-
-        return project_binary
-
-    @staticmethod
-    async def load(path: Path):
-        try:
-            data = await _utils.load_json(ProjectBinary._get_config_path(path))
-
-            uuid = UUID(data['uuid'])
-            simbin_name = data['simbin_name']
-            binary = data['binary']
-            creation_timestamp = data['creation_timestamp']
-        except (LookupError, json.JSONDecodeError):
-            raise ValueError("Project binary config not formatted correctly.")
-
-        return ProjectBinary(path, uuid, simbin_name, binary, creation_timestamp)
-
-    @staticmethod
-    def _get_config_path(path: Path):
-        return path / 'binary.json'
-
-    @staticmethod
-    def _get_description_path(path: Path):
-        return path / 'description.txt'
-
-    @staticmethod
-    def _get_src_dir(path: Path):
-        return path / 'src'
-
-    @staticmethod
-    def _get_bin_dir(path: Path):
-        return path / 'bin'
-
-    def get_binary_path(self) -> Path:
-        return self.path / self.binary
-
-    def set_description(self, description):
-        with ProjectBinary._get_description_path(self.path).open('w') as f:
-            f.write(description)
-
-    def get_description(self):
-        with ProjectBinary._get_description_path(self.path).open() as f:
-            return f.read()
-
-    def get_description_summary(self):
-        with ProjectBinary._get_description_path(self.path).open() as f:
-            return f.readline(50).strip()
+    async def copy_binary_files(self, destination_dir: Path):
+        if not destination_dir.is_dir():
+            raise NotADirectoryError(f'Cannot copy binary files to {destination_dir}: not a directory.')
+        await asyncio.to_thread(shutil.copy2, self.get_binary_path(), destination_dir)
