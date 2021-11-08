@@ -458,7 +458,7 @@ class Project:
     async def get_timeline_points(self, timeline_id: UUID):
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
-                'SELECT tick, creation_timestamp FROM point WHERE id = ?',
+                'SELECT tick, creation_timestamp FROM point WHERE id = ? ORDER BY tick ASC',
                 (timeline_id,)
             )
             results = await cursor.fetchall()
