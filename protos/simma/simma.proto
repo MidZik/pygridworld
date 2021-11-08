@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package PyGridWorld;
+package simma;
 
-// python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/TimelinesService.proto
+// python -m grpc_tools.protoc -I protos --python_out=. --grpc_python_out=. ./protos/simma/simma.proto
 
-service TimelineService {
+service Simma {
     rpc GetTimelines (TimelinesRequest) returns (TimelinesResponse) {}
     rpc GetTimelineTicks (TimelineTicksRequest) returns (TimelineTicksResponse) {}
     rpc GetTimelineData (TimelineDataRequest) returns (stream TimelineDataResponse) {}
