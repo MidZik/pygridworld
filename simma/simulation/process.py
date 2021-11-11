@@ -26,6 +26,9 @@ class Process:
     def make_client(self, token=""):
         return Client(self._channel, token)
 
+    def get_address(self):
+        return self._address
+
 
 async def start_simulation_process(simulation_library_path, owner_token):
     process = await asyncio.create_subprocess_exec(
