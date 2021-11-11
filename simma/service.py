@@ -2,7 +2,7 @@ import asyncio
 import shutil
 from pathlib import Path
 from uuid import UUID, uuid4
-from typing import Optional, AsyncContextManager, Generic
+from typing import Optional, Generic, TypeVar
 from abc import abstractmethod
 from secrets import token_urlsafe
 from contextlib import asynccontextmanager
@@ -10,10 +10,12 @@ from dataclasses import dataclass
 
 from .simulation import process
 from .project import Project, BinaryInfo
-from ._utils import T
 
 
-class ProcessOwner:
+RunningContextT = TypeVar('RunningContextT', bound='RunningContext')
+
+
+class ProcessOwner(Generic[RunningContextT]):
     class _EditorTokenContext:
         def __init__(self, owner: 'ProcessOwner'):
             self._owner = owner
@@ -36,6 +38,7 @@ class ProcessOwner:
         self._edit_token_lock = asyncio.Lock()
         self._process_lock = asyncio.Lock()
         self._process_user_count = 0
+        self._users: set[UUID] = set()
 
     @abstractmethod
     async def _get_binary_path(self) -> Path:
@@ -46,7 +49,7 @@ class ProcessOwner:
         pass
 
     @abstractmethod
-    def _get_running_context(self):
+    def _get_running_context(self, user_token: str) -> RunningContextT:
         pass
 
     @asynccontextmanager
@@ -60,10 +63,13 @@ class ProcessOwner:
                 self.client = self.process.make_client()
                 await self._init_process(self.client)
         running_context = None
+        new_user_token = token_urlsafe(32)
         try:
-            running_context = self._get_running_context()
+            self._users.add(new_user_token)
+            running_context = self._get_running_context(new_user_token)
             yield running_context
         finally:
+            self._users.remove(new_user_token)
             if running_context is not None:
                 running_context.kill_context()
             async with self._process_lock:
@@ -75,7 +81,7 @@ class ProcessOwner:
                     self.client = None
 
     @asynccontextmanager
-    async def editor_token_context(self) -> AsyncContextManager[_EditorTokenContext]:
+    async def editor_token_context(self):
         async with self._edit_token_lock:
             editor_modifier = self._EditorTokenContext(self)
             yield editor_modifier
@@ -91,8 +97,14 @@ class ProcessOwner:
             finally:
                 await etc.set_editor(old_token)
 
+    def get_process_address(self):
+        if self.process is None:
+            return None
+        else:
+            return self.process.get_address()
 
-class TimelineSimulator(ProcessOwner):
+
+class TimelineSimulator(ProcessOwner['TimelineSimulatorRunningContext']):
     def __init__(self, project: Project, timeline_id: UUID):
         super().__init__()
         self.project = project
@@ -110,30 +122,11 @@ class TimelineSimulator(ProcessOwner):
         async with self.temp_owner_takeover():
             await client.set_state_binary(state_binary)
 
-    def _get_running_context(self):
-        return TimelineSimulatorRunningContext(self)
+    def _get_running_context(self, user_token: str):
+        return TimelineSimulatorRunningContext(self, user_token)
 
 
-class TimelineSimulatorRunningContext:
-    def __init__(self, timeline_simulator: TimelineSimulator):
-        self._sim = timeline_simulator
-
-    def kill_context(self):
-        self._sim = None
-
-    async def save_state_to_new_point(self):
-        client = self._sim.client
-        project = self._sim.project
-        timeline_id = self._sim.timeline_id
-        binary, tick = await client.get_state_binary()
-        existing_tick = await project.get_timeline_point(timeline_id, tick)
-        if existing_tick is None:
-            temp_path = project.get_temp_path()
-            await asyncio.to_thread(temp_path.write_bytes, binary)
-            await project.add_timeline_point(temp_path, timeline_id, tick)
-
-
-class TimelineCreator(ProcessOwner):
+class TimelineCreator(ProcessOwner['TimelineCreatorRunningContext']):
     def __init__(self, project: Project, binary_id: UUID, initial_timeline_id: UUID, tick: int):
         super().__init__()
         self.project = project
@@ -142,6 +135,8 @@ class TimelineCreator(ProcessOwner):
         self.tick = tick
 
         self.parent_id = None
+
+        self.current_editor = None
 
     async def _get_binary_path(self) -> Path:
         binary_info = await self.project.get_binary_info(self.binary_id)
@@ -161,34 +156,68 @@ class TimelineCreator(ProcessOwner):
             await client.set_state_binary(state_binary)
             etc.set_editor(token_urlsafe(32))
 
-    def _get_running_context(self):
-        return TimelineCreatorRunningContext(self)
+    def _get_running_context(self, user_token: str):
+        return TimelineCreatorRunningContext(self, user_token)
 
 
-class TimelineCreatorRunningContext:
-    def __init__(self, timeline_creator: TimelineCreator):
-        self._creator = timeline_creator
-        self._current_editor = None
+ProcessOwnerT = TypeVar('ProcessOwnerT', bound=ProcessOwner)
+
+
+class RunningContext(Generic[ProcessOwnerT]):
+    def __init__(self, owner: ProcessOwnerT, user_token: str):
+        self.owner = owner
+        self.user_token = user_token
 
     def kill_context(self):
-        self._creator = None
+        self.owner = None
 
+    def get_process_address(self):
+        return self.owner.get_process_address()
+
+
+class TimelineSimulatorRunningContext(RunningContext[TimelineSimulator]):
+    async def move_to_tick(self, tick: int):
+        client = self.owner.client
+        project = self.owner.project
+        timeline_id = self.owner.timeline_id
+        point_path = await project.get_timeline_point(timeline_id, tick)
+        if point_path:
+            binary = await asyncio.to_thread(point_path.read_bytes)
+            await client.set_state_binary(binary)
+
+    async def save_state_to_new_point(self):
+        client = self.owner.client
+        project = self.owner.project
+        timeline_id = self.owner.timeline_id
+        binary, tick = await client.get_state_binary()
+        existing_tick = await project.get_timeline_point(timeline_id, tick)
+        if existing_tick is None:
+            temp_path = project.get_temp_path()
+            await asyncio.to_thread(temp_path.write_bytes, binary)
+            await project.add_timeline_point(temp_path, timeline_id, tick)
+            return tick
+        else:
+            return None
+
+
+class TimelineCreatorRunningContext(RunningContext[TimelineCreator]):
     @asynccontextmanager
     async def editor(self, editor_token: str):
         if not editor_token:
             raise ValueError("Must specify a non-empty editor token to edit.")
-        async with self._creator.editor_token_context() as etc:
-            if self._current_editor:
-                raise RuntimeError("Only one editor of a simulation is allowed at a time.")
+        async with self.owner.editor_token_context() as etc:
+            if self.owner.current_editor:
+                raise RuntimeError("Only one editor is allowed at a time.")
             await etc.set_editor(editor_token)
-            self._current_editor = editor_token
+            self.owner.current_editor = editor_token
         try:
-            yield TimelineCreatorEditorContext(self._creator)
+            yield TimelineCreatorEditorContext(self.owner)
         finally:
-            async with self._creator.editor_token_context() as etc:
+            async with self.owner.editor_token_context() as etc:
                 # resetting the editor token to a random token ensures that
                 # the simulation cannot run while no editor is assigned.
                 etc.set_editor(token_urlsafe(32))
+                self.owner.current_editor = None
 
 
 class TimelineCreatorEditorContext:
@@ -221,13 +250,13 @@ class TimelineCreatorEditorContext:
         binary, tick = await client.get_state_binary()
         temp_path = project.get_temp_path()
         await asyncio.to_thread(temp_path.write_bytes, binary)
-        await project.create_timeline(temp_path, binary_id, parent_id, tick)
+        return await project.create_timeline(temp_path, binary_id, parent_id, tick)
 
 
 @dataclass
-class ProcessContainer(Generic[T]):
+class ProcessContainer(Generic[ProcessOwnerT]):
     user_count: int
-    process: T
+    process: ProcessOwnerT
 
 
 class ProjectService:
@@ -330,8 +359,80 @@ class ProjectService:
                                                         tags_to_add=tags_to_add,
                                                         tags_to_remove=tags_to_remove)
 
-    async def get_timeline_point_ticks(self, timeline_id: UUID):
-        return [point_tick for point_tick, _ in await self._project.get_timeline_points(timeline_id)]
+    async def get_timeline_point(self, timeline_id: UUID, tick: int):
+        return await self._project.get_timeline_point(timeline_id, tick)
+
+    async def get_timeline_points(self, timeline_id: UUID):
+        return await self._project.get_timeline_points(timeline_id)
+
+    @asynccontextmanager
+    async def timeline_point_json_generator(self, timeline_id: UUID):
+        """Returns a generator that accepts paths to binary point data of the given timeline,
+        and yields JSON string representations of the binary data."""
+        timeline = await self._project.get_timeline_info(timeline_id)
+        binary = await self._project.get_binary_info(timeline.binary_id)
+
+        converter_generator = process.convert_multiple_generator('binary', str(binary.binary_path), 'json')
+        await converter_generator.asend(None)
+        try:
+            yield converter_generator
+        finally:
+            try:
+                await converter_generator.asend(None)
+            except StopAsyncIteration:
+                pass
+
+    async def get_timeline_events(self, timeline_id, *, start_tick=None, end_tick=None, event_name_filters=None):
+        """
+        :param timeline_id:
+        :param start_tick:
+        :param end_tick:
+        :param event_name_filters: A collection of event name filters. Only event names matching the provided filters
+            will be returned. Filter names which end in a period (.) will include all events that start with it,
+            otherwise it will only return exact matches.
+        :return: A generator of (tick, event_name, event_json) tuples, containing the requested event data.
+        Events will be returned in ascending tick order, with no guarantee that events within a single tick
+        will be consistently ordered.
+        """
+        query = "SELECT tick, event_name, event_json FROM events"
+        where_clauses = []
+        parameters = []
+
+        if start_tick is not None:
+            where_clauses.append("tick >= ?")
+            parameters.append(start_tick)
+
+        if end_tick is not None:
+            where_clauses.append("tick <= ?")
+            parameters.append(end_tick)
+
+        if event_name_filters:
+            filter_clauses = []
+            filter_parameters = []
+            for f in event_name_filters:
+                if f.contains('\\'):
+                    raise ValueError("Filters cannot contain backslashes (\\).")
+                filter_clauses += r"event_name LIKE ? ESCAPE '\'"
+                f = f.replace(r'%', r'\%').replace(r'_', r'\_')
+                if f.endswith('.'):
+                    filter_parameters.append(f + '%')
+                else:
+                    filter_parameters.append(f)
+
+            where_clauses.append(" OR ".join(filter_clauses))
+            parameters.extend(filter_parameters)
+
+        if where_clauses:
+            query += " WHERE ("
+            query += ") AND (".join(where_clauses)
+            query += ")"
+
+        query += " ORDER BY tick ASC"
+
+        async with self._project.timeline_event_db_connection(timeline_id) as db:
+            async with db.execute(query, tuple(parameters)) as cursor:
+                async for row in cursor:
+                    yield tuple(row)
 
     async def delete_timeline_points(self, timeline_id: UUID, *ticks_to_delete: int):
         return await self._project.delete_timeline_points(timeline_id, *ticks_to_delete)
@@ -344,7 +445,7 @@ class ProjectService:
         else:
             container = self._timeline_simulators[timeline_id]
         container.user_count += 1
-        sim = container.process
+        sim: TimelineSimulator = container.process
         try:
             async with sim.running() as running_context:
                 yield running_context
