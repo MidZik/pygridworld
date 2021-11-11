@@ -1,13 +1,12 @@
-import asyncio
-from typing import Optional
-from pathlib import Path
 import aiosqlite
-
-from dataclasses import dataclass
-from uuid import uuid4, UUID
-import shutil
 import appdirs
+import asyncio
+from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
+import shutil
+from typing import Optional
+from uuid import uuid4, UUID
 
 from .binary import LocalSimbin
 from . import _utils
@@ -78,17 +77,17 @@ class Project:
     def _timeline_events_db_path(self, timeline_id: UUID):
         return self._timeline_data_path(timeline_id) / 'events.db'
 
-    def _init_timeline_events_db(self, timeline_id: UUID):
+    async def _init_timeline_events_db(self, timeline_id: UUID):
         db_path = self._timeline_events_db_path(timeline_id)
         async with aiosqlite.connect(db_path) as db:
-            db.execute('''
+            await db.execute('''
                 CREATE TABLE event (
                     tick INTEGER NOT NULL,
                     name TEXT,
                     json TEXT,
                     PRIMARY KEY(tick, name)
                 )''')
-            db.commit()
+            await db.commit()
 
     def _binary_data_path(self, binary_id: Optional[UUID] = None):
         path = self._path / 'binary_data'
@@ -278,7 +277,7 @@ class Project:
                 )
                 timeline_point_dir.mkdir(exist_ok=False)
                 temp_head_path.rename(head_point_destination)
-                self._init_timeline_events_db(timeline_id)
+                await self._init_timeline_events_db(timeline_id)
                 await db.commit()
             return TimelineInfo(timeline_id, binary_id, parent_timeline_id, head_tick, creation_time,
                                 head_point_destination)
@@ -494,3 +493,9 @@ class Project:
             creation_time = datetime.fromisoformat(creation_timestamp)
             point = self._timeline_point_path(timeline_id, tick, creation_time)
             await asyncio.to_thread(point.unlink, missing_ok=True)
+
+    async def timeline_event_db_connection(self, timeline_id: UUID):
+        timeline_info = await self.get_timeline_info(timeline_id)
+        if timeline_info is None:
+            raise ValueError(f"Timeline {timeline_id} does not exist.")
+        return aiosqlite.connect(self._timeline_events_db_path(timeline_id))
