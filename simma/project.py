@@ -111,7 +111,10 @@ class Project:
     @staticmethod
     async def create(path: Path):
         path = path.resolve()
-        path.mkdir(exist_ok=False)
+        path.mkdir(exist_ok=True)
+        if path.is_dir():
+            if next(path.iterdir(), None) is not None:
+                raise FileExistsError("Cannot create project in non-empty directory.")
         project = Project(path)
 
         project._timeline_data_path().mkdir()
