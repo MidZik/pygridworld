@@ -464,6 +464,15 @@ class Project:
         return [(int(tick), self._timeline_point_path(timeline_id, tick, datetime.fromisoformat(creation_timestamp)))
                 for tick, creation_timestamp in results]
 
+    async def get_timeline_tags(self, timeline_id: UUID):
+        async with self._db_connect() as db:
+            cursor: aiosqlite.Cursor = await db.execute(
+                'SELECT tag FROM tag WHERE timeline_id = ? ORDER BY tag ASC',
+                (timeline_id,)
+            )
+            results = await cursor.fetchall()
+            return [tag for (tag,) in results]
+
     async def delete_timeline_points(self, timeline_id: UUID, *ticks_to_delete: int):
         async with self._db_connect() as db:
             await db.execute(

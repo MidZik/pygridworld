@@ -365,6 +365,9 @@ class ProjectService:
     async def get_timeline_points(self, timeline_id: UUID):
         return await self._project.get_timeline_points(timeline_id)
 
+    async def get_timeline_tags(self, timeline_id: UUID):
+        return await self._project.get_timeline_tags(timeline_id)
+
     @asynccontextmanager
     async def timeline_point_json_generator(self, timeline_id: UUID):
         """Returns a generator that accepts paths to binary point data of the given timeline,
