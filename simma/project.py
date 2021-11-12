@@ -9,7 +9,6 @@ from typing import Optional
 from uuid import uuid4, UUID
 
 from .binary import LocalSimbin
-from . import _utils
 
 
 def _user_data_path():
