@@ -41,45 +41,20 @@ class SimmaStub(object):
                 request_serializer=simma_dot_simma__pb2.TimelineEventsRequest.SerializeToString,
                 response_deserializer=simma_dot_simma__pb2.TimelineEventsResponse.FromString,
                 )
-        self.GetOrStartSimulation = channel.unary_unary(
-                '/simma.Simma/GetOrStartSimulation',
-                request_serializer=simma_dot_simma__pb2.GetOrStartSimulationRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.GetOrStartSimulationResponse.FromString,
+        self.TimelineSimulator = channel.stream_stream(
+                '/simma.Simma/TimelineSimulator',
+                request_serializer=simma_dot_simma__pb2.TimelineSimulatorRequest.SerializeToString,
+                response_deserializer=simma_dot_simma__pb2.TimelineSimulatorResponse.FromString,
                 )
-        self.StopSimulation = channel.unary_unary(
-                '/simma.Simma/StopSimulation',
-                request_serializer=simma_dot_simma__pb2.StopSimulationRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.StopSimulationResponse.FromString,
-                )
-        self.MoveSimToTick = channel.unary_unary(
-                '/simma.Simma/MoveSimToTick',
-                request_serializer=simma_dot_simma__pb2.MoveSimToTickRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.MoveSimToTickResponse.FromString,
-                )
-        self.EditSimulation = channel.stream_stream(
-                '/simma.Simma/EditSimulation',
-                request_serializer=simma_dot_simma__pb2.EditSimulationRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.EditSimulationResponse.FromString,
+        self.TimelineCreator = channel.stream_stream(
+                '/simma.Simma/TimelineCreator',
+                request_serializer=simma_dot_simma__pb2.TimelineCreatorRequest.SerializeToString,
+                response_deserializer=simma_dot_simma__pb2.TimelineCreatorResponse.FromString,
                 )
         self.ModifyTimelineTags = channel.unary_unary(
                 '/simma.Simma/ModifyTimelineTags',
                 request_serializer=simma_dot_simma__pb2.ModifyTimelineTagsRequest.SerializeToString,
                 response_deserializer=simma_dot_simma__pb2.ModifyTimelineTagsResponse.FromString,
-                )
-        self.CreateTimeline = channel.unary_unary(
-                '/simma.Simma/CreateTimeline',
-                request_serializer=simma_dot_simma__pb2.CreateTimelineRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.CreateTimelineResponse.FromString,
-                )
-        self.CloneTimeline = channel.unary_unary(
-                '/simma.Simma/CloneTimeline',
-                request_serializer=simma_dot_simma__pb2.CloneTimelineRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.CloneTimelineResponse.FromString,
-                )
-        self.CreateTimelineFromSimulation = channel.unary_unary(
-                '/simma.Simma/CreateTimelineFromSimulation',
-                request_serializer=simma_dot_simma__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.CreateTimelineFromSimulationResponse.FromString,
                 )
         self.DeleteTimeline = channel.unary_unary(
                 '/simma.Simma/DeleteTimeline',
@@ -128,49 +103,19 @@ class SimmaServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetOrStartSimulation(self, request, context):
+    def TimelineSimulator(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def StopSimulation(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def MoveSimToTick(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def EditSimulation(self, request_iterator, context):
+    def TimelineCreator(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ModifyTimelineTags(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def CreateTimeline(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def CloneTimeline(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def CreateTimelineFromSimulation(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -216,45 +161,20 @@ def add_SimmaServicer_to_server(servicer, server):
                     request_deserializer=simma_dot_simma__pb2.TimelineEventsRequest.FromString,
                     response_serializer=simma_dot_simma__pb2.TimelineEventsResponse.SerializeToString,
             ),
-            'GetOrStartSimulation': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetOrStartSimulation,
-                    request_deserializer=simma_dot_simma__pb2.GetOrStartSimulationRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.GetOrStartSimulationResponse.SerializeToString,
+            'TimelineSimulator': grpc.stream_stream_rpc_method_handler(
+                    servicer.TimelineSimulator,
+                    request_deserializer=simma_dot_simma__pb2.TimelineSimulatorRequest.FromString,
+                    response_serializer=simma_dot_simma__pb2.TimelineSimulatorResponse.SerializeToString,
             ),
-            'StopSimulation': grpc.unary_unary_rpc_method_handler(
-                    servicer.StopSimulation,
-                    request_deserializer=simma_dot_simma__pb2.StopSimulationRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.StopSimulationResponse.SerializeToString,
-            ),
-            'MoveSimToTick': grpc.unary_unary_rpc_method_handler(
-                    servicer.MoveSimToTick,
-                    request_deserializer=simma_dot_simma__pb2.MoveSimToTickRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.MoveSimToTickResponse.SerializeToString,
-            ),
-            'EditSimulation': grpc.stream_stream_rpc_method_handler(
-                    servicer.EditSimulation,
-                    request_deserializer=simma_dot_simma__pb2.EditSimulationRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.EditSimulationResponse.SerializeToString,
+            'TimelineCreator': grpc.stream_stream_rpc_method_handler(
+                    servicer.TimelineCreator,
+                    request_deserializer=simma_dot_simma__pb2.TimelineCreatorRequest.FromString,
+                    response_serializer=simma_dot_simma__pb2.TimelineCreatorResponse.SerializeToString,
             ),
             'ModifyTimelineTags': grpc.unary_unary_rpc_method_handler(
                     servicer.ModifyTimelineTags,
                     request_deserializer=simma_dot_simma__pb2.ModifyTimelineTagsRequest.FromString,
                     response_serializer=simma_dot_simma__pb2.ModifyTimelineTagsResponse.SerializeToString,
-            ),
-            'CreateTimeline': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateTimeline,
-                    request_deserializer=simma_dot_simma__pb2.CreateTimelineRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.CreateTimelineResponse.SerializeToString,
-            ),
-            'CloneTimeline': grpc.unary_unary_rpc_method_handler(
-                    servicer.CloneTimeline,
-                    request_deserializer=simma_dot_simma__pb2.CloneTimelineRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.CloneTimelineResponse.SerializeToString,
-            ),
-            'CreateTimelineFromSimulation': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateTimelineFromSimulation,
-                    request_deserializer=simma_dot_simma__pb2.CreateTimelineFromSimulationRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.CreateTimelineFromSimulationResponse.SerializeToString,
             ),
             'DeleteTimeline': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteTimeline,
@@ -364,7 +284,7 @@ class Simma(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetOrStartSimulation(request,
+    def TimelineSimulator(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -374,14 +294,14 @@ class Simma(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma.Simma/GetOrStartSimulation',
-            simma_dot_simma__pb2.GetOrStartSimulationRequest.SerializeToString,
-            simma_dot_simma__pb2.GetOrStartSimulationResponse.FromString,
+        return grpc.experimental.stream_stream(request_iterator, target, '/simma.Simma/TimelineSimulator',
+            simma_dot_simma__pb2.TimelineSimulatorRequest.SerializeToString,
+            simma_dot_simma__pb2.TimelineSimulatorResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def StopSimulation(request,
+    def TimelineCreator(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -391,43 +311,9 @@ class Simma(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma.Simma/StopSimulation',
-            simma_dot_simma__pb2.StopSimulationRequest.SerializeToString,
-            simma_dot_simma__pb2.StopSimulationResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def MoveSimToTick(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma.Simma/MoveSimToTick',
-            simma_dot_simma__pb2.MoveSimToTickRequest.SerializeToString,
-            simma_dot_simma__pb2.MoveSimToTickResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def EditSimulation(request_iterator,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/simma.Simma/EditSimulation',
-            simma_dot_simma__pb2.EditSimulationRequest.SerializeToString,
-            simma_dot_simma__pb2.EditSimulationResponse.FromString,
+        return grpc.experimental.stream_stream(request_iterator, target, '/simma.Simma/TimelineCreator',
+            simma_dot_simma__pb2.TimelineCreatorRequest.SerializeToString,
+            simma_dot_simma__pb2.TimelineCreatorResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -445,57 +331,6 @@ class Simma(object):
         return grpc.experimental.unary_unary(request, target, '/simma.Simma/ModifyTimelineTags',
             simma_dot_simma__pb2.ModifyTimelineTagsRequest.SerializeToString,
             simma_dot_simma__pb2.ModifyTimelineTagsResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def CreateTimeline(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma.Simma/CreateTimeline',
-            simma_dot_simma__pb2.CreateTimelineRequest.SerializeToString,
-            simma_dot_simma__pb2.CreateTimelineResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def CloneTimeline(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma.Simma/CloneTimeline',
-            simma_dot_simma__pb2.CloneTimelineRequest.SerializeToString,
-            simma_dot_simma__pb2.CloneTimelineResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def CreateTimelineFromSimulation(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma.Simma/CreateTimelineFromSimulation',
-            simma_dot_simma__pb2.CreateTimelineFromSimulationRequest.SerializeToString,
-            simma_dot_simma__pb2.CreateTimelineFromSimulationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

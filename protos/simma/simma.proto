@@ -10,14 +10,9 @@ service Simma {
     rpc GetTimelineData (TimelineDataRequest) returns (stream TimelineDataResponse) {}
     rpc GetTimelineJson (TimelineJsonRequest) returns (stream TimelineJsonResponse) {}
     rpc GetTimelineEvents (TimelineEventsRequest) returns (stream TimelineEventsResponse) {}
-    rpc GetOrStartSimulation(GetOrStartSimulationRequest) returns (GetOrStartSimulationResponse) {}
-    rpc StopSimulation(StopSimulationRequest) returns (StopSimulationResponse) {}
-    rpc MoveSimToTick(MoveSimToTickRequest) returns (MoveSimToTickResponse) {}
-    rpc EditSimulation(stream EditSimulationRequest) returns (stream EditSimulationResponse) {}
+    rpc TimelineSimulator(stream TimelineSimulatorRequest) returns (stream TimelineSimulatorResponse) {}
+    rpc TimelineCreator(stream TimelineCreatorRequest) returns (stream TimelineCreatorResponse) {}
     rpc ModifyTimelineTags(ModifyTimelineTagsRequest) returns (ModifyTimelineTagsResponse) {}
-    rpc CreateTimeline (CreateTimelineRequest) returns (CreateTimelineResponse) {}
-    rpc CloneTimeline (CloneTimelineRequest) returns (CloneTimelineResponse) {}
-    rpc CreateTimelineFromSimulation (CreateTimelineFromSimulationRequest) returns (CreateTimelineFromSimulationResponse) {}
     rpc DeleteTimeline (DeleteTimelineRequest) returns (DeleteTimelineResponse) {}
     rpc GetTimelineDetails (GetTimelineDetailsRequest) returns (GetTimelineDetailsResponse) {}
 }
@@ -32,18 +27,17 @@ message TickRange {
 }
 
 message TimelinesRequest {
-    repeated string tags = 1;
-    int32 parent_id = 2;
-    int64 head_tick = 3;
-    repeated string exclude_tags = 4;
+    repeated string filter_parent_ids = 1;
+    repeated string require_tags = 2;
+    repeated string disallow_tags = 3;
 }
 
 message TimelinesResponse {
-    repeated int64 timeline_ids = 1;
+    repeated string timeline_ids = 1;
 }
 
 message TimelineTicksRequest {
-    int32 timeline_id = 1;
+    string timeline_id = 1;
 }
 
 message TimelineTicksResponse {
@@ -51,7 +45,7 @@ message TimelineTicksResponse {
 }
 
 message TimelineDataRequest {
-    int32 timeline_id = 1;
+    string timeline_id = 1;
     oneof tick_option {
         TickList tick_list = 2;
         TickRange tick_range = 3;
@@ -64,7 +58,7 @@ message TimelineDataResponse {
 }
 
 message TimelineJsonRequest {
-    int32 timeline_id = 1;
+    string timeline_id = 1;
     oneof tick_option {
         TickList tick_list = 2;
         TickRange tick_range = 3;
@@ -77,9 +71,9 @@ message TimelineJsonResponse {
 }
 
 message TimelineEventsRequest {
-    int32 timeline_id = 1;
+    string timeline_id = 1;
     TickRange tick_range = 2;
-    repeated string filters = 3;
+    repeated string event_name_filters = 3;
 }
 
 message EventMessage {
@@ -88,91 +82,121 @@ message EventMessage {
 }
 
 message TimelineEventsResponse {
-    int32 timeline_id = 1;
+    string timeline_id = 1;
     int64 tick = 2;
     repeated EventMessage events = 3;
 }
 
-message GetOrStartSimulationRequest {
-    int32 timeline_id = 1;
-    int64 tick = 2;
-}
-
-message GetOrStartSimulationResponse {
-    string address = 1;
-    string token = 2;
-}
-
-message StopSimulationRequest {
-    int32 timeline_id = 1;
-}
-
-message StopSimulationResponse {
-
-}
-
-message MoveSimToTickRequest {
-    int32 timeline_id = 1;
-    int64 tick = 2;
-}
-
-message MoveSimToTickResponse {
-
-}
-
-message EditSimulationRequest {
-    int32 timeline_id = 1;
-
-    enum Command {
-        UNKNOWN = 0;
-        START = 1;
-        END = 2;
-        DISCARD = 3;
-        COMMIT = 4;
+message TimelineSimulatorRequest {
+    message Start {
+        string timeline_id = 1;
+    }
+    message SaveStateToPoint {
+    }
+    message MoveToTick {
+        int64 tick = 1;
     }
 
-    Command command = 2;
+    oneof message {
+        Start start = 4;
+        SaveStateToPoint save_state_to_point = 5;
+        MoveToTick move_to_tick = 6;
+    }
 }
 
-message EditSimulationResponse {
-    bool success = 1;
-    string result = 2;
+message TimelineSimulatorResponse {
+    message Error {
+        string message = 1;
+    }
+    message Start {
+        string address = 1;
+        string user_token = 2;
+    }
+    message SaveStateToPoint {
+        int64 new_tick = 1;
+    }
+    message MoveToTick {
+    }
+
+    oneof message {
+        Error error = 1;
+        Start start = 4;
+        SaveStateToPoint save_state_to_point = 5;
+        MoveToTick move_to_tick = 6;
+    }
+}
+
+message TimelineCreatorRequest {
+    message StartNew {
+        string binary_id = 1;
+        string initial_timeline_id = 2;
+        int64 tick = 3;
+    }
+    message StartExisting {
+        string creator_id = 1;
+    }
+    message StartEditing {
+    }
+    message StopEditing {
+    }
+    message LoadState {
+        string timeline_id = 1;
+    }
+    message SaveToNewTimeline {
+    }
+
+    oneof message {
+        StartNew start_new = 4;
+        StartExisting start_existing = 5;
+        StartEditing start_editing = 6;
+        StopEditing stop_editing = 7;
+        LoadState load_state = 8;
+        SaveToNewTimeline save_to_new_timeline = 9;
+    }
+}
+
+message TimelineCreatorResponse{
+    message Error {
+        string message = 1;
+    }
+    message StartNew {
+        string creator_id = 1;
+        string address = 2;
+        string user_token = 3;
+    }
+    message StartExisting {
+        string address = 1;
+        string user_token = 2;
+    }
+    message StartEditing {
+    }
+    message StopEditing {
+    }
+    message LoadState {
+    }
+    message SaveToNewTimeline {
+        string new_timeline_id = 1;
+    }
+
+    oneof message {
+        Error error = 1;
+        StartNew start_new = 4;
+        StartExisting start_existing = 5;
+        StartEditing start_editing = 6;
+        StopEditing stop_editing = 7;
+        LoadState load_state = 8;
+        SaveToNewTimeline save_to_new_timeline = 9;
+    }
 }
 
 message ModifyTimelineTagsRequest {
-    int32 timeline_id = 1;
+    string timeline_id = 1;
     repeated string tags_to_add = 2;
     repeated string tags_to_remove = 3;
 }
 
 message ModifyTimelineTagsResponse {
 
-}
-
-message CreateTimelineRequest {
-    int32 source_timeline_id = 1;
-    int64 source_tick = 2;
-}
-
-message CreateTimelineResponse {
-    int32 created_timeline_id = 1;
-}
-
-message CloneTimelineRequest {
-    int32 source_timeline_id = 1;
-}
-
-message CloneTimelineResponse {
-    int32 created_timeline_id = 1;
-}
-
-message CreateTimelineFromSimulationRequest {
-    int32 source_timeline_id = 1;
-    bool as_sibling = 2;
-}
-
-message CreateTimelineFromSimulationResponse {
-    int32 created_timeline_id = 1;
 }
 
 message DeleteTimelineRequest {
@@ -184,13 +208,13 @@ message DeleteTimelineResponse {
 }
 
 message GetTimelineDetailsRequest {
-    int32 timeline_id = 1;
+    string timeline_id = 1;
 }
 
 message GetTimelineDetailsResponse {
-    int32 parent_id = 1;
-    int64 head_tick = 2;
-    string last_commit_timestamp = 3;
-    repeated string tags = 4;
-    int64 furthest_tick = 5;
+    string binary_id = 1;
+    string parent_id = 2;
+    int64 head_tick = 3;
+    string creation_timestamp = 4;
+    repeated string tags = 5;
 }

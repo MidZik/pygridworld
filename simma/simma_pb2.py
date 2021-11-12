@@ -19,50 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11simma/simma.proto\x12\x05simma\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"\\\n\x10TimelinesRequest\x12\x0c\n\x04tags\x18\x01 \x03(\t\x12\x11\n\tparent_id\x18\x02 \x01(\x05\x12\x11\n\thead_tick\x18\x03 \x01(\x03\x12\x14\n\x0c\x65xclude_tags\x18\x04 \x03(\t\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\x03\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\";\n\x15TimelineTicksResponse\x12\"\n\ttick_list\x18\x01 \x01(\x0b\x32\x0f.simma.TickList\"\x87\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x87\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"c\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12$\n\ntick_range\x18\x02 \x01(\x0b\x32\x10.simma.TickRange\x12\x0f\n\x07\x66ilters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"`\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12#\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x13.simma.EventMessage\"@\n\x1bGetOrStartSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\">\n\x1cGetOrStartSimulationResponse\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\",\n\x15StopSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16StopSimulationResponse\"9\n\x14MoveSimToTickRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x0c\n\x04tick\x18\x02 \x01(\x03\"\x17\n\x15MoveSimToTickResponse\"\xa8\x01\n\x15\x45\x64itSimulationRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x35\n\x07\x63ommand\x18\x02 \x01(\x0e\x32$.simma.EditSimulationRequest.Command\"C\n\x07\x43ommand\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05START\x10\x01\x12\x07\n\x03\x45ND\x10\x02\x12\x0b\n\x07\x44ISCARD\x10\x03\x12\n\n\x06\x43OMMIT\x10\x04\"9\n\x16\x45\x64itSimulationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0e\n\x06result\x18\x02 \x01(\t\"]\n\x19ModifyTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\x12\x13\n\x0btags_to_add\x18\x02 \x03(\t\x12\x16\n\x0etags_to_remove\x18\x03 \x03(\t\"\x1c\n\x1aModifyTimelineTagsResponse\"H\n\x15\x43reateTimelineRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\x12\x13\n\x0bsource_tick\x18\x02 \x01(\x03\"5\n\x16\x43reateTimelineResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\"2\n\x14\x43loneTimelineRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\"4\n\x15\x43loneTimelineResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\"U\n#CreateTimelineFromSimulationRequest\x12\x1a\n\x12source_timeline_id\x18\x01 \x01(\x05\x12\x12\n\nas_sibling\x18\x02 \x01(\x08\"C\n$CreateTimelineFromSimulationResponse\x12\x1b\n\x13\x63reated_timeline_id\x18\x01 \x01(\x05\",\n\x15\x44\x65leteTimelineRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16\x44\x65leteTimelineResponse\"0\n\x19GetTimelineDetailsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x86\x01\n\x1aGetTimelineDetailsResponse\x12\x11\n\tparent_id\x18\x01 \x01(\x05\x12\x11\n\thead_tick\x18\x02 \x01(\x03\x12\x1d\n\x15last_commit_timestamp\x18\x03 \x01(\t\x12\x0c\n\x04tags\x18\x04 \x03(\t\x12\x15\n\rfurthest_tick\x18\x05 \x01(\x03\x32\x8f\n\n\x05Simma\x12\x43\n\x0cGetTimelines\x12\x17.simma.TimelinesRequest\x1a\x18.simma.TimelinesResponse\"\x00\x12O\n\x10GetTimelineTicks\x12\x1b.simma.TimelineTicksRequest\x1a\x1c.simma.TimelineTicksResponse\"\x00\x12N\n\x0fGetTimelineData\x12\x1a.simma.TimelineDataRequest\x1a\x1b.simma.TimelineDataResponse\"\x00\x30\x01\x12N\n\x0fGetTimelineJson\x12\x1a.simma.TimelineJsonRequest\x1a\x1b.simma.TimelineJsonResponse\"\x00\x30\x01\x12T\n\x11GetTimelineEvents\x12\x1c.simma.TimelineEventsRequest\x1a\x1d.simma.TimelineEventsResponse\"\x00\x30\x01\x12\x61\n\x14GetOrStartSimulation\x12\".simma.GetOrStartSimulationRequest\x1a#.simma.GetOrStartSimulationResponse\"\x00\x12O\n\x0eStopSimulation\x12\x1c.simma.StopSimulationRequest\x1a\x1d.simma.StopSimulationResponse\"\x00\x12L\n\rMoveSimToTick\x12\x1b.simma.MoveSimToTickRequest\x1a\x1c.simma.MoveSimToTickResponse\"\x00\x12S\n\x0e\x45\x64itSimulation\x12\x1c.simma.EditSimulationRequest\x1a\x1d.simma.EditSimulationResponse\"\x00(\x01\x30\x01\x12[\n\x12ModifyTimelineTags\x12 .simma.ModifyTimelineTagsRequest\x1a!.simma.ModifyTimelineTagsResponse\"\x00\x12O\n\x0e\x43reateTimeline\x12\x1c.simma.CreateTimelineRequest\x1a\x1d.simma.CreateTimelineResponse\"\x00\x12L\n\rCloneTimeline\x12\x1b.simma.CloneTimelineRequest\x1a\x1c.simma.CloneTimelineResponse\"\x00\x12y\n\x1c\x43reateTimelineFromSimulation\x12*.simma.CreateTimelineFromSimulationRequest\x1a+.simma.CreateTimelineFromSimulationResponse\"\x00\x12O\n\x0e\x44\x65leteTimeline\x12\x1c.simma.DeleteTimelineRequest\x1a\x1d.simma.DeleteTimelineResponse\"\x00\x12[\n\x12GetTimelineDetails\x12 .simma.GetTimelineDetailsRequest\x1a!.simma.GetTimelineDetailsResponse\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x11simma/simma.proto\x12\x05simma\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"Z\n\x10TimelinesRequest\x12\x19\n\x11\x66ilter_parent_ids\x18\x01 \x03(\t\x12\x14\n\x0crequire_tags\x18\x02 \x03(\t\x12\x15\n\rdisallow_tags\x18\x03 \x03(\t\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\t\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\";\n\x15TimelineTicksResponse\x12\"\n\ttick_list\x18\x01 \x01(\x0b\x32\x0f.simma.TickList\"\x87\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x87\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"n\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ntick_range\x18\x02 \x01(\x0b\x32\x10.simma.TickRange\x12\x1a\n\x12\x65vent_name_filters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"`\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12#\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x13.simma.EventMessage\"\xc0\x02\n\x18TimelineSimulatorRequest\x12\x36\n\x05start\x18\x04 \x01(\x0b\x32%.simma.TimelineSimulatorRequest.StartH\x00\x12O\n\x13save_state_to_point\x18\x05 \x01(\x0b\x32\x30.simma.TimelineSimulatorRequest.SaveStateToPointH\x00\x12\x42\n\x0cmove_to_tick\x18\x06 \x01(\x0b\x32*.simma.TimelineSimulatorRequest.MoveToTickH\x00\x1a\x1c\n\x05Start\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x1a\x12\n\x10SaveStateToPoint\x1a\x1a\n\nMoveToTick\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x42\t\n\x07message\"\xab\x03\n\x19TimelineSimulatorResponse\x12\x37\n\x05\x65rror\x18\x01 \x01(\x0b\x32&.simma.TimelineSimulatorResponse.ErrorH\x00\x12\x37\n\x05start\x18\x04 \x01(\x0b\x32&.simma.TimelineSimulatorResponse.StartH\x00\x12P\n\x13save_state_to_point\x18\x05 \x01(\x0b\x32\x31.simma.TimelineSimulatorResponse.SaveStateToPointH\x00\x12\x43\n\x0cmove_to_tick\x18\x06 \x01(\x0b\x32+.simma.TimelineSimulatorResponse.MoveToTickH\x00\x1a\x18\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x1a,\n\x05Start\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x12\n\nuser_token\x18\x02 \x01(\t\x1a$\n\x10SaveStateToPoint\x12\x10\n\x08new_tick\x18\x01 \x01(\x03\x1a\x0c\n\nMoveToTickB\t\n\x07message\"\x84\x05\n\x16TimelineCreatorRequest\x12;\n\tstart_new\x18\x04 \x01(\x0b\x32&.simma.TimelineCreatorRequest.StartNewH\x00\x12\x45\n\x0estart_existing\x18\x05 \x01(\x0b\x32+.simma.TimelineCreatorRequest.StartExistingH\x00\x12\x43\n\rstart_editing\x18\x06 \x01(\x0b\x32*.simma.TimelineCreatorRequest.StartEditingH\x00\x12\x41\n\x0cstop_editing\x18\x07 \x01(\x0b\x32).simma.TimelineCreatorRequest.StopEditingH\x00\x12=\n\nload_state\x18\x08 \x01(\x0b\x32\'.simma.TimelineCreatorRequest.LoadStateH\x00\x12O\n\x14save_to_new_timeline\x18\t \x01(\x0b\x32/.simma.TimelineCreatorRequest.SaveToNewTimelineH\x00\x1aH\n\x08StartNew\x12\x11\n\tbinary_id\x18\x01 \x01(\t\x12\x1b\n\x13initial_timeline_id\x18\x02 \x01(\t\x12\x0c\n\x04tick\x18\x03 \x01(\x03\x1a#\n\rStartExisting\x12\x12\n\ncreator_id\x18\x01 \x01(\t\x1a\x0e\n\x0cStartEditing\x1a\r\n\x0bStopEditing\x1a \n\tLoadState\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x1a\x13\n\x11SaveToNewTimelineB\t\n\x07message\"\xec\x05\n\x17TimelineCreatorResponse\x12\x35\n\x05\x65rror\x18\x01 \x01(\x0b\x32$.simma.TimelineCreatorResponse.ErrorH\x00\x12<\n\tstart_new\x18\x04 \x01(\x0b\x32\'.simma.TimelineCreatorResponse.StartNewH\x00\x12\x46\n\x0estart_existing\x18\x05 \x01(\x0b\x32,.simma.TimelineCreatorResponse.StartExistingH\x00\x12\x44\n\rstart_editing\x18\x06 \x01(\x0b\x32+.simma.TimelineCreatorResponse.StartEditingH\x00\x12\x42\n\x0cstop_editing\x18\x07 \x01(\x0b\x32*.simma.TimelineCreatorResponse.StopEditingH\x00\x12>\n\nload_state\x18\x08 \x01(\x0b\x32(.simma.TimelineCreatorResponse.LoadStateH\x00\x12P\n\x14save_to_new_timeline\x18\t \x01(\x0b\x32\x30.simma.TimelineCreatorResponse.SaveToNewTimelineH\x00\x1a\x18\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x1a\x43\n\x08StartNew\x12\x12\n\ncreator_id\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t\x12\x12\n\nuser_token\x18\x03 \x01(\t\x1a\x34\n\rStartExisting\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x12\n\nuser_token\x18\x02 \x01(\t\x1a\x0e\n\x0cStartEditing\x1a\r\n\x0bStopEditing\x1a\x0b\n\tLoadState\x1a,\n\x11SaveToNewTimeline\x12\x17\n\x0fnew_timeline_id\x18\x01 \x01(\tB\t\n\x07message\"]\n\x19ModifyTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12\x13\n\x0btags_to_add\x18\x02 \x03(\t\x12\x16\n\x0etags_to_remove\x18\x03 \x03(\t\"\x1c\n\x1aModifyTimelineTagsResponse\",\n\x15\x44\x65leteTimelineRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16\x44\x65leteTimelineResponse\"0\n\x19GetTimelineDetailsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\"\x7f\n\x1aGetTimelineDetailsResponse\x12\x11\n\tbinary_id\x18\x01 \x01(\t\x12\x11\n\tparent_id\x18\x02 \x01(\t\x12\x11\n\thead_tick\x18\x03 \x01(\x03\x12\x1a\n\x12\x63reation_timestamp\x18\x04 \x01(\t\x12\x0c\n\x04tags\x18\x05 \x03(\t2\xd4\x06\n\x05Simma\x12\x43\n\x0cGetTimelines\x12\x17.simma.TimelinesRequest\x1a\x18.simma.TimelinesResponse\"\x00\x12O\n\x10GetTimelineTicks\x12\x1b.simma.TimelineTicksRequest\x1a\x1c.simma.TimelineTicksResponse\"\x00\x12N\n\x0fGetTimelineData\x12\x1a.simma.TimelineDataRequest\x1a\x1b.simma.TimelineDataResponse\"\x00\x30\x01\x12N\n\x0fGetTimelineJson\x12\x1a.simma.TimelineJsonRequest\x1a\x1b.simma.TimelineJsonResponse\"\x00\x30\x01\x12T\n\x11GetTimelineEvents\x12\x1c.simma.TimelineEventsRequest\x1a\x1d.simma.TimelineEventsResponse\"\x00\x30\x01\x12\\\n\x11TimelineSimulator\x12\x1f.simma.TimelineSimulatorRequest\x1a .simma.TimelineSimulatorResponse\"\x00(\x01\x30\x01\x12V\n\x0fTimelineCreator\x12\x1d.simma.TimelineCreatorRequest\x1a\x1e.simma.TimelineCreatorResponse\"\x00(\x01\x30\x01\x12[\n\x12ModifyTimelineTags\x12 .simma.ModifyTimelineTagsRequest\x1a!.simma.ModifyTimelineTagsResponse\"\x00\x12O\n\x0e\x44\x65leteTimeline\x12\x1c.simma.DeleteTimelineRequest\x1a\x1d.simma.DeleteTimelineResponse\"\x00\x12[\n\x12GetTimelineDetails\x12 .simma.GetTimelineDetailsRequest\x1a!.simma.GetTimelineDetailsResponse\"\x00\x62\x06proto3'
 )
 
 
-
-_EDITSIMULATIONREQUEST_COMMAND = _descriptor.EnumDescriptor(
-  name='Command',
-  full_name='simma.EditSimulationRequest.Command',
-  filename=None,
-  file=DESCRIPTOR,
-  create_key=_descriptor._internal_create_key,
-  values=[
-    _descriptor.EnumValueDescriptor(
-      name='UNKNOWN', index=0, number=0,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='START', index=1, number=1,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='END', index=2, number=2,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='DISCARD', index=3, number=3,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='COMMIT', index=4, number=4,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-  ],
-  containing_type=None,
-  serialized_options=None,
-  serialized_start=1360,
-  serialized_end=1427,
-)
-_sym_db.RegisterEnumDescriptor(_EDITSIMULATIONREQUEST_COMMAND)
 
 
 _TICKLIST = _descriptor.Descriptor(
@@ -145,29 +105,22 @@ _TIMELINESREQUEST = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tags', full_name='simma.TimelinesRequest.tags', index=0,
+      name='filter_parent_ids', full_name='simma.TimelinesRequest.filter_parent_ids', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='parent_id', full_name='simma.TimelinesRequest.parent_id', index=1,
-      number=2, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      name='require_tags', full_name='simma.TimelinesRequest.require_tags', index=1,
+      number=2, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='head_tick', full_name='simma.TimelinesRequest.head_tick', index=2,
-      number=3, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='exclude_tags', full_name='simma.TimelinesRequest.exclude_tags', index=3,
-      number=4, type=9, cpp_type=9, label=3,
+      name='disallow_tags', full_name='simma.TimelinesRequest.disallow_tags', index=2,
+      number=3, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -185,7 +138,7 @@ _TIMELINESREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=106,
-  serialized_end=198,
+  serialized_end=196,
 )
 
 
@@ -199,7 +152,7 @@ _TIMELINESRESPONSE = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_ids', full_name='simma.TimelinesResponse.timeline_ids', index=0,
-      number=1, type=3, cpp_type=2, label=3,
+      number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -216,8 +169,8 @@ _TIMELINESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=200,
-  serialized_end=241,
+  serialized_start=198,
+  serialized_end=239,
 )
 
 
@@ -231,8 +184,8 @@ _TIMELINETICKSREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_id', full_name='simma.TimelineTicksRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -248,8 +201,8 @@ _TIMELINETICKSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=243,
-  serialized_end=286,
+  serialized_start=241,
+  serialized_end=284,
 )
 
 
@@ -280,8 +233,8 @@ _TIMELINETICKSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=288,
-  serialized_end=347,
+  serialized_start=286,
+  serialized_end=345,
 )
 
 
@@ -295,8 +248,8 @@ _TIMELINEDATAREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_id', full_name='simma.TimelineDataRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -331,8 +284,8 @@ _TIMELINEDATAREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=350,
-  serialized_end=485,
+  serialized_start=348,
+  serialized_end=483,
 )
 
 
@@ -370,8 +323,8 @@ _TIMELINEDATARESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=487,
-  serialized_end=537,
+  serialized_start=485,
+  serialized_end=535,
 )
 
 
@@ -385,8 +338,8 @@ _TIMELINEJSONREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_id', full_name='simma.TimelineJsonRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -421,8 +374,8 @@ _TIMELINEJSONREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=540,
-  serialized_end=675,
+  serialized_start=538,
+  serialized_end=673,
 )
 
 
@@ -460,8 +413,8 @@ _TIMELINEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=677,
-  serialized_end=727,
+  serialized_start=675,
+  serialized_end=725,
 )
 
 
@@ -475,8 +428,8 @@ _TIMELINEEVENTSREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_id', full_name='simma.TimelineEventsRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -488,7 +441,7 @@ _TIMELINEEVENTSREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='filters', full_name='simma.TimelineEventsRequest.filters', index=2,
+      name='event_name_filters', full_name='simma.TimelineEventsRequest.event_name_filters', index=2,
       number=3, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -506,8 +459,8 @@ _TIMELINEEVENTSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=729,
-  serialized_end=828,
+  serialized_start=727,
+  serialized_end=837,
 )
 
 
@@ -545,8 +498,8 @@ _EVENTMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=830,
-  serialized_end=872,
+  serialized_start=839,
+  serialized_end=881,
 )
 
 
@@ -560,8 +513,8 @@ _TIMELINEEVENTSRESPONSE = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_id', full_name='simma.TimelineEventsResponse.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -591,29 +544,77 @@ _TIMELINEEVENTSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=874,
-  serialized_end=970,
+  serialized_start=883,
+  serialized_end=979,
 )
 
 
-_GETORSTARTSIMULATIONREQUEST = _descriptor.Descriptor(
-  name='GetOrStartSimulationRequest',
-  full_name='simma.GetOrStartSimulationRequest',
+_TIMELINESIMULATORREQUEST_START = _descriptor.Descriptor(
+  name='Start',
+  full_name='simma.TimelineSimulatorRequest.Start',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='timeline_id', full_name='simma.GetOrStartSimulationRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      name='timeline_id', full_name='simma.TimelineSimulatorRequest.Start.timeline_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1215,
+  serialized_end=1243,
+)
+
+_TIMELINESIMULATORREQUEST_SAVESTATETOPOINT = _descriptor.Descriptor(
+  name='SaveStateToPoint',
+  full_name='simma.TimelineSimulatorRequest.SaveStateToPoint',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1245,
+  serialized_end=1263,
+)
+
+_TIMELINESIMULATORREQUEST_MOVETOTICK = _descriptor.Descriptor(
+  name='MoveToTick',
+  full_name='simma.TimelineSimulatorRequest.MoveToTick',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetOrStartSimulationRequest.tick', index=1,
-      number=2, type=3, cpp_type=2, label=1,
+      name='tick', full_name='simma.TimelineSimulatorRequest.MoveToTick.tick', index=0,
+      number=1, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -630,28 +631,109 @@ _GETORSTARTSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=972,
-  serialized_end=1036,
+  serialized_start=1265,
+  serialized_end=1291,
 )
 
-
-_GETORSTARTSIMULATIONRESPONSE = _descriptor.Descriptor(
-  name='GetOrStartSimulationResponse',
-  full_name='simma.GetOrStartSimulationResponse',
+_TIMELINESIMULATORREQUEST = _descriptor.Descriptor(
+  name='TimelineSimulatorRequest',
+  full_name='simma.TimelineSimulatorRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='address', full_name='simma.GetOrStartSimulationResponse.address', index=0,
+      name='start', full_name='simma.TimelineSimulatorRequest.start', index=0,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='save_state_to_point', full_name='simma.TimelineSimulatorRequest.save_state_to_point', index=1,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='move_to_tick', full_name='simma.TimelineSimulatorRequest.move_to_tick', index=2,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[_TIMELINESIMULATORREQUEST_START, _TIMELINESIMULATORREQUEST_SAVESTATETOPOINT, _TIMELINESIMULATORREQUEST_MOVETOTICK, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='message', full_name='simma.TimelineSimulatorRequest.message',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=982,
+  serialized_end=1302,
+)
+
+
+_TIMELINESIMULATORRESPONSE_ERROR = _descriptor.Descriptor(
+  name='Error',
+  full_name='simma.TimelineSimulatorResponse.Error',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='message', full_name='simma.TimelineSimulatorResponse.Error.message', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1599,
+  serialized_end=1623,
+)
+
+_TIMELINESIMULATORRESPONSE_START = _descriptor.Descriptor(
+  name='Start',
+  full_name='simma.TimelineSimulatorResponse.Start',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='address', full_name='simma.TimelineSimulatorResponse.Start.address', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='token', full_name='simma.GetOrStartSimulationResponse.token', index=1,
+      name='user_token', full_name='simma.TimelineSimulatorResponse.Start.user_token', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -669,22 +751,21 @@ _GETORSTARTSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1038,
-  serialized_end=1100,
+  serialized_start=1625,
+  serialized_end=1669,
 )
 
-
-_STOPSIMULATIONREQUEST = _descriptor.Descriptor(
-  name='StopSimulationRequest',
-  full_name='simma.StopSimulationRequest',
+_TIMELINESIMULATORRESPONSE_SAVESTATETOPOINT = _descriptor.Descriptor(
+  name='SaveStateToPoint',
+  full_name='simma.TimelineSimulatorResponse.SaveStateToPoint',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='timeline_id', full_name='simma.StopSimulationRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
+      name='new_tick', full_name='simma.TimelineSimulatorResponse.SaveStateToPoint.new_tick', index=0,
+      number=1, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -701,78 +782,13 @@ _STOPSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1102,
-  serialized_end=1146,
+  serialized_start=1671,
+  serialized_end=1707,
 )
 
-
-_STOPSIMULATIONRESPONSE = _descriptor.Descriptor(
-  name='StopSimulationResponse',
-  full_name='simma.StopSimulationResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1148,
-  serialized_end=1172,
-)
-
-
-_MOVESIMTOTICKREQUEST = _descriptor.Descriptor(
-  name='MoveSimToTickRequest',
-  full_name='simma.MoveSimToTickRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='timeline_id', full_name='simma.MoveSimToTickRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.MoveSimToTickRequest.tick', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1174,
-  serialized_end=1231,
-)
-
-
-_MOVESIMTOTICKRESPONSE = _descriptor.Descriptor(
-  name='MoveSimToTickResponse',
-  full_name='simma.MoveSimToTickResponse',
+_TIMELINESIMULATORRESPONSE_MOVETOTICK = _descriptor.Descriptor(
+  name='MoveToTick',
+  full_name='simma.TimelineSimulatorResponse.MoveToTick',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -790,29 +806,93 @@ _MOVESIMTOTICKRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1233,
-  serialized_end=1256,
+  serialized_start=1265,
+  serialized_end=1277,
 )
 
-
-_EDITSIMULATIONREQUEST = _descriptor.Descriptor(
-  name='EditSimulationRequest',
-  full_name='simma.EditSimulationRequest',
+_TIMELINESIMULATORRESPONSE = _descriptor.Descriptor(
+  name='TimelineSimulatorResponse',
+  full_name='simma.TimelineSimulatorResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='timeline_id', full_name='simma.EditSimulationRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      name='error', full_name='simma.TimelineSimulatorResponse.error', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='command', full_name='simma.EditSimulationRequest.command', index=1,
-      number=2, type=14, cpp_type=8, label=1,
+      name='start', full_name='simma.TimelineSimulatorResponse.start', index=1,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='save_state_to_point', full_name='simma.TimelineSimulatorResponse.save_state_to_point', index=2,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='move_to_tick', full_name='simma.TimelineSimulatorResponse.move_to_tick', index=3,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[_TIMELINESIMULATORRESPONSE_ERROR, _TIMELINESIMULATORRESPONSE_START, _TIMELINESIMULATORRESPONSE_SAVESTATETOPOINT, _TIMELINESIMULATORRESPONSE_MOVETOTICK, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='message', full_name='simma.TimelineSimulatorResponse.message',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=1305,
+  serialized_end=1732,
+)
+
+
+_TIMELINECREATORREQUEST_STARTNEW = _descriptor.Descriptor(
+  name='StartNew',
+  full_name='simma.TimelineCreatorRequest.StartNew',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='binary_id', full_name='simma.TimelineCreatorRequest.StartNew.binary_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='initial_timeline_id', full_name='simma.TimelineCreatorRequest.StartNew.initial_timeline_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tick', full_name='simma.TimelineCreatorRequest.StartNew.tick', index=2,
+      number=3, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -822,7 +902,6 @@ _EDITSIMULATIONREQUEST = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
-    _EDITSIMULATIONREQUEST_COMMAND,
   ],
   serialized_options=None,
   is_extendable=False,
@@ -830,28 +909,309 @@ _EDITSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1259,
-  serialized_end=1427,
+  serialized_start=2173,
+  serialized_end=2245,
 )
 
-
-_EDITSIMULATIONRESPONSE = _descriptor.Descriptor(
-  name='EditSimulationResponse',
-  full_name='simma.EditSimulationResponse',
+_TIMELINECREATORREQUEST_STARTEXISTING = _descriptor.Descriptor(
+  name='StartExisting',
+  full_name='simma.TimelineCreatorRequest.StartExisting',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='success', full_name='simma.EditSimulationResponse.success', index=0,
-      number=1, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
+      name='creator_id', full_name='simma.TimelineCreatorRequest.StartExisting.creator_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2247,
+  serialized_end=2282,
+)
+
+_TIMELINECREATORREQUEST_STARTEDITING = _descriptor.Descriptor(
+  name='StartEditing',
+  full_name='simma.TimelineCreatorRequest.StartEditing',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2284,
+  serialized_end=2298,
+)
+
+_TIMELINECREATORREQUEST_STOPEDITING = _descriptor.Descriptor(
+  name='StopEditing',
+  full_name='simma.TimelineCreatorRequest.StopEditing',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2300,
+  serialized_end=2313,
+)
+
+_TIMELINECREATORREQUEST_LOADSTATE = _descriptor.Descriptor(
+  name='LoadState',
+  full_name='simma.TimelineCreatorRequest.LoadState',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='timeline_id', full_name='simma.TimelineCreatorRequest.LoadState.timeline_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2315,
+  serialized_end=2347,
+)
+
+_TIMELINECREATORREQUEST_SAVETONEWTIMELINE = _descriptor.Descriptor(
+  name='SaveToNewTimeline',
+  full_name='simma.TimelineCreatorRequest.SaveToNewTimeline',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2349,
+  serialized_end=2368,
+)
+
+_TIMELINECREATORREQUEST = _descriptor.Descriptor(
+  name='TimelineCreatorRequest',
+  full_name='simma.TimelineCreatorRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='start_new', full_name='simma.TimelineCreatorRequest.start_new', index=0,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='result', full_name='simma.EditSimulationResponse.result', index=1,
+      name='start_existing', full_name='simma.TimelineCreatorRequest.start_existing', index=1,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='start_editing', full_name='simma.TimelineCreatorRequest.start_editing', index=2,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='stop_editing', full_name='simma.TimelineCreatorRequest.stop_editing', index=3,
+      number=7, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='load_state', full_name='simma.TimelineCreatorRequest.load_state', index=4,
+      number=8, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='save_to_new_timeline', full_name='simma.TimelineCreatorRequest.save_to_new_timeline', index=5,
+      number=9, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[_TIMELINECREATORREQUEST_STARTNEW, _TIMELINECREATORREQUEST_STARTEXISTING, _TIMELINECREATORREQUEST_STARTEDITING, _TIMELINECREATORREQUEST_STOPEDITING, _TIMELINECREATORREQUEST_LOADSTATE, _TIMELINECREATORREQUEST_SAVETONEWTIMELINE, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='message', full_name='simma.TimelineCreatorRequest.message',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=1735,
+  serialized_end=2379,
+)
+
+
+_TIMELINECREATORRESPONSE_ERROR = _descriptor.Descriptor(
+  name='Error',
+  full_name='simma.TimelineCreatorResponse.Error',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='message', full_name='simma.TimelineCreatorResponse.Error.message', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1599,
+  serialized_end=1623,
+)
+
+_TIMELINECREATORRESPONSE_STARTNEW = _descriptor.Descriptor(
+  name='StartNew',
+  full_name='simma.TimelineCreatorResponse.StartNew',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='creator_id', full_name='simma.TimelineCreatorResponse.StartNew.creator_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='address', full_name='simma.TimelineCreatorResponse.StartNew.address', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='user_token', full_name='simma.TimelineCreatorResponse.StartNew.user_token', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2908,
+  serialized_end=2975,
+)
+
+_TIMELINECREATORRESPONSE_STARTEXISTING = _descriptor.Descriptor(
+  name='StartExisting',
+  full_name='simma.TimelineCreatorResponse.StartExisting',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='address', full_name='simma.TimelineCreatorResponse.StartExisting.address', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='user_token', full_name='simma.TimelineCreatorResponse.StartExisting.user_token', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -869,8 +1229,189 @@ _EDITSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1429,
-  serialized_end=1486,
+  serialized_start=2977,
+  serialized_end=3029,
+)
+
+_TIMELINECREATORRESPONSE_STARTEDITING = _descriptor.Descriptor(
+  name='StartEditing',
+  full_name='simma.TimelineCreatorResponse.StartEditing',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2284,
+  serialized_end=2298,
+)
+
+_TIMELINECREATORRESPONSE_STOPEDITING = _descriptor.Descriptor(
+  name='StopEditing',
+  full_name='simma.TimelineCreatorResponse.StopEditing',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2300,
+  serialized_end=2313,
+)
+
+_TIMELINECREATORRESPONSE_LOADSTATE = _descriptor.Descriptor(
+  name='LoadState',
+  full_name='simma.TimelineCreatorResponse.LoadState',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2315,
+  serialized_end=2326,
+)
+
+_TIMELINECREATORRESPONSE_SAVETONEWTIMELINE = _descriptor.Descriptor(
+  name='SaveToNewTimeline',
+  full_name='simma.TimelineCreatorResponse.SaveToNewTimeline',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='new_timeline_id', full_name='simma.TimelineCreatorResponse.SaveToNewTimeline.new_timeline_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=3075,
+  serialized_end=3119,
+)
+
+_TIMELINECREATORRESPONSE = _descriptor.Descriptor(
+  name='TimelineCreatorResponse',
+  full_name='simma.TimelineCreatorResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='error', full_name='simma.TimelineCreatorResponse.error', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='start_new', full_name='simma.TimelineCreatorResponse.start_new', index=1,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='start_existing', full_name='simma.TimelineCreatorResponse.start_existing', index=2,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='start_editing', full_name='simma.TimelineCreatorResponse.start_editing', index=3,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='stop_editing', full_name='simma.TimelineCreatorResponse.stop_editing', index=4,
+      number=7, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='load_state', full_name='simma.TimelineCreatorResponse.load_state', index=5,
+      number=8, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='save_to_new_timeline', full_name='simma.TimelineCreatorResponse.save_to_new_timeline', index=6,
+      number=9, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[_TIMELINECREATORRESPONSE_ERROR, _TIMELINECREATORRESPONSE_STARTNEW, _TIMELINECREATORRESPONSE_STARTEXISTING, _TIMELINECREATORRESPONSE_STARTEDITING, _TIMELINECREATORRESPONSE_STOPEDITING, _TIMELINECREATORRESPONSE_LOADSTATE, _TIMELINECREATORRESPONSE_SAVETONEWTIMELINE, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='message', full_name='simma.TimelineCreatorResponse.message',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=2382,
+  serialized_end=3130,
 )
 
 
@@ -884,8 +1425,8 @@ _MODIFYTIMELINETAGSREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_id', full_name='simma.ModifyTimelineTagsRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -915,8 +1456,8 @@ _MODIFYTIMELINETAGSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1488,
-  serialized_end=1581,
+  serialized_start=3132,
+  serialized_end=3225,
 )
 
 
@@ -940,214 +1481,8 @@ _MODIFYTIMELINETAGSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1583,
-  serialized_end=1611,
-)
-
-
-_CREATETIMELINEREQUEST = _descriptor.Descriptor(
-  name='CreateTimelineRequest',
-  full_name='simma.CreateTimelineRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='source_timeline_id', full_name='simma.CreateTimelineRequest.source_timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='source_tick', full_name='simma.CreateTimelineRequest.source_tick', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1613,
-  serialized_end=1685,
-)
-
-
-_CREATETIMELINERESPONSE = _descriptor.Descriptor(
-  name='CreateTimelineResponse',
-  full_name='simma.CreateTimelineResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='created_timeline_id', full_name='simma.CreateTimelineResponse.created_timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1687,
-  serialized_end=1740,
-)
-
-
-_CLONETIMELINEREQUEST = _descriptor.Descriptor(
-  name='CloneTimelineRequest',
-  full_name='simma.CloneTimelineRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='source_timeline_id', full_name='simma.CloneTimelineRequest.source_timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1742,
-  serialized_end=1792,
-)
-
-
-_CLONETIMELINERESPONSE = _descriptor.Descriptor(
-  name='CloneTimelineResponse',
-  full_name='simma.CloneTimelineResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='created_timeline_id', full_name='simma.CloneTimelineResponse.created_timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1794,
-  serialized_end=1846,
-)
-
-
-_CREATETIMELINEFROMSIMULATIONREQUEST = _descriptor.Descriptor(
-  name='CreateTimelineFromSimulationRequest',
-  full_name='simma.CreateTimelineFromSimulationRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='source_timeline_id', full_name='simma.CreateTimelineFromSimulationRequest.source_timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='as_sibling', full_name='simma.CreateTimelineFromSimulationRequest.as_sibling', index=1,
-      number=2, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1848,
-  serialized_end=1933,
-)
-
-
-_CREATETIMELINEFROMSIMULATIONRESPONSE = _descriptor.Descriptor(
-  name='CreateTimelineFromSimulationResponse',
-  full_name='simma.CreateTimelineFromSimulationResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='created_timeline_id', full_name='simma.CreateTimelineFromSimulationResponse.created_timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1935,
-  serialized_end=2002,
+  serialized_start=3227,
+  serialized_end=3255,
 )
 
 
@@ -1178,8 +1513,8 @@ _DELETETIMELINEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2004,
-  serialized_end=2048,
+  serialized_start=3257,
+  serialized_end=3301,
 )
 
 
@@ -1203,8 +1538,8 @@ _DELETETIMELINERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2050,
-  serialized_end=2074,
+  serialized_start=3303,
+  serialized_end=3327,
 )
 
 
@@ -1218,8 +1553,8 @@ _GETTIMELINEDETAILSREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='timeline_id', full_name='simma.GetTimelineDetailsRequest.timeline_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -1235,8 +1570,8 @@ _GETTIMELINEDETAILSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2076,
-  serialized_end=2124,
+  serialized_start=3329,
+  serialized_end=3377,
 )
 
 
@@ -1249,37 +1584,37 @@ _GETTIMELINEDETAILSRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='parent_id', full_name='simma.GetTimelineDetailsResponse.parent_id', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='head_tick', full_name='simma.GetTimelineDetailsResponse.head_tick', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='last_commit_timestamp', full_name='simma.GetTimelineDetailsResponse.last_commit_timestamp', index=2,
-      number=3, type=9, cpp_type=9, label=1,
+      name='binary_id', full_name='simma.GetTimelineDetailsResponse.binary_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='tags', full_name='simma.GetTimelineDetailsResponse.tags', index=3,
-      number=4, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
+      name='parent_id', full_name='simma.GetTimelineDetailsResponse.parent_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='furthest_tick', full_name='simma.GetTimelineDetailsResponse.furthest_tick', index=4,
-      number=5, type=3, cpp_type=2, label=1,
+      name='head_tick', full_name='simma.GetTimelineDetailsResponse.head_tick', index=2,
+      number=3, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='creation_timestamp', full_name='simma.GetTimelineDetailsResponse.creation_timestamp', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tags', full_name='simma.GetTimelineDetailsResponse.tags', index=4,
+      number=5, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -1295,8 +1630,8 @@ _GETTIMELINEDETAILSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2127,
-  serialized_end=2261,
+  serialized_start=3379,
+  serialized_end=3506,
 )
 
 _TIMELINETICKSRESPONSE.fields_by_name['tick_list'].message_type = _TICKLIST
@@ -1318,8 +1653,106 @@ _TIMELINEJSONREQUEST.oneofs_by_name['tick_option'].fields.append(
 _TIMELINEJSONREQUEST.fields_by_name['tick_range'].containing_oneof = _TIMELINEJSONREQUEST.oneofs_by_name['tick_option']
 _TIMELINEEVENTSREQUEST.fields_by_name['tick_range'].message_type = _TICKRANGE
 _TIMELINEEVENTSRESPONSE.fields_by_name['events'].message_type = _EVENTMESSAGE
-_EDITSIMULATIONREQUEST.fields_by_name['command'].enum_type = _EDITSIMULATIONREQUEST_COMMAND
-_EDITSIMULATIONREQUEST_COMMAND.containing_type = _EDITSIMULATIONREQUEST
+_TIMELINESIMULATORREQUEST_START.containing_type = _TIMELINESIMULATORREQUEST
+_TIMELINESIMULATORREQUEST_SAVESTATETOPOINT.containing_type = _TIMELINESIMULATORREQUEST
+_TIMELINESIMULATORREQUEST_MOVETOTICK.containing_type = _TIMELINESIMULATORREQUEST
+_TIMELINESIMULATORREQUEST.fields_by_name['start'].message_type = _TIMELINESIMULATORREQUEST_START
+_TIMELINESIMULATORREQUEST.fields_by_name['save_state_to_point'].message_type = _TIMELINESIMULATORREQUEST_SAVESTATETOPOINT
+_TIMELINESIMULATORREQUEST.fields_by_name['move_to_tick'].message_type = _TIMELINESIMULATORREQUEST_MOVETOTICK
+_TIMELINESIMULATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINESIMULATORREQUEST.fields_by_name['start'])
+_TIMELINESIMULATORREQUEST.fields_by_name['start'].containing_oneof = _TIMELINESIMULATORREQUEST.oneofs_by_name['message']
+_TIMELINESIMULATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINESIMULATORREQUEST.fields_by_name['save_state_to_point'])
+_TIMELINESIMULATORREQUEST.fields_by_name['save_state_to_point'].containing_oneof = _TIMELINESIMULATORREQUEST.oneofs_by_name['message']
+_TIMELINESIMULATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINESIMULATORREQUEST.fields_by_name['move_to_tick'])
+_TIMELINESIMULATORREQUEST.fields_by_name['move_to_tick'].containing_oneof = _TIMELINESIMULATORREQUEST.oneofs_by_name['message']
+_TIMELINESIMULATORRESPONSE_ERROR.containing_type = _TIMELINESIMULATORRESPONSE
+_TIMELINESIMULATORRESPONSE_START.containing_type = _TIMELINESIMULATORRESPONSE
+_TIMELINESIMULATORRESPONSE_SAVESTATETOPOINT.containing_type = _TIMELINESIMULATORRESPONSE
+_TIMELINESIMULATORRESPONSE_MOVETOTICK.containing_type = _TIMELINESIMULATORRESPONSE
+_TIMELINESIMULATORRESPONSE.fields_by_name['error'].message_type = _TIMELINESIMULATORRESPONSE_ERROR
+_TIMELINESIMULATORRESPONSE.fields_by_name['start'].message_type = _TIMELINESIMULATORRESPONSE_START
+_TIMELINESIMULATORRESPONSE.fields_by_name['save_state_to_point'].message_type = _TIMELINESIMULATORRESPONSE_SAVESTATETOPOINT
+_TIMELINESIMULATORRESPONSE.fields_by_name['move_to_tick'].message_type = _TIMELINESIMULATORRESPONSE_MOVETOTICK
+_TIMELINESIMULATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINESIMULATORRESPONSE.fields_by_name['error'])
+_TIMELINESIMULATORRESPONSE.fields_by_name['error'].containing_oneof = _TIMELINESIMULATORRESPONSE.oneofs_by_name['message']
+_TIMELINESIMULATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINESIMULATORRESPONSE.fields_by_name['start'])
+_TIMELINESIMULATORRESPONSE.fields_by_name['start'].containing_oneof = _TIMELINESIMULATORRESPONSE.oneofs_by_name['message']
+_TIMELINESIMULATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINESIMULATORRESPONSE.fields_by_name['save_state_to_point'])
+_TIMELINESIMULATORRESPONSE.fields_by_name['save_state_to_point'].containing_oneof = _TIMELINESIMULATORRESPONSE.oneofs_by_name['message']
+_TIMELINESIMULATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINESIMULATORRESPONSE.fields_by_name['move_to_tick'])
+_TIMELINESIMULATORRESPONSE.fields_by_name['move_to_tick'].containing_oneof = _TIMELINESIMULATORRESPONSE.oneofs_by_name['message']
+_TIMELINECREATORREQUEST_STARTNEW.containing_type = _TIMELINECREATORREQUEST
+_TIMELINECREATORREQUEST_STARTEXISTING.containing_type = _TIMELINECREATORREQUEST
+_TIMELINECREATORREQUEST_STARTEDITING.containing_type = _TIMELINECREATORREQUEST
+_TIMELINECREATORREQUEST_STOPEDITING.containing_type = _TIMELINECREATORREQUEST
+_TIMELINECREATORREQUEST_LOADSTATE.containing_type = _TIMELINECREATORREQUEST
+_TIMELINECREATORREQUEST_SAVETONEWTIMELINE.containing_type = _TIMELINECREATORREQUEST
+_TIMELINECREATORREQUEST.fields_by_name['start_new'].message_type = _TIMELINECREATORREQUEST_STARTNEW
+_TIMELINECREATORREQUEST.fields_by_name['start_existing'].message_type = _TIMELINECREATORREQUEST_STARTEXISTING
+_TIMELINECREATORREQUEST.fields_by_name['start_editing'].message_type = _TIMELINECREATORREQUEST_STARTEDITING
+_TIMELINECREATORREQUEST.fields_by_name['stop_editing'].message_type = _TIMELINECREATORREQUEST_STOPEDITING
+_TIMELINECREATORREQUEST.fields_by_name['load_state'].message_type = _TIMELINECREATORREQUEST_LOADSTATE
+_TIMELINECREATORREQUEST.fields_by_name['save_to_new_timeline'].message_type = _TIMELINECREATORREQUEST_SAVETONEWTIMELINE
+_TIMELINECREATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORREQUEST.fields_by_name['start_new'])
+_TIMELINECREATORREQUEST.fields_by_name['start_new'].containing_oneof = _TIMELINECREATORREQUEST.oneofs_by_name['message']
+_TIMELINECREATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORREQUEST.fields_by_name['start_existing'])
+_TIMELINECREATORREQUEST.fields_by_name['start_existing'].containing_oneof = _TIMELINECREATORREQUEST.oneofs_by_name['message']
+_TIMELINECREATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORREQUEST.fields_by_name['start_editing'])
+_TIMELINECREATORREQUEST.fields_by_name['start_editing'].containing_oneof = _TIMELINECREATORREQUEST.oneofs_by_name['message']
+_TIMELINECREATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORREQUEST.fields_by_name['stop_editing'])
+_TIMELINECREATORREQUEST.fields_by_name['stop_editing'].containing_oneof = _TIMELINECREATORREQUEST.oneofs_by_name['message']
+_TIMELINECREATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORREQUEST.fields_by_name['load_state'])
+_TIMELINECREATORREQUEST.fields_by_name['load_state'].containing_oneof = _TIMELINECREATORREQUEST.oneofs_by_name['message']
+_TIMELINECREATORREQUEST.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORREQUEST.fields_by_name['save_to_new_timeline'])
+_TIMELINECREATORREQUEST.fields_by_name['save_to_new_timeline'].containing_oneof = _TIMELINECREATORREQUEST.oneofs_by_name['message']
+_TIMELINECREATORRESPONSE_ERROR.containing_type = _TIMELINECREATORRESPONSE
+_TIMELINECREATORRESPONSE_STARTNEW.containing_type = _TIMELINECREATORRESPONSE
+_TIMELINECREATORRESPONSE_STARTEXISTING.containing_type = _TIMELINECREATORRESPONSE
+_TIMELINECREATORRESPONSE_STARTEDITING.containing_type = _TIMELINECREATORRESPONSE
+_TIMELINECREATORRESPONSE_STOPEDITING.containing_type = _TIMELINECREATORRESPONSE
+_TIMELINECREATORRESPONSE_LOADSTATE.containing_type = _TIMELINECREATORRESPONSE
+_TIMELINECREATORRESPONSE_SAVETONEWTIMELINE.containing_type = _TIMELINECREATORRESPONSE
+_TIMELINECREATORRESPONSE.fields_by_name['error'].message_type = _TIMELINECREATORRESPONSE_ERROR
+_TIMELINECREATORRESPONSE.fields_by_name['start_new'].message_type = _TIMELINECREATORRESPONSE_STARTNEW
+_TIMELINECREATORRESPONSE.fields_by_name['start_existing'].message_type = _TIMELINECREATORRESPONSE_STARTEXISTING
+_TIMELINECREATORRESPONSE.fields_by_name['start_editing'].message_type = _TIMELINECREATORRESPONSE_STARTEDITING
+_TIMELINECREATORRESPONSE.fields_by_name['stop_editing'].message_type = _TIMELINECREATORRESPONSE_STOPEDITING
+_TIMELINECREATORRESPONSE.fields_by_name['load_state'].message_type = _TIMELINECREATORRESPONSE_LOADSTATE
+_TIMELINECREATORRESPONSE.fields_by_name['save_to_new_timeline'].message_type = _TIMELINECREATORRESPONSE_SAVETONEWTIMELINE
+_TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORRESPONSE.fields_by_name['error'])
+_TIMELINECREATORRESPONSE.fields_by_name['error'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
+_TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORRESPONSE.fields_by_name['start_new'])
+_TIMELINECREATORRESPONSE.fields_by_name['start_new'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
+_TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORRESPONSE.fields_by_name['start_existing'])
+_TIMELINECREATORRESPONSE.fields_by_name['start_existing'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
+_TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORRESPONSE.fields_by_name['start_editing'])
+_TIMELINECREATORRESPONSE.fields_by_name['start_editing'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
+_TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORRESPONSE.fields_by_name['stop_editing'])
+_TIMELINECREATORRESPONSE.fields_by_name['stop_editing'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
+_TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORRESPONSE.fields_by_name['load_state'])
+_TIMELINECREATORRESPONSE.fields_by_name['load_state'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
+_TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
+  _TIMELINECREATORRESPONSE.fields_by_name['save_to_new_timeline'])
+_TIMELINECREATORRESPONSE.fields_by_name['save_to_new_timeline'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
 DESCRIPTOR.message_types_by_name['TickList'] = _TICKLIST
 DESCRIPTOR.message_types_by_name['TickRange'] = _TICKRANGE
 DESCRIPTOR.message_types_by_name['TimelinesRequest'] = _TIMELINESREQUEST
@@ -1333,22 +1766,12 @@ DESCRIPTOR.message_types_by_name['TimelineJsonResponse'] = _TIMELINEJSONRESPONSE
 DESCRIPTOR.message_types_by_name['TimelineEventsRequest'] = _TIMELINEEVENTSREQUEST
 DESCRIPTOR.message_types_by_name['EventMessage'] = _EVENTMESSAGE
 DESCRIPTOR.message_types_by_name['TimelineEventsResponse'] = _TIMELINEEVENTSRESPONSE
-DESCRIPTOR.message_types_by_name['GetOrStartSimulationRequest'] = _GETORSTARTSIMULATIONREQUEST
-DESCRIPTOR.message_types_by_name['GetOrStartSimulationResponse'] = _GETORSTARTSIMULATIONRESPONSE
-DESCRIPTOR.message_types_by_name['StopSimulationRequest'] = _STOPSIMULATIONREQUEST
-DESCRIPTOR.message_types_by_name['StopSimulationResponse'] = _STOPSIMULATIONRESPONSE
-DESCRIPTOR.message_types_by_name['MoveSimToTickRequest'] = _MOVESIMTOTICKREQUEST
-DESCRIPTOR.message_types_by_name['MoveSimToTickResponse'] = _MOVESIMTOTICKRESPONSE
-DESCRIPTOR.message_types_by_name['EditSimulationRequest'] = _EDITSIMULATIONREQUEST
-DESCRIPTOR.message_types_by_name['EditSimulationResponse'] = _EDITSIMULATIONRESPONSE
+DESCRIPTOR.message_types_by_name['TimelineSimulatorRequest'] = _TIMELINESIMULATORREQUEST
+DESCRIPTOR.message_types_by_name['TimelineSimulatorResponse'] = _TIMELINESIMULATORRESPONSE
+DESCRIPTOR.message_types_by_name['TimelineCreatorRequest'] = _TIMELINECREATORREQUEST
+DESCRIPTOR.message_types_by_name['TimelineCreatorResponse'] = _TIMELINECREATORRESPONSE
 DESCRIPTOR.message_types_by_name['ModifyTimelineTagsRequest'] = _MODIFYTIMELINETAGSREQUEST
 DESCRIPTOR.message_types_by_name['ModifyTimelineTagsResponse'] = _MODIFYTIMELINETAGSRESPONSE
-DESCRIPTOR.message_types_by_name['CreateTimelineRequest'] = _CREATETIMELINEREQUEST
-DESCRIPTOR.message_types_by_name['CreateTimelineResponse'] = _CREATETIMELINERESPONSE
-DESCRIPTOR.message_types_by_name['CloneTimelineRequest'] = _CLONETIMELINEREQUEST
-DESCRIPTOR.message_types_by_name['CloneTimelineResponse'] = _CLONETIMELINERESPONSE
-DESCRIPTOR.message_types_by_name['CreateTimelineFromSimulationRequest'] = _CREATETIMELINEFROMSIMULATIONREQUEST
-DESCRIPTOR.message_types_by_name['CreateTimelineFromSimulationResponse'] = _CREATETIMELINEFROMSIMULATIONRESPONSE
 DESCRIPTOR.message_types_by_name['DeleteTimelineRequest'] = _DELETETIMELINEREQUEST
 DESCRIPTOR.message_types_by_name['DeleteTimelineResponse'] = _DELETETIMELINERESPONSE
 DESCRIPTOR.message_types_by_name['GetTimelineDetailsRequest'] = _GETTIMELINEDETAILSREQUEST
@@ -1446,61 +1869,193 @@ TimelineEventsResponse = _reflection.GeneratedProtocolMessageType('TimelineEvent
   })
 _sym_db.RegisterMessage(TimelineEventsResponse)
 
-GetOrStartSimulationRequest = _reflection.GeneratedProtocolMessageType('GetOrStartSimulationRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GETORSTARTSIMULATIONREQUEST,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetOrStartSimulationRequest)
-  })
-_sym_db.RegisterMessage(GetOrStartSimulationRequest)
+TimelineSimulatorRequest = _reflection.GeneratedProtocolMessageType('TimelineSimulatorRequest', (_message.Message,), {
 
-GetOrStartSimulationResponse = _reflection.GeneratedProtocolMessageType('GetOrStartSimulationResponse', (_message.Message,), {
-  'DESCRIPTOR' : _GETORSTARTSIMULATIONRESPONSE,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetOrStartSimulationResponse)
-  })
-_sym_db.RegisterMessage(GetOrStartSimulationResponse)
+  'Start' : _reflection.GeneratedProtocolMessageType('Start', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINESIMULATORREQUEST_START,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorRequest.Start)
+    })
+  ,
 
-StopSimulationRequest = _reflection.GeneratedProtocolMessageType('StopSimulationRequest', (_message.Message,), {
-  'DESCRIPTOR' : _STOPSIMULATIONREQUEST,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.StopSimulationRequest)
-  })
-_sym_db.RegisterMessage(StopSimulationRequest)
+  'SaveStateToPoint' : _reflection.GeneratedProtocolMessageType('SaveStateToPoint', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINESIMULATORREQUEST_SAVESTATETOPOINT,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorRequest.SaveStateToPoint)
+    })
+  ,
 
-StopSimulationResponse = _reflection.GeneratedProtocolMessageType('StopSimulationResponse', (_message.Message,), {
-  'DESCRIPTOR' : _STOPSIMULATIONRESPONSE,
+  'MoveToTick' : _reflection.GeneratedProtocolMessageType('MoveToTick', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINESIMULATORREQUEST_MOVETOTICK,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorRequest.MoveToTick)
+    })
+  ,
+  'DESCRIPTOR' : _TIMELINESIMULATORREQUEST,
   '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.StopSimulationResponse)
+  # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorRequest)
   })
-_sym_db.RegisterMessage(StopSimulationResponse)
+_sym_db.RegisterMessage(TimelineSimulatorRequest)
+_sym_db.RegisterMessage(TimelineSimulatorRequest.Start)
+_sym_db.RegisterMessage(TimelineSimulatorRequest.SaveStateToPoint)
+_sym_db.RegisterMessage(TimelineSimulatorRequest.MoveToTick)
 
-MoveSimToTickRequest = _reflection.GeneratedProtocolMessageType('MoveSimToTickRequest', (_message.Message,), {
-  'DESCRIPTOR' : _MOVESIMTOTICKREQUEST,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.MoveSimToTickRequest)
-  })
-_sym_db.RegisterMessage(MoveSimToTickRequest)
+TimelineSimulatorResponse = _reflection.GeneratedProtocolMessageType('TimelineSimulatorResponse', (_message.Message,), {
 
-MoveSimToTickResponse = _reflection.GeneratedProtocolMessageType('MoveSimToTickResponse', (_message.Message,), {
-  'DESCRIPTOR' : _MOVESIMTOTICKRESPONSE,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.MoveSimToTickResponse)
-  })
-_sym_db.RegisterMessage(MoveSimToTickResponse)
+  'Error' : _reflection.GeneratedProtocolMessageType('Error', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINESIMULATORRESPONSE_ERROR,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorResponse.Error)
+    })
+  ,
 
-EditSimulationRequest = _reflection.GeneratedProtocolMessageType('EditSimulationRequest', (_message.Message,), {
-  'DESCRIPTOR' : _EDITSIMULATIONREQUEST,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.EditSimulationRequest)
-  })
-_sym_db.RegisterMessage(EditSimulationRequest)
+  'Start' : _reflection.GeneratedProtocolMessageType('Start', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINESIMULATORRESPONSE_START,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorResponse.Start)
+    })
+  ,
 
-EditSimulationResponse = _reflection.GeneratedProtocolMessageType('EditSimulationResponse', (_message.Message,), {
-  'DESCRIPTOR' : _EDITSIMULATIONRESPONSE,
+  'SaveStateToPoint' : _reflection.GeneratedProtocolMessageType('SaveStateToPoint', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINESIMULATORRESPONSE_SAVESTATETOPOINT,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorResponse.SaveStateToPoint)
+    })
+  ,
+
+  'MoveToTick' : _reflection.GeneratedProtocolMessageType('MoveToTick', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINESIMULATORRESPONSE_MOVETOTICK,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorResponse.MoveToTick)
+    })
+  ,
+  'DESCRIPTOR' : _TIMELINESIMULATORRESPONSE,
   '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.EditSimulationResponse)
+  # @@protoc_insertion_point(class_scope:simma.TimelineSimulatorResponse)
   })
-_sym_db.RegisterMessage(EditSimulationResponse)
+_sym_db.RegisterMessage(TimelineSimulatorResponse)
+_sym_db.RegisterMessage(TimelineSimulatorResponse.Error)
+_sym_db.RegisterMessage(TimelineSimulatorResponse.Start)
+_sym_db.RegisterMessage(TimelineSimulatorResponse.SaveStateToPoint)
+_sym_db.RegisterMessage(TimelineSimulatorResponse.MoveToTick)
+
+TimelineCreatorRequest = _reflection.GeneratedProtocolMessageType('TimelineCreatorRequest', (_message.Message,), {
+
+  'StartNew' : _reflection.GeneratedProtocolMessageType('StartNew', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORREQUEST_STARTNEW,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorRequest.StartNew)
+    })
+  ,
+
+  'StartExisting' : _reflection.GeneratedProtocolMessageType('StartExisting', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORREQUEST_STARTEXISTING,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorRequest.StartExisting)
+    })
+  ,
+
+  'StartEditing' : _reflection.GeneratedProtocolMessageType('StartEditing', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORREQUEST_STARTEDITING,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorRequest.StartEditing)
+    })
+  ,
+
+  'StopEditing' : _reflection.GeneratedProtocolMessageType('StopEditing', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORREQUEST_STOPEDITING,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorRequest.StopEditing)
+    })
+  ,
+
+  'LoadState' : _reflection.GeneratedProtocolMessageType('LoadState', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORREQUEST_LOADSTATE,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorRequest.LoadState)
+    })
+  ,
+
+  'SaveToNewTimeline' : _reflection.GeneratedProtocolMessageType('SaveToNewTimeline', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORREQUEST_SAVETONEWTIMELINE,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorRequest.SaveToNewTimeline)
+    })
+  ,
+  'DESCRIPTOR' : _TIMELINECREATORREQUEST,
+  '__module__' : 'simma.simma_pb2'
+  # @@protoc_insertion_point(class_scope:simma.TimelineCreatorRequest)
+  })
+_sym_db.RegisterMessage(TimelineCreatorRequest)
+_sym_db.RegisterMessage(TimelineCreatorRequest.StartNew)
+_sym_db.RegisterMessage(TimelineCreatorRequest.StartExisting)
+_sym_db.RegisterMessage(TimelineCreatorRequest.StartEditing)
+_sym_db.RegisterMessage(TimelineCreatorRequest.StopEditing)
+_sym_db.RegisterMessage(TimelineCreatorRequest.LoadState)
+_sym_db.RegisterMessage(TimelineCreatorRequest.SaveToNewTimeline)
+
+TimelineCreatorResponse = _reflection.GeneratedProtocolMessageType('TimelineCreatorResponse', (_message.Message,), {
+
+  'Error' : _reflection.GeneratedProtocolMessageType('Error', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORRESPONSE_ERROR,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse.Error)
+    })
+  ,
+
+  'StartNew' : _reflection.GeneratedProtocolMessageType('StartNew', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORRESPONSE_STARTNEW,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse.StartNew)
+    })
+  ,
+
+  'StartExisting' : _reflection.GeneratedProtocolMessageType('StartExisting', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORRESPONSE_STARTEXISTING,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse.StartExisting)
+    })
+  ,
+
+  'StartEditing' : _reflection.GeneratedProtocolMessageType('StartEditing', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORRESPONSE_STARTEDITING,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse.StartEditing)
+    })
+  ,
+
+  'StopEditing' : _reflection.GeneratedProtocolMessageType('StopEditing', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORRESPONSE_STOPEDITING,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse.StopEditing)
+    })
+  ,
+
+  'LoadState' : _reflection.GeneratedProtocolMessageType('LoadState', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORRESPONSE_LOADSTATE,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse.LoadState)
+    })
+  ,
+
+  'SaveToNewTimeline' : _reflection.GeneratedProtocolMessageType('SaveToNewTimeline', (_message.Message,), {
+    'DESCRIPTOR' : _TIMELINECREATORRESPONSE_SAVETONEWTIMELINE,
+    '__module__' : 'simma.simma_pb2'
+    # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse.SaveToNewTimeline)
+    })
+  ,
+  'DESCRIPTOR' : _TIMELINECREATORRESPONSE,
+  '__module__' : 'simma.simma_pb2'
+  # @@protoc_insertion_point(class_scope:simma.TimelineCreatorResponse)
+  })
+_sym_db.RegisterMessage(TimelineCreatorResponse)
+_sym_db.RegisterMessage(TimelineCreatorResponse.Error)
+_sym_db.RegisterMessage(TimelineCreatorResponse.StartNew)
+_sym_db.RegisterMessage(TimelineCreatorResponse.StartExisting)
+_sym_db.RegisterMessage(TimelineCreatorResponse.StartEditing)
+_sym_db.RegisterMessage(TimelineCreatorResponse.StopEditing)
+_sym_db.RegisterMessage(TimelineCreatorResponse.LoadState)
+_sym_db.RegisterMessage(TimelineCreatorResponse.SaveToNewTimeline)
 
 ModifyTimelineTagsRequest = _reflection.GeneratedProtocolMessageType('ModifyTimelineTagsRequest', (_message.Message,), {
   'DESCRIPTOR' : _MODIFYTIMELINETAGSREQUEST,
@@ -1515,48 +2070,6 @@ ModifyTimelineTagsResponse = _reflection.GeneratedProtocolMessageType('ModifyTim
   # @@protoc_insertion_point(class_scope:simma.ModifyTimelineTagsResponse)
   })
 _sym_db.RegisterMessage(ModifyTimelineTagsResponse)
-
-CreateTimelineRequest = _reflection.GeneratedProtocolMessageType('CreateTimelineRequest', (_message.Message,), {
-  'DESCRIPTOR' : _CREATETIMELINEREQUEST,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CreateTimelineRequest)
-  })
-_sym_db.RegisterMessage(CreateTimelineRequest)
-
-CreateTimelineResponse = _reflection.GeneratedProtocolMessageType('CreateTimelineResponse', (_message.Message,), {
-  'DESCRIPTOR' : _CREATETIMELINERESPONSE,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CreateTimelineResponse)
-  })
-_sym_db.RegisterMessage(CreateTimelineResponse)
-
-CloneTimelineRequest = _reflection.GeneratedProtocolMessageType('CloneTimelineRequest', (_message.Message,), {
-  'DESCRIPTOR' : _CLONETIMELINEREQUEST,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CloneTimelineRequest)
-  })
-_sym_db.RegisterMessage(CloneTimelineRequest)
-
-CloneTimelineResponse = _reflection.GeneratedProtocolMessageType('CloneTimelineResponse', (_message.Message,), {
-  'DESCRIPTOR' : _CLONETIMELINERESPONSE,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CloneTimelineResponse)
-  })
-_sym_db.RegisterMessage(CloneTimelineResponse)
-
-CreateTimelineFromSimulationRequest = _reflection.GeneratedProtocolMessageType('CreateTimelineFromSimulationRequest', (_message.Message,), {
-  'DESCRIPTOR' : _CREATETIMELINEFROMSIMULATIONREQUEST,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CreateTimelineFromSimulationRequest)
-  })
-_sym_db.RegisterMessage(CreateTimelineFromSimulationRequest)
-
-CreateTimelineFromSimulationResponse = _reflection.GeneratedProtocolMessageType('CreateTimelineFromSimulationResponse', (_message.Message,), {
-  'DESCRIPTOR' : _CREATETIMELINEFROMSIMULATIONRESPONSE,
-  '__module__' : 'simma.simma_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CreateTimelineFromSimulationResponse)
-  })
-_sym_db.RegisterMessage(CreateTimelineFromSimulationResponse)
 
 DeleteTimelineRequest = _reflection.GeneratedProtocolMessageType('DeleteTimelineRequest', (_message.Message,), {
   'DESCRIPTOR' : _DELETETIMELINEREQUEST,
@@ -1595,8 +2108,8 @@ _SIMMA = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=2264,
-  serialized_end=3559,
+  serialized_start=3509,
+  serialized_end=4361,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTimelines',
@@ -1649,49 +2162,29 @@ _SIMMA = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='GetOrStartSimulation',
-    full_name='simma.Simma.GetOrStartSimulation',
+    name='TimelineSimulator',
+    full_name='simma.Simma.TimelineSimulator',
     index=5,
     containing_service=None,
-    input_type=_GETORSTARTSIMULATIONREQUEST,
-    output_type=_GETORSTARTSIMULATIONRESPONSE,
+    input_type=_TIMELINESIMULATORREQUEST,
+    output_type=_TIMELINESIMULATORRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='StopSimulation',
-    full_name='simma.Simma.StopSimulation',
+    name='TimelineCreator',
+    full_name='simma.Simma.TimelineCreator',
     index=6,
     containing_service=None,
-    input_type=_STOPSIMULATIONREQUEST,
-    output_type=_STOPSIMULATIONRESPONSE,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-  _descriptor.MethodDescriptor(
-    name='MoveSimToTick',
-    full_name='simma.Simma.MoveSimToTick',
-    index=7,
-    containing_service=None,
-    input_type=_MOVESIMTOTICKREQUEST,
-    output_type=_MOVESIMTOTICKRESPONSE,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-  _descriptor.MethodDescriptor(
-    name='EditSimulation',
-    full_name='simma.Simma.EditSimulation',
-    index=8,
-    containing_service=None,
-    input_type=_EDITSIMULATIONREQUEST,
-    output_type=_EDITSIMULATIONRESPONSE,
+    input_type=_TIMELINECREATORREQUEST,
+    output_type=_TIMELINECREATORRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
     name='ModifyTimelineTags',
     full_name='simma.Simma.ModifyTimelineTags',
-    index=9,
+    index=7,
     containing_service=None,
     input_type=_MODIFYTIMELINETAGSREQUEST,
     output_type=_MODIFYTIMELINETAGSRESPONSE,
@@ -1699,39 +2192,9 @@ _SIMMA = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='CreateTimeline',
-    full_name='simma.Simma.CreateTimeline',
-    index=10,
-    containing_service=None,
-    input_type=_CREATETIMELINEREQUEST,
-    output_type=_CREATETIMELINERESPONSE,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-  _descriptor.MethodDescriptor(
-    name='CloneTimeline',
-    full_name='simma.Simma.CloneTimeline',
-    index=11,
-    containing_service=None,
-    input_type=_CLONETIMELINEREQUEST,
-    output_type=_CLONETIMELINERESPONSE,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-  _descriptor.MethodDescriptor(
-    name='CreateTimelineFromSimulation',
-    full_name='simma.Simma.CreateTimelineFromSimulation',
-    index=12,
-    containing_service=None,
-    input_type=_CREATETIMELINEFROMSIMULATIONREQUEST,
-    output_type=_CREATETIMELINEFROMSIMULATIONRESPONSE,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-  _descriptor.MethodDescriptor(
     name='DeleteTimeline',
     full_name='simma.Simma.DeleteTimeline',
-    index=13,
+    index=8,
     containing_service=None,
     input_type=_DELETETIMELINEREQUEST,
     output_type=_DELETETIMELINERESPONSE,
@@ -1741,7 +2204,7 @@ _SIMMA = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetTimelineDetails',
     full_name='simma.Simma.GetTimelineDetails',
-    index=14,
+    index=9,
     containing_service=None,
     input_type=_GETTIMELINEDETAILSREQUEST,
     output_type=_GETTIMELINEDETAILSRESPONSE,
