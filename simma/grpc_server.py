@@ -49,7 +49,7 @@ class Service(pb2_grpc.SimmaServicer):
         elif tick_option == 'tick_range':
             start_tick = request.tick_range.start_tick
             end_tick = request.tick_range.end_tick
-            points = (tick, point_path
+            points = ((tick, point_path)
                       for tick, point_path
                       in await self._service.get_timeline_points(timeline_id)
                       if start_tick <= tick <= end_tick)
@@ -75,7 +75,7 @@ class Service(pb2_grpc.SimmaServicer):
             elif tick_option == 'tick_range':
                 start_tick = request.tick_range.start_tick
                 end_tick = request.tick_range.end_tick
-                points = (tick, point_path
+                points = ((tick, point_path)
                           for tick, point_path
                           in await self._service.get_timeline_points(timeline_id)
                           if start_tick <= tick <= end_tick)
@@ -234,7 +234,7 @@ async def serve():
     from pathlib import Path
 
     parser = argparse.ArgumentParser(description="Run a simma project server.")
-    parser.add_argument('create', action='store_true')
+    parser.add_argument('--create', action='store_true')
     parser.add_argument('project_path', type=Path, nargs='?', default=Path.cwd())
 
     args = parser.parse_args()
