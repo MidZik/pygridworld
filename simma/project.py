@@ -48,13 +48,7 @@ class Project:
             return self.root / 'bin'
 
     def __init__(self, path: Path):
-        self._path = path.resolve(True)
-        if (
-                not self._db_path().is_file()
-                or not self._timeline_data_path().is_dir()
-                or not self._binary_data_path().is_dir()
-        ):
-            raise RuntimeError(f"Cannot load project at path {path}")
+        self._path = path.resolve()
 
     def _timeline_data_path(self, timeline_id: Optional[UUID] = None):
         path = self._path / 'timeline_data'
@@ -106,6 +100,18 @@ class Project:
 
     def _db_connect(self):
         return aiosqlite.connect(self._db_path())
+
+    @staticmethod
+    def load(path: Path):
+        project = Project(path.resolve(True))
+        if (
+                not project._db_path().is_file()
+                or not project._timeline_data_path().is_dir()
+                or not project._binary_data_path().is_dir()
+        ):
+            raise RuntimeError(f"Cannot load project at path {path}")
+        else:
+            return project
 
     @staticmethod
     async def create(path: Path):

@@ -261,7 +261,7 @@ class ProcessContainer(Generic[ProcessOwnerT]):
 
 class ProjectService:
     def __init__(self, project_path: Path):
-        self._project = Project(project_path)
+        self._project = Project.load(project_path)
         self._timeline_simulators: dict[UUID, ProcessContainer[TimelineSimulator]] = {}
         self._timeline_creators: dict[UUID, ProcessContainer[TimelineCreator]] = {}
 
