@@ -15,11 +15,11 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='simma/simulation.proto',
-  package='simma',
+  package='simma_old',
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16simma/simulation.proto\x12\x05simma\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"2\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x17\n\x15GetAllEntitiesRequest\"4\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"6\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"H\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"6\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"C\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x04json\x18\x02 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"F\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12#\n\x06\x65vents\x18\x02 \x03(\x0b\x32\x13.simma.EventMessage\"\x17\n\x15GetStateBinaryRequest\"6\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse\"!\n\x11RunCommandRequest\x12\x0c\n\x04\x61rgs\x18\x01 \x03(\t\"1\n\x12RunCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0e\n\x06output\x18\x02 \x01(\t\"&\n\x15SetEditorTokenRequest\x12\r\n\x05token\x18\x01 \x01(\t\"\x18\n\x16SetEditorTokenResponse\"+\n\x10IsEditingRequest\x12\x17\n\x0f\x63heck_self_only\x18\x01 \x01(\x08\"\'\n\x11IsEditingResponse\x12\x12\n\nis_editing\x18\x01 \x01(\x08\x32\xe1\x0e\n\nSimulation\x12\x38\n\x07GetTick\x12\x15.simma.GetTickRequest\x1a\x16.simma.GetTickResponse\x12G\n\x0cGetStateJson\x12\x1a.simma.GetStateJsonRequest\x1a\x1b.simma.GetStateJsonResponse\x12G\n\x0cSetStateJson\x12\x1a.simma.SetStateJsonRequest\x1a\x1b.simma.SetStateJsonResponse\x12G\n\x0c\x43reateEntity\x12\x1a.simma.CreateEntityRequest\x1a\x1b.simma.CreateEntityResponse\x12J\n\rDestroyEntity\x12\x1b.simma.DestroyEntityRequest\x1a\x1c.simma.DestroyEntityResponse\x12M\n\x0eGetAllEntities\x12\x1c.simma.GetAllEntitiesRequest\x1a\x1d.simma.GetAllEntitiesResponse\x12P\n\x0fStartSimulation\x12\x1d.simma.StartSimulationRequest\x1a\x1e.simma.StartSimulationResponse\x12M\n\x0eStopSimulation\x12\x1c.simma.StopSimulationRequest\x1a\x1d.simma.StopSimulationResponse\x12>\n\tIsRunning\x12\x17.simma.IsRunningRequest\x1a\x18.simma.IsRunningResponse\x12P\n\x0f\x41ssignComponent\x12\x1d.simma.AssignComponentRequest\x1a\x1e.simma.AssignComponentResponse\x12S\n\x10GetComponentJson\x12\x1e.simma.GetComponentJsonRequest\x1a\x1f.simma.GetComponentJsonResponse\x12P\n\x0fRemoveComponent\x12\x1d.simma.RemoveComponentRequest\x1a\x1e.simma.RemoveComponentResponse\x12S\n\x10ReplaceComponent\x12\x1e.simma.ReplaceComponentRequest\x1a\x1f.simma.ReplaceComponentResponse\x12V\n\x11GetComponentNames\x12\x1f.simma.GetComponentNamesRequest\x1a .simma.GetComponentNamesResponse\x12h\n\x17GetEntityComponentNames\x12%.simma.GetEntityComponentNamesRequest\x1a&.simma.GetEntityComponentNamesResponse\x12S\n\x10GetSingletonJson\x12\x1e.simma.GetSingletonJsonRequest\x1a\x1f.simma.GetSingletonJsonResponse\x12S\n\x10SetSingletonJson\x12\x1e.simma.SetSingletonJsonRequest\x1a\x1f.simma.SetSingletonJsonResponse\x12V\n\x11GetSingletonNames\x12\x1f.simma.GetSingletonNamesRequest\x1a .simma.GetSingletonNamesResponse\x12@\n\tGetEvents\x12\x17.simma.GetEventsRequest\x1a\x18.simma.GetEventsResponse0\x01\x12M\n\x0eGetStateBinary\x12\x1c.simma.GetStateBinaryRequest\x1a\x1d.simma.GetStateBinaryResponse\x12M\n\x0eSetStateBinary\x12\x1c.simma.SetStateBinaryRequest\x1a\x1d.simma.SetStateBinaryResponse\x12\x41\n\nRunCommand\x12\x18.simma.RunCommandRequest\x1a\x19.simma.RunCommandResponse\x12M\n\x0eSetEditorToken\x12\x1c.simma.SetEditorTokenRequest\x1a\x1d.simma.SetEditorTokenResponse\x12>\n\tIsEditing\x12\x17.simma.IsEditingRequest\x1a\x18.simma.IsEditingResponseb\x06proto3'
+  serialized_pb=b'\n\x16simma/simulation.proto\x12\tsimma_old\"\x10\n\x0eGetTickRequest\"\x1f\n\x0fGetTickResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\"\x15\n\x13GetStateJsonRequest\"2\n\x14GetStateJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"#\n\x13SetStateJsonRequest\x12\x0c\n\x04json\x18\x01 \x01(\t\"\x16\n\x14SetStateJsonResponse\"\x15\n\x13\x43reateEntityRequest\"#\n\x14\x43reateEntityResponse\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"#\n\x14\x44\x65stroyEntityRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"\x17\n\x15\x44\x65stroyEntityResponse\"\x17\n\x15GetAllEntitiesRequest\"4\n\x16GetAllEntitiesResponse\x12\x0c\n\x04\x65ids\x18\x01 \x03(\x04\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"\x18\n\x16StartSimulationRequest\"\x19\n\x17StartSimulationResponse\"\x17\n\x15StopSimulationRequest\"\x18\n\x16StopSimulationResponse\"\x12\n\x10IsRunningRequest\"$\n\x11IsRunningResponse\x12\x0f\n\x07running\x18\x01 \x01(\x08\"=\n\x16\x41ssignComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17\x41ssignComponentResponse\">\n\x17GetComponentJsonRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"6\n\x18GetComponentJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"=\n\x16RemoveComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\"\x19\n\x17RemoveComponentResponse\"L\n\x17ReplaceComponentRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\x12\x16\n\x0e\x63omponent_name\x18\x02 \x01(\t\x12\x0c\n\x04json\x18\x03 \x01(\t\"\x1a\n\x18ReplaceComponentResponse\"\x1a\n\x18GetComponentNamesRequest\"4\n\x19GetComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\"-\n\x1eGetEntityComponentNamesRequest\x12\x0b\n\x03\x65id\x18\x01 \x01(\x04\"H\n\x1fGetEntityComponentNamesResponse\x12\x17\n\x0f\x63omponent_names\x18\x01 \x03(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"1\n\x17GetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\"6\n\x18GetSingletonJsonResponse\x12\x0c\n\x04json\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"?\n\x17SetSingletonJsonRequest\x12\x16\n\x0esingleton_name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"\x1a\n\x18SetSingletonJsonResponse\"\x1a\n\x18GetSingletonNamesRequest\"4\n\x19GetSingletonNamesResponse\x12\x17\n\x0fsingleton_names\x18\x01 \x03(\t\"\x12\n\x10GetEventsRequest\"C\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x04json\x18\x02 \x01(\tH\x00\x12\r\n\x03\x62in\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"J\n\x11GetEventsResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x04\x12\'\n\x06\x65vents\x18\x02 \x03(\x0b\x32\x17.simma_old.EventMessage\"\x17\n\x15GetStateBinaryRequest\"6\n\x16GetStateBinaryResponse\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\x12\x0c\n\x04tick\x18\x02 \x01(\x04\"\'\n\x15SetStateBinaryRequest\x12\x0e\n\x06\x62inary\x18\x01 \x01(\x0c\"\x18\n\x16SetStateBinaryResponse\"!\n\x11RunCommandRequest\x12\x0c\n\x04\x61rgs\x18\x01 \x03(\t\"1\n\x12RunCommandResponse\x12\x0b\n\x03\x65rr\x18\x01 \x01(\t\x12\x0e\n\x06output\x18\x02 \x01(\t\"&\n\x15SetEditorTokenRequest\x12\r\n\x05token\x18\x01 \x01(\t\"\x18\n\x16SetEditorTokenResponse\"+\n\x10IsEditingRequest\x12\x17\n\x0f\x63heck_self_only\x18\x01 \x01(\x08\"\'\n\x11IsEditingResponse\x12\x12\n\nis_editing\x18\x01 \x01(\x08\x32\xa1\x10\n\nSimulation\x12@\n\x07GetTick\x12\x19.simma_old.GetTickRequest\x1a\x1a.simma_old.GetTickResponse\x12O\n\x0cGetStateJson\x12\x1e.simma_old.GetStateJsonRequest\x1a\x1f.simma_old.GetStateJsonResponse\x12O\n\x0cSetStateJson\x12\x1e.simma_old.SetStateJsonRequest\x1a\x1f.simma_old.SetStateJsonResponse\x12O\n\x0c\x43reateEntity\x12\x1e.simma_old.CreateEntityRequest\x1a\x1f.simma_old.CreateEntityResponse\x12R\n\rDestroyEntity\x12\x1f.simma_old.DestroyEntityRequest\x1a .simma_old.DestroyEntityResponse\x12U\n\x0eGetAllEntities\x12 .simma_old.GetAllEntitiesRequest\x1a!.simma_old.GetAllEntitiesResponse\x12X\n\x0fStartSimulation\x12!.simma_old.StartSimulationRequest\x1a\".simma_old.StartSimulationResponse\x12U\n\x0eStopSimulation\x12 .simma_old.StopSimulationRequest\x1a!.simma_old.StopSimulationResponse\x12\x46\n\tIsRunning\x12\x1b.simma_old.IsRunningRequest\x1a\x1c.simma_old.IsRunningResponse\x12X\n\x0f\x41ssignComponent\x12!.simma_old.AssignComponentRequest\x1a\".simma_old.AssignComponentResponse\x12[\n\x10GetComponentJson\x12\".simma_old.GetComponentJsonRequest\x1a#.simma_old.GetComponentJsonResponse\x12X\n\x0fRemoveComponent\x12!.simma_old.RemoveComponentRequest\x1a\".simma_old.RemoveComponentResponse\x12[\n\x10ReplaceComponent\x12\".simma_old.ReplaceComponentRequest\x1a#.simma_old.ReplaceComponentResponse\x12^\n\x11GetComponentNames\x12#.simma_old.GetComponentNamesRequest\x1a$.simma_old.GetComponentNamesResponse\x12p\n\x17GetEntityComponentNames\x12).simma_old.GetEntityComponentNamesRequest\x1a*.simma_old.GetEntityComponentNamesResponse\x12[\n\x10GetSingletonJson\x12\".simma_old.GetSingletonJsonRequest\x1a#.simma_old.GetSingletonJsonResponse\x12[\n\x10SetSingletonJson\x12\".simma_old.SetSingletonJsonRequest\x1a#.simma_old.SetSingletonJsonResponse\x12^\n\x11GetSingletonNames\x12#.simma_old.GetSingletonNamesRequest\x1a$.simma_old.GetSingletonNamesResponse\x12H\n\tGetEvents\x12\x1b.simma_old.GetEventsRequest\x1a\x1c.simma_old.GetEventsResponse0\x01\x12U\n\x0eGetStateBinary\x12 .simma_old.GetStateBinaryRequest\x1a!.simma_old.GetStateBinaryResponse\x12U\n\x0eSetStateBinary\x12 .simma_old.SetStateBinaryRequest\x1a!.simma_old.SetStateBinaryResponse\x12I\n\nRunCommand\x12\x1c.simma_old.RunCommandRequest\x1a\x1d.simma_old.RunCommandResponse\x12U\n\x0eSetEditorToken\x12 .simma_old.SetEditorTokenRequest\x1a!.simma_old.SetEditorTokenResponse\x12\x46\n\tIsEditing\x12\x1b.simma_old.IsEditingRequest\x1a\x1c.simma_old.IsEditingResponseb\x06proto3'
 )
 
 
@@ -27,7 +27,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
 
 _GETTICKREQUEST = _descriptor.Descriptor(
   name='GetTickRequest',
-  full_name='simma.GetTickRequest',
+  full_name='simma_old.GetTickRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -45,21 +45,21 @@ _GETTICKREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=33,
-  serialized_end=49,
+  serialized_start=37,
+  serialized_end=53,
 )
 
 
 _GETTICKRESPONSE = _descriptor.Descriptor(
   name='GetTickResponse',
-  full_name='simma.GetTickResponse',
+  full_name='simma_old.GetTickResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetTickResponse.tick', index=0,
+      name='tick', full_name='simma_old.GetTickResponse.tick', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -77,14 +77,14 @@ _GETTICKRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=51,
-  serialized_end=82,
+  serialized_start=55,
+  serialized_end=86,
 )
 
 
 _GETSTATEJSONREQUEST = _descriptor.Descriptor(
   name='GetStateJsonRequest',
-  full_name='simma.GetStateJsonRequest',
+  full_name='simma_old.GetStateJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -102,28 +102,28 @@ _GETSTATEJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=84,
-  serialized_end=105,
+  serialized_start=88,
+  serialized_end=109,
 )
 
 
 _GETSTATEJSONRESPONSE = _descriptor.Descriptor(
   name='GetStateJsonResponse',
-  full_name='simma.GetStateJsonResponse',
+  full_name='simma_old.GetStateJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='simma.GetStateJsonResponse.json', index=0,
+      name='json', full_name='simma_old.GetStateJsonResponse.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetStateJsonResponse.tick', index=1,
+      name='tick', full_name='simma_old.GetStateJsonResponse.tick', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -141,21 +141,21 @@ _GETSTATEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=107,
-  serialized_end=157,
+  serialized_start=111,
+  serialized_end=161,
 )
 
 
 _SETSTATEJSONREQUEST = _descriptor.Descriptor(
   name='SetStateJsonRequest',
-  full_name='simma.SetStateJsonRequest',
+  full_name='simma_old.SetStateJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='simma.SetStateJsonRequest.json', index=0,
+      name='json', full_name='simma_old.SetStateJsonRequest.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -173,14 +173,14 @@ _SETSTATEJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=159,
-  serialized_end=194,
+  serialized_start=163,
+  serialized_end=198,
 )
 
 
 _SETSTATEJSONRESPONSE = _descriptor.Descriptor(
   name='SetStateJsonResponse',
-  full_name='simma.SetStateJsonResponse',
+  full_name='simma_old.SetStateJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -198,14 +198,14 @@ _SETSTATEJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=196,
-  serialized_end=218,
+  serialized_start=200,
+  serialized_end=222,
 )
 
 
 _CREATEENTITYREQUEST = _descriptor.Descriptor(
   name='CreateEntityRequest',
-  full_name='simma.CreateEntityRequest',
+  full_name='simma_old.CreateEntityRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -223,21 +223,21 @@ _CREATEENTITYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=220,
-  serialized_end=241,
+  serialized_start=224,
+  serialized_end=245,
 )
 
 
 _CREATEENTITYRESPONSE = _descriptor.Descriptor(
   name='CreateEntityResponse',
-  full_name='simma.CreateEntityResponse',
+  full_name='simma_old.CreateEntityResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='simma.CreateEntityResponse.eid', index=0,
+      name='eid', full_name='simma_old.CreateEntityResponse.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -255,21 +255,21 @@ _CREATEENTITYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=243,
-  serialized_end=278,
+  serialized_start=247,
+  serialized_end=282,
 )
 
 
 _DESTROYENTITYREQUEST = _descriptor.Descriptor(
   name='DestroyEntityRequest',
-  full_name='simma.DestroyEntityRequest',
+  full_name='simma_old.DestroyEntityRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='simma.DestroyEntityRequest.eid', index=0,
+      name='eid', full_name='simma_old.DestroyEntityRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -287,14 +287,14 @@ _DESTROYENTITYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=280,
-  serialized_end=315,
+  serialized_start=284,
+  serialized_end=319,
 )
 
 
 _DESTROYENTITYRESPONSE = _descriptor.Descriptor(
   name='DestroyEntityResponse',
-  full_name='simma.DestroyEntityResponse',
+  full_name='simma_old.DestroyEntityResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -312,14 +312,14 @@ _DESTROYENTITYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=317,
-  serialized_end=340,
+  serialized_start=321,
+  serialized_end=344,
 )
 
 
 _GETALLENTITIESREQUEST = _descriptor.Descriptor(
   name='GetAllEntitiesRequest',
-  full_name='simma.GetAllEntitiesRequest',
+  full_name='simma_old.GetAllEntitiesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -337,28 +337,28 @@ _GETALLENTITIESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=342,
-  serialized_end=365,
+  serialized_start=346,
+  serialized_end=369,
 )
 
 
 _GETALLENTITIESRESPONSE = _descriptor.Descriptor(
   name='GetAllEntitiesResponse',
-  full_name='simma.GetAllEntitiesResponse',
+  full_name='simma_old.GetAllEntitiesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eids', full_name='simma.GetAllEntitiesResponse.eids', index=0,
+      name='eids', full_name='simma_old.GetAllEntitiesResponse.eids', index=0,
       number=1, type=4, cpp_type=4, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetAllEntitiesResponse.tick', index=1,
+      name='tick', full_name='simma_old.GetAllEntitiesResponse.tick', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -376,14 +376,14 @@ _GETALLENTITIESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=367,
-  serialized_end=419,
+  serialized_start=371,
+  serialized_end=423,
 )
 
 
 _STARTSIMULATIONREQUEST = _descriptor.Descriptor(
   name='StartSimulationRequest',
-  full_name='simma.StartSimulationRequest',
+  full_name='simma_old.StartSimulationRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -401,14 +401,14 @@ _STARTSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=421,
-  serialized_end=445,
+  serialized_start=425,
+  serialized_end=449,
 )
 
 
 _STARTSIMULATIONRESPONSE = _descriptor.Descriptor(
   name='StartSimulationResponse',
-  full_name='simma.StartSimulationResponse',
+  full_name='simma_old.StartSimulationResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -426,14 +426,14 @@ _STARTSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=447,
-  serialized_end=472,
+  serialized_start=451,
+  serialized_end=476,
 )
 
 
 _STOPSIMULATIONREQUEST = _descriptor.Descriptor(
   name='StopSimulationRequest',
-  full_name='simma.StopSimulationRequest',
+  full_name='simma_old.StopSimulationRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -451,14 +451,14 @@ _STOPSIMULATIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=474,
-  serialized_end=497,
+  serialized_start=478,
+  serialized_end=501,
 )
 
 
 _STOPSIMULATIONRESPONSE = _descriptor.Descriptor(
   name='StopSimulationResponse',
-  full_name='simma.StopSimulationResponse',
+  full_name='simma_old.StopSimulationResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -476,14 +476,14 @@ _STOPSIMULATIONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=499,
-  serialized_end=523,
+  serialized_start=503,
+  serialized_end=527,
 )
 
 
 _ISRUNNINGREQUEST = _descriptor.Descriptor(
   name='IsRunningRequest',
-  full_name='simma.IsRunningRequest',
+  full_name='simma_old.IsRunningRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -501,21 +501,21 @@ _ISRUNNINGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=525,
-  serialized_end=543,
+  serialized_start=529,
+  serialized_end=547,
 )
 
 
 _ISRUNNINGRESPONSE = _descriptor.Descriptor(
   name='IsRunningResponse',
-  full_name='simma.IsRunningResponse',
+  full_name='simma_old.IsRunningResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='running', full_name='simma.IsRunningResponse.running', index=0,
+      name='running', full_name='simma_old.IsRunningResponse.running', index=0,
       number=1, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -533,28 +533,28 @@ _ISRUNNINGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=545,
-  serialized_end=581,
+  serialized_start=549,
+  serialized_end=585,
 )
 
 
 _ASSIGNCOMPONENTREQUEST = _descriptor.Descriptor(
   name='AssignComponentRequest',
-  full_name='simma.AssignComponentRequest',
+  full_name='simma_old.AssignComponentRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='simma.AssignComponentRequest.eid', index=0,
+      name='eid', full_name='simma_old.AssignComponentRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='simma.AssignComponentRequest.component_name', index=1,
+      name='component_name', full_name='simma_old.AssignComponentRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -572,14 +572,14 @@ _ASSIGNCOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=583,
-  serialized_end=644,
+  serialized_start=587,
+  serialized_end=648,
 )
 
 
 _ASSIGNCOMPONENTRESPONSE = _descriptor.Descriptor(
   name='AssignComponentResponse',
-  full_name='simma.AssignComponentResponse',
+  full_name='simma_old.AssignComponentResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -597,28 +597,28 @@ _ASSIGNCOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=646,
-  serialized_end=671,
+  serialized_start=650,
+  serialized_end=675,
 )
 
 
 _GETCOMPONENTJSONREQUEST = _descriptor.Descriptor(
   name='GetComponentJsonRequest',
-  full_name='simma.GetComponentJsonRequest',
+  full_name='simma_old.GetComponentJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='simma.GetComponentJsonRequest.eid', index=0,
+      name='eid', full_name='simma_old.GetComponentJsonRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='simma.GetComponentJsonRequest.component_name', index=1,
+      name='component_name', full_name='simma_old.GetComponentJsonRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -636,28 +636,28 @@ _GETCOMPONENTJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=673,
-  serialized_end=735,
+  serialized_start=677,
+  serialized_end=739,
 )
 
 
 _GETCOMPONENTJSONRESPONSE = _descriptor.Descriptor(
   name='GetComponentJsonResponse',
-  full_name='simma.GetComponentJsonResponse',
+  full_name='simma_old.GetComponentJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='simma.GetComponentJsonResponse.json', index=0,
+      name='json', full_name='simma_old.GetComponentJsonResponse.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetComponentJsonResponse.tick', index=1,
+      name='tick', full_name='simma_old.GetComponentJsonResponse.tick', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -675,28 +675,28 @@ _GETCOMPONENTJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=737,
-  serialized_end=791,
+  serialized_start=741,
+  serialized_end=795,
 )
 
 
 _REMOVECOMPONENTREQUEST = _descriptor.Descriptor(
   name='RemoveComponentRequest',
-  full_name='simma.RemoveComponentRequest',
+  full_name='simma_old.RemoveComponentRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='simma.RemoveComponentRequest.eid', index=0,
+      name='eid', full_name='simma_old.RemoveComponentRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='simma.RemoveComponentRequest.component_name', index=1,
+      name='component_name', full_name='simma_old.RemoveComponentRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -714,14 +714,14 @@ _REMOVECOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=793,
-  serialized_end=854,
+  serialized_start=797,
+  serialized_end=858,
 )
 
 
 _REMOVECOMPONENTRESPONSE = _descriptor.Descriptor(
   name='RemoveComponentResponse',
-  full_name='simma.RemoveComponentResponse',
+  full_name='simma_old.RemoveComponentResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -739,35 +739,35 @@ _REMOVECOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=856,
-  serialized_end=881,
+  serialized_start=860,
+  serialized_end=885,
 )
 
 
 _REPLACECOMPONENTREQUEST = _descriptor.Descriptor(
   name='ReplaceComponentRequest',
-  full_name='simma.ReplaceComponentRequest',
+  full_name='simma_old.ReplaceComponentRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='simma.ReplaceComponentRequest.eid', index=0,
+      name='eid', full_name='simma_old.ReplaceComponentRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='component_name', full_name='simma.ReplaceComponentRequest.component_name', index=1,
+      name='component_name', full_name='simma_old.ReplaceComponentRequest.component_name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='json', full_name='simma.ReplaceComponentRequest.json', index=2,
+      name='json', full_name='simma_old.ReplaceComponentRequest.json', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -785,14 +785,14 @@ _REPLACECOMPONENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=883,
-  serialized_end=959,
+  serialized_start=887,
+  serialized_end=963,
 )
 
 
 _REPLACECOMPONENTRESPONSE = _descriptor.Descriptor(
   name='ReplaceComponentResponse',
-  full_name='simma.ReplaceComponentResponse',
+  full_name='simma_old.ReplaceComponentResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -810,14 +810,14 @@ _REPLACECOMPONENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=961,
-  serialized_end=987,
+  serialized_start=965,
+  serialized_end=991,
 )
 
 
 _GETCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   name='GetComponentNamesRequest',
-  full_name='simma.GetComponentNamesRequest',
+  full_name='simma_old.GetComponentNamesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -835,21 +835,21 @@ _GETCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=989,
-  serialized_end=1015,
+  serialized_start=993,
+  serialized_end=1019,
 )
 
 
 _GETCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   name='GetComponentNamesResponse',
-  full_name='simma.GetComponentNamesResponse',
+  full_name='simma_old.GetComponentNamesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='component_names', full_name='simma.GetComponentNamesResponse.component_names', index=0,
+      name='component_names', full_name='simma_old.GetComponentNamesResponse.component_names', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -867,21 +867,21 @@ _GETCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1017,
-  serialized_end=1069,
+  serialized_start=1021,
+  serialized_end=1073,
 )
 
 
 _GETENTITYCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   name='GetEntityComponentNamesRequest',
-  full_name='simma.GetEntityComponentNamesRequest',
+  full_name='simma_old.GetEntityComponentNamesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='eid', full_name='simma.GetEntityComponentNamesRequest.eid', index=0,
+      name='eid', full_name='simma_old.GetEntityComponentNamesRequest.eid', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -899,28 +899,28 @@ _GETENTITYCOMPONENTNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1071,
-  serialized_end=1116,
+  serialized_start=1075,
+  serialized_end=1120,
 )
 
 
 _GETENTITYCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   name='GetEntityComponentNamesResponse',
-  full_name='simma.GetEntityComponentNamesResponse',
+  full_name='simma_old.GetEntityComponentNamesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='component_names', full_name='simma.GetEntityComponentNamesResponse.component_names', index=0,
+      name='component_names', full_name='simma_old.GetEntityComponentNamesResponse.component_names', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetEntityComponentNamesResponse.tick', index=1,
+      name='tick', full_name='simma_old.GetEntityComponentNamesResponse.tick', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -938,21 +938,21 @@ _GETENTITYCOMPONENTNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1118,
-  serialized_end=1190,
+  serialized_start=1122,
+  serialized_end=1194,
 )
 
 
 _GETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   name='GetSingletonJsonRequest',
-  full_name='simma.GetSingletonJsonRequest',
+  full_name='simma_old.GetSingletonJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='singleton_name', full_name='simma.GetSingletonJsonRequest.singleton_name', index=0,
+      name='singleton_name', full_name='simma_old.GetSingletonJsonRequest.singleton_name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -970,28 +970,28 @@ _GETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1192,
-  serialized_end=1241,
+  serialized_start=1196,
+  serialized_end=1245,
 )
 
 
 _GETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   name='GetSingletonJsonResponse',
-  full_name='simma.GetSingletonJsonResponse',
+  full_name='simma_old.GetSingletonJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='json', full_name='simma.GetSingletonJsonResponse.json', index=0,
+      name='json', full_name='simma_old.GetSingletonJsonResponse.json', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetSingletonJsonResponse.tick', index=1,
+      name='tick', full_name='simma_old.GetSingletonJsonResponse.tick', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1009,28 +1009,28 @@ _GETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1243,
-  serialized_end=1297,
+  serialized_start=1247,
+  serialized_end=1301,
 )
 
 
 _SETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   name='SetSingletonJsonRequest',
-  full_name='simma.SetSingletonJsonRequest',
+  full_name='simma_old.SetSingletonJsonRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='singleton_name', full_name='simma.SetSingletonJsonRequest.singleton_name', index=0,
+      name='singleton_name', full_name='simma_old.SetSingletonJsonRequest.singleton_name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='json', full_name='simma.SetSingletonJsonRequest.json', index=1,
+      name='json', full_name='simma_old.SetSingletonJsonRequest.json', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -1048,14 +1048,14 @@ _SETSINGLETONJSONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1299,
-  serialized_end=1362,
+  serialized_start=1303,
+  serialized_end=1366,
 )
 
 
 _SETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   name='SetSingletonJsonResponse',
-  full_name='simma.SetSingletonJsonResponse',
+  full_name='simma_old.SetSingletonJsonResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1073,14 +1073,14 @@ _SETSINGLETONJSONRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1364,
-  serialized_end=1390,
+  serialized_start=1368,
+  serialized_end=1394,
 )
 
 
 _GETSINGLETONNAMESREQUEST = _descriptor.Descriptor(
   name='GetSingletonNamesRequest',
-  full_name='simma.GetSingletonNamesRequest',
+  full_name='simma_old.GetSingletonNamesRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1098,21 +1098,21 @@ _GETSINGLETONNAMESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1392,
-  serialized_end=1418,
+  serialized_start=1396,
+  serialized_end=1422,
 )
 
 
 _GETSINGLETONNAMESRESPONSE = _descriptor.Descriptor(
   name='GetSingletonNamesResponse',
-  full_name='simma.GetSingletonNamesResponse',
+  full_name='simma_old.GetSingletonNamesResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='singleton_names', full_name='simma.GetSingletonNamesResponse.singleton_names', index=0,
+      name='singleton_names', full_name='simma_old.GetSingletonNamesResponse.singleton_names', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1130,14 +1130,14 @@ _GETSINGLETONNAMESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1420,
-  serialized_end=1472,
+  serialized_start=1424,
+  serialized_end=1476,
 )
 
 
 _GETEVENTSREQUEST = _descriptor.Descriptor(
   name='GetEventsRequest',
-  full_name='simma.GetEventsRequest',
+  full_name='simma_old.GetEventsRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1155,35 +1155,35 @@ _GETEVENTSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1474,
-  serialized_end=1492,
+  serialized_start=1478,
+  serialized_end=1496,
 )
 
 
 _EVENTMESSAGE = _descriptor.Descriptor(
   name='EventMessage',
-  full_name='simma.EventMessage',
+  full_name='simma_old.EventMessage',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='simma.EventMessage.name', index=0,
+      name='name', full_name='simma_old.EventMessage.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='json', full_name='simma.EventMessage.json', index=1,
+      name='json', full_name='simma_old.EventMessage.json', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='bin', full_name='simma.EventMessage.bin', index=2,
+      name='bin', full_name='simma_old.EventMessage.bin', index=2,
       number=3, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
@@ -1201,33 +1201,33 @@ _EVENTMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='data', full_name='simma.EventMessage.data',
+      name='data', full_name='simma_old.EventMessage.data',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1494,
-  serialized_end=1561,
+  serialized_start=1498,
+  serialized_end=1565,
 )
 
 
 _GETEVENTSRESPONSE = _descriptor.Descriptor(
   name='GetEventsResponse',
-  full_name='simma.GetEventsResponse',
+  full_name='simma_old.GetEventsResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetEventsResponse.tick', index=0,
+      name='tick', full_name='simma_old.GetEventsResponse.tick', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='events', full_name='simma.GetEventsResponse.events', index=1,
+      name='events', full_name='simma_old.GetEventsResponse.events', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1245,14 +1245,14 @@ _GETEVENTSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1563,
-  serialized_end=1633,
+  serialized_start=1567,
+  serialized_end=1641,
 )
 
 
 _GETSTATEBINARYREQUEST = _descriptor.Descriptor(
   name='GetStateBinaryRequest',
-  full_name='simma.GetStateBinaryRequest',
+  full_name='simma_old.GetStateBinaryRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1270,28 +1270,28 @@ _GETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1635,
-  serialized_end=1658,
+  serialized_start=1643,
+  serialized_end=1666,
 )
 
 
 _GETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   name='GetStateBinaryResponse',
-  full_name='simma.GetStateBinaryResponse',
+  full_name='simma_old.GetStateBinaryResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='binary', full_name='simma.GetStateBinaryResponse.binary', index=0,
+      name='binary', full_name='simma_old.GetStateBinaryResponse.binary', index=0,
       number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='tick', full_name='simma.GetStateBinaryResponse.tick', index=1,
+      name='tick', full_name='simma_old.GetStateBinaryResponse.tick', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1309,21 +1309,21 @@ _GETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1660,
-  serialized_end=1714,
+  serialized_start=1668,
+  serialized_end=1722,
 )
 
 
 _SETSTATEBINARYREQUEST = _descriptor.Descriptor(
   name='SetStateBinaryRequest',
-  full_name='simma.SetStateBinaryRequest',
+  full_name='simma_old.SetStateBinaryRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='binary', full_name='simma.SetStateBinaryRequest.binary', index=0,
+      name='binary', full_name='simma_old.SetStateBinaryRequest.binary', index=0,
       number=1, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
@@ -1341,14 +1341,14 @@ _SETSTATEBINARYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1716,
-  serialized_end=1755,
+  serialized_start=1724,
+  serialized_end=1763,
 )
 
 
 _SETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   name='SetStateBinaryResponse',
-  full_name='simma.SetStateBinaryResponse',
+  full_name='simma_old.SetStateBinaryResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1366,21 +1366,21 @@ _SETSTATEBINARYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1757,
-  serialized_end=1781,
+  serialized_start=1765,
+  serialized_end=1789,
 )
 
 
 _RUNCOMMANDREQUEST = _descriptor.Descriptor(
   name='RunCommandRequest',
-  full_name='simma.RunCommandRequest',
+  full_name='simma_old.RunCommandRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='args', full_name='simma.RunCommandRequest.args', index=0,
+      name='args', full_name='simma_old.RunCommandRequest.args', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1398,28 +1398,28 @@ _RUNCOMMANDREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1783,
-  serialized_end=1816,
+  serialized_start=1791,
+  serialized_end=1824,
 )
 
 
 _RUNCOMMANDRESPONSE = _descriptor.Descriptor(
   name='RunCommandResponse',
-  full_name='simma.RunCommandResponse',
+  full_name='simma_old.RunCommandResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='err', full_name='simma.RunCommandResponse.err', index=0,
+      name='err', full_name='simma_old.RunCommandResponse.err', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='output', full_name='simma.RunCommandResponse.output', index=1,
+      name='output', full_name='simma_old.RunCommandResponse.output', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -1437,21 +1437,21 @@ _RUNCOMMANDRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1818,
-  serialized_end=1867,
+  serialized_start=1826,
+  serialized_end=1875,
 )
 
 
 _SETEDITORTOKENREQUEST = _descriptor.Descriptor(
   name='SetEditorTokenRequest',
-  full_name='simma.SetEditorTokenRequest',
+  full_name='simma_old.SetEditorTokenRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='token', full_name='simma.SetEditorTokenRequest.token', index=0,
+      name='token', full_name='simma_old.SetEditorTokenRequest.token', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -1469,14 +1469,14 @@ _SETEDITORTOKENREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1869,
-  serialized_end=1907,
+  serialized_start=1877,
+  serialized_end=1915,
 )
 
 
 _SETEDITORTOKENRESPONSE = _descriptor.Descriptor(
   name='SetEditorTokenResponse',
-  full_name='simma.SetEditorTokenResponse',
+  full_name='simma_old.SetEditorTokenResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1494,21 +1494,21 @@ _SETEDITORTOKENRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1909,
-  serialized_end=1933,
+  serialized_start=1917,
+  serialized_end=1941,
 )
 
 
 _ISEDITINGREQUEST = _descriptor.Descriptor(
   name='IsEditingRequest',
-  full_name='simma.IsEditingRequest',
+  full_name='simma_old.IsEditingRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='check_self_only', full_name='simma.IsEditingRequest.check_self_only', index=0,
+      name='check_self_only', full_name='simma_old.IsEditingRequest.check_self_only', index=0,
       number=1, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -1526,21 +1526,21 @@ _ISEDITINGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1935,
-  serialized_end=1978,
+  serialized_start=1943,
+  serialized_end=1986,
 )
 
 
 _ISEDITINGRESPONSE = _descriptor.Descriptor(
   name='IsEditingResponse',
-  full_name='simma.IsEditingResponse',
+  full_name='simma_old.IsEditingResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='is_editing', full_name='simma.IsEditingResponse.is_editing', index=0,
+      name='is_editing', full_name='simma_old.IsEditingResponse.is_editing', index=0,
       number=1, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -1558,8 +1558,8 @@ _ISEDITINGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1980,
-  serialized_end=2019,
+  serialized_start=1988,
+  serialized_end=2027,
 )
 
 _EVENTMESSAGE.oneofs_by_name['data'].fields.append(
@@ -1623,343 +1623,343 @@ _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 GetTickRequest = _reflection.GeneratedProtocolMessageType('GetTickRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETTICKREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetTickRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetTickRequest)
   })
 _sym_db.RegisterMessage(GetTickRequest)
 
 GetTickResponse = _reflection.GeneratedProtocolMessageType('GetTickResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETTICKRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetTickResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetTickResponse)
   })
 _sym_db.RegisterMessage(GetTickResponse)
 
 GetStateJsonRequest = _reflection.GeneratedProtocolMessageType('GetStateJsonRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETSTATEJSONREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetStateJsonRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetStateJsonRequest)
   })
 _sym_db.RegisterMessage(GetStateJsonRequest)
 
 GetStateJsonResponse = _reflection.GeneratedProtocolMessageType('GetStateJsonResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETSTATEJSONRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetStateJsonResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetStateJsonResponse)
   })
 _sym_db.RegisterMessage(GetStateJsonResponse)
 
 SetStateJsonRequest = _reflection.GeneratedProtocolMessageType('SetStateJsonRequest', (_message.Message,), {
   'DESCRIPTOR' : _SETSTATEJSONREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetStateJsonRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.SetStateJsonRequest)
   })
 _sym_db.RegisterMessage(SetStateJsonRequest)
 
 SetStateJsonResponse = _reflection.GeneratedProtocolMessageType('SetStateJsonResponse', (_message.Message,), {
   'DESCRIPTOR' : _SETSTATEJSONRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetStateJsonResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.SetStateJsonResponse)
   })
 _sym_db.RegisterMessage(SetStateJsonResponse)
 
 CreateEntityRequest = _reflection.GeneratedProtocolMessageType('CreateEntityRequest', (_message.Message,), {
   'DESCRIPTOR' : _CREATEENTITYREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CreateEntityRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.CreateEntityRequest)
   })
 _sym_db.RegisterMessage(CreateEntityRequest)
 
 CreateEntityResponse = _reflection.GeneratedProtocolMessageType('CreateEntityResponse', (_message.Message,), {
   'DESCRIPTOR' : _CREATEENTITYRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.CreateEntityResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.CreateEntityResponse)
   })
 _sym_db.RegisterMessage(CreateEntityResponse)
 
 DestroyEntityRequest = _reflection.GeneratedProtocolMessageType('DestroyEntityRequest', (_message.Message,), {
   'DESCRIPTOR' : _DESTROYENTITYREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.DestroyEntityRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.DestroyEntityRequest)
   })
 _sym_db.RegisterMessage(DestroyEntityRequest)
 
 DestroyEntityResponse = _reflection.GeneratedProtocolMessageType('DestroyEntityResponse', (_message.Message,), {
   'DESCRIPTOR' : _DESTROYENTITYRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.DestroyEntityResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.DestroyEntityResponse)
   })
 _sym_db.RegisterMessage(DestroyEntityResponse)
 
 GetAllEntitiesRequest = _reflection.GeneratedProtocolMessageType('GetAllEntitiesRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETALLENTITIESREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetAllEntitiesRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetAllEntitiesRequest)
   })
 _sym_db.RegisterMessage(GetAllEntitiesRequest)
 
 GetAllEntitiesResponse = _reflection.GeneratedProtocolMessageType('GetAllEntitiesResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETALLENTITIESRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetAllEntitiesResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetAllEntitiesResponse)
   })
 _sym_db.RegisterMessage(GetAllEntitiesResponse)
 
 StartSimulationRequest = _reflection.GeneratedProtocolMessageType('StartSimulationRequest', (_message.Message,), {
   'DESCRIPTOR' : _STARTSIMULATIONREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.StartSimulationRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.StartSimulationRequest)
   })
 _sym_db.RegisterMessage(StartSimulationRequest)
 
 StartSimulationResponse = _reflection.GeneratedProtocolMessageType('StartSimulationResponse', (_message.Message,), {
   'DESCRIPTOR' : _STARTSIMULATIONRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.StartSimulationResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.StartSimulationResponse)
   })
 _sym_db.RegisterMessage(StartSimulationResponse)
 
 StopSimulationRequest = _reflection.GeneratedProtocolMessageType('StopSimulationRequest', (_message.Message,), {
   'DESCRIPTOR' : _STOPSIMULATIONREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.StopSimulationRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.StopSimulationRequest)
   })
 _sym_db.RegisterMessage(StopSimulationRequest)
 
 StopSimulationResponse = _reflection.GeneratedProtocolMessageType('StopSimulationResponse', (_message.Message,), {
   'DESCRIPTOR' : _STOPSIMULATIONRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.StopSimulationResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.StopSimulationResponse)
   })
 _sym_db.RegisterMessage(StopSimulationResponse)
 
 IsRunningRequest = _reflection.GeneratedProtocolMessageType('IsRunningRequest', (_message.Message,), {
   'DESCRIPTOR' : _ISRUNNINGREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.IsRunningRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.IsRunningRequest)
   })
 _sym_db.RegisterMessage(IsRunningRequest)
 
 IsRunningResponse = _reflection.GeneratedProtocolMessageType('IsRunningResponse', (_message.Message,), {
   'DESCRIPTOR' : _ISRUNNINGRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.IsRunningResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.IsRunningResponse)
   })
 _sym_db.RegisterMessage(IsRunningResponse)
 
 AssignComponentRequest = _reflection.GeneratedProtocolMessageType('AssignComponentRequest', (_message.Message,), {
   'DESCRIPTOR' : _ASSIGNCOMPONENTREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.AssignComponentRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.AssignComponentRequest)
   })
 _sym_db.RegisterMessage(AssignComponentRequest)
 
 AssignComponentResponse = _reflection.GeneratedProtocolMessageType('AssignComponentResponse', (_message.Message,), {
   'DESCRIPTOR' : _ASSIGNCOMPONENTRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.AssignComponentResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.AssignComponentResponse)
   })
 _sym_db.RegisterMessage(AssignComponentResponse)
 
 GetComponentJsonRequest = _reflection.GeneratedProtocolMessageType('GetComponentJsonRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETCOMPONENTJSONREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetComponentJsonRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetComponentJsonRequest)
   })
 _sym_db.RegisterMessage(GetComponentJsonRequest)
 
 GetComponentJsonResponse = _reflection.GeneratedProtocolMessageType('GetComponentJsonResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETCOMPONENTJSONRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetComponentJsonResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetComponentJsonResponse)
   })
 _sym_db.RegisterMessage(GetComponentJsonResponse)
 
 RemoveComponentRequest = _reflection.GeneratedProtocolMessageType('RemoveComponentRequest', (_message.Message,), {
   'DESCRIPTOR' : _REMOVECOMPONENTREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.RemoveComponentRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.RemoveComponentRequest)
   })
 _sym_db.RegisterMessage(RemoveComponentRequest)
 
 RemoveComponentResponse = _reflection.GeneratedProtocolMessageType('RemoveComponentResponse', (_message.Message,), {
   'DESCRIPTOR' : _REMOVECOMPONENTRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.RemoveComponentResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.RemoveComponentResponse)
   })
 _sym_db.RegisterMessage(RemoveComponentResponse)
 
 ReplaceComponentRequest = _reflection.GeneratedProtocolMessageType('ReplaceComponentRequest', (_message.Message,), {
   'DESCRIPTOR' : _REPLACECOMPONENTREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.ReplaceComponentRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.ReplaceComponentRequest)
   })
 _sym_db.RegisterMessage(ReplaceComponentRequest)
 
 ReplaceComponentResponse = _reflection.GeneratedProtocolMessageType('ReplaceComponentResponse', (_message.Message,), {
   'DESCRIPTOR' : _REPLACECOMPONENTRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.ReplaceComponentResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.ReplaceComponentResponse)
   })
 _sym_db.RegisterMessage(ReplaceComponentResponse)
 
 GetComponentNamesRequest = _reflection.GeneratedProtocolMessageType('GetComponentNamesRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETCOMPONENTNAMESREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetComponentNamesRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetComponentNamesRequest)
   })
 _sym_db.RegisterMessage(GetComponentNamesRequest)
 
 GetComponentNamesResponse = _reflection.GeneratedProtocolMessageType('GetComponentNamesResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETCOMPONENTNAMESRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetComponentNamesResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetComponentNamesResponse)
   })
 _sym_db.RegisterMessage(GetComponentNamesResponse)
 
 GetEntityComponentNamesRequest = _reflection.GeneratedProtocolMessageType('GetEntityComponentNamesRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETENTITYCOMPONENTNAMESREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetEntityComponentNamesRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetEntityComponentNamesRequest)
   })
 _sym_db.RegisterMessage(GetEntityComponentNamesRequest)
 
 GetEntityComponentNamesResponse = _reflection.GeneratedProtocolMessageType('GetEntityComponentNamesResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETENTITYCOMPONENTNAMESRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetEntityComponentNamesResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetEntityComponentNamesResponse)
   })
 _sym_db.RegisterMessage(GetEntityComponentNamesResponse)
 
 GetSingletonJsonRequest = _reflection.GeneratedProtocolMessageType('GetSingletonJsonRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETSINGLETONJSONREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetSingletonJsonRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetSingletonJsonRequest)
   })
 _sym_db.RegisterMessage(GetSingletonJsonRequest)
 
 GetSingletonJsonResponse = _reflection.GeneratedProtocolMessageType('GetSingletonJsonResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETSINGLETONJSONRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetSingletonJsonResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetSingletonJsonResponse)
   })
 _sym_db.RegisterMessage(GetSingletonJsonResponse)
 
 SetSingletonJsonRequest = _reflection.GeneratedProtocolMessageType('SetSingletonJsonRequest', (_message.Message,), {
   'DESCRIPTOR' : _SETSINGLETONJSONREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetSingletonJsonRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.SetSingletonJsonRequest)
   })
 _sym_db.RegisterMessage(SetSingletonJsonRequest)
 
 SetSingletonJsonResponse = _reflection.GeneratedProtocolMessageType('SetSingletonJsonResponse', (_message.Message,), {
   'DESCRIPTOR' : _SETSINGLETONJSONRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetSingletonJsonResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.SetSingletonJsonResponse)
   })
 _sym_db.RegisterMessage(SetSingletonJsonResponse)
 
 GetSingletonNamesRequest = _reflection.GeneratedProtocolMessageType('GetSingletonNamesRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETSINGLETONNAMESREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetSingletonNamesRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetSingletonNamesRequest)
   })
 _sym_db.RegisterMessage(GetSingletonNamesRequest)
 
 GetSingletonNamesResponse = _reflection.GeneratedProtocolMessageType('GetSingletonNamesResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETSINGLETONNAMESRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetSingletonNamesResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetSingletonNamesResponse)
   })
 _sym_db.RegisterMessage(GetSingletonNamesResponse)
 
 GetEventsRequest = _reflection.GeneratedProtocolMessageType('GetEventsRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETEVENTSREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetEventsRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetEventsRequest)
   })
 _sym_db.RegisterMessage(GetEventsRequest)
 
 EventMessage = _reflection.GeneratedProtocolMessageType('EventMessage', (_message.Message,), {
   'DESCRIPTOR' : _EVENTMESSAGE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.EventMessage)
+  # @@protoc_insertion_point(class_scope:simma_old.EventMessage)
   })
 _sym_db.RegisterMessage(EventMessage)
 
 GetEventsResponse = _reflection.GeneratedProtocolMessageType('GetEventsResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETEVENTSRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetEventsResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetEventsResponse)
   })
 _sym_db.RegisterMessage(GetEventsResponse)
 
 GetStateBinaryRequest = _reflection.GeneratedProtocolMessageType('GetStateBinaryRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETSTATEBINARYREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetStateBinaryRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.GetStateBinaryRequest)
   })
 _sym_db.RegisterMessage(GetStateBinaryRequest)
 
 GetStateBinaryResponse = _reflection.GeneratedProtocolMessageType('GetStateBinaryResponse', (_message.Message,), {
   'DESCRIPTOR' : _GETSTATEBINARYRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.GetStateBinaryResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.GetStateBinaryResponse)
   })
 _sym_db.RegisterMessage(GetStateBinaryResponse)
 
 SetStateBinaryRequest = _reflection.GeneratedProtocolMessageType('SetStateBinaryRequest', (_message.Message,), {
   'DESCRIPTOR' : _SETSTATEBINARYREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetStateBinaryRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.SetStateBinaryRequest)
   })
 _sym_db.RegisterMessage(SetStateBinaryRequest)
 
 SetStateBinaryResponse = _reflection.GeneratedProtocolMessageType('SetStateBinaryResponse', (_message.Message,), {
   'DESCRIPTOR' : _SETSTATEBINARYRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetStateBinaryResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.SetStateBinaryResponse)
   })
 _sym_db.RegisterMessage(SetStateBinaryResponse)
 
 RunCommandRequest = _reflection.GeneratedProtocolMessageType('RunCommandRequest', (_message.Message,), {
   'DESCRIPTOR' : _RUNCOMMANDREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.RunCommandRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.RunCommandRequest)
   })
 _sym_db.RegisterMessage(RunCommandRequest)
 
 RunCommandResponse = _reflection.GeneratedProtocolMessageType('RunCommandResponse', (_message.Message,), {
   'DESCRIPTOR' : _RUNCOMMANDRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.RunCommandResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.RunCommandResponse)
   })
 _sym_db.RegisterMessage(RunCommandResponse)
 
 SetEditorTokenRequest = _reflection.GeneratedProtocolMessageType('SetEditorTokenRequest', (_message.Message,), {
   'DESCRIPTOR' : _SETEDITORTOKENREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetEditorTokenRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.SetEditorTokenRequest)
   })
 _sym_db.RegisterMessage(SetEditorTokenRequest)
 
 SetEditorTokenResponse = _reflection.GeneratedProtocolMessageType('SetEditorTokenResponse', (_message.Message,), {
   'DESCRIPTOR' : _SETEDITORTOKENRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.SetEditorTokenResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.SetEditorTokenResponse)
   })
 _sym_db.RegisterMessage(SetEditorTokenResponse)
 
 IsEditingRequest = _reflection.GeneratedProtocolMessageType('IsEditingRequest', (_message.Message,), {
   'DESCRIPTOR' : _ISEDITINGREQUEST,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.IsEditingRequest)
+  # @@protoc_insertion_point(class_scope:simma_old.IsEditingRequest)
   })
 _sym_db.RegisterMessage(IsEditingRequest)
 
 IsEditingResponse = _reflection.GeneratedProtocolMessageType('IsEditingResponse', (_message.Message,), {
   'DESCRIPTOR' : _ISEDITINGRESPONSE,
   '__module__' : 'simma.simulation_pb2'
-  # @@protoc_insertion_point(class_scope:simma.IsEditingResponse)
+  # @@protoc_insertion_point(class_scope:simma_old.IsEditingResponse)
   })
 _sym_db.RegisterMessage(IsEditingResponse)
 
@@ -1967,17 +1967,17 @@ _sym_db.RegisterMessage(IsEditingResponse)
 
 _SIMULATION = _descriptor.ServiceDescriptor(
   name='Simulation',
-  full_name='simma.Simulation',
+  full_name='simma_old.Simulation',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=2022,
-  serialized_end=3911,
+  serialized_start=2030,
+  serialized_end=4111,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTick',
-    full_name='simma.Simulation.GetTick',
+    full_name='simma_old.Simulation.GetTick',
     index=0,
     containing_service=None,
     input_type=_GETTICKREQUEST,
@@ -1987,7 +1987,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetStateJson',
-    full_name='simma.Simulation.GetStateJson',
+    full_name='simma_old.Simulation.GetStateJson',
     index=1,
     containing_service=None,
     input_type=_GETSTATEJSONREQUEST,
@@ -1997,7 +1997,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetStateJson',
-    full_name='simma.Simulation.SetStateJson',
+    full_name='simma_old.Simulation.SetStateJson',
     index=2,
     containing_service=None,
     input_type=_SETSTATEJSONREQUEST,
@@ -2007,7 +2007,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='CreateEntity',
-    full_name='simma.Simulation.CreateEntity',
+    full_name='simma_old.Simulation.CreateEntity',
     index=3,
     containing_service=None,
     input_type=_CREATEENTITYREQUEST,
@@ -2017,7 +2017,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='DestroyEntity',
-    full_name='simma.Simulation.DestroyEntity',
+    full_name='simma_old.Simulation.DestroyEntity',
     index=4,
     containing_service=None,
     input_type=_DESTROYENTITYREQUEST,
@@ -2027,7 +2027,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetAllEntities',
-    full_name='simma.Simulation.GetAllEntities',
+    full_name='simma_old.Simulation.GetAllEntities',
     index=5,
     containing_service=None,
     input_type=_GETALLENTITIESREQUEST,
@@ -2037,7 +2037,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='StartSimulation',
-    full_name='simma.Simulation.StartSimulation',
+    full_name='simma_old.Simulation.StartSimulation',
     index=6,
     containing_service=None,
     input_type=_STARTSIMULATIONREQUEST,
@@ -2047,7 +2047,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='StopSimulation',
-    full_name='simma.Simulation.StopSimulation',
+    full_name='simma_old.Simulation.StopSimulation',
     index=7,
     containing_service=None,
     input_type=_STOPSIMULATIONREQUEST,
@@ -2057,7 +2057,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='IsRunning',
-    full_name='simma.Simulation.IsRunning',
+    full_name='simma_old.Simulation.IsRunning',
     index=8,
     containing_service=None,
     input_type=_ISRUNNINGREQUEST,
@@ -2067,7 +2067,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='AssignComponent',
-    full_name='simma.Simulation.AssignComponent',
+    full_name='simma_old.Simulation.AssignComponent',
     index=9,
     containing_service=None,
     input_type=_ASSIGNCOMPONENTREQUEST,
@@ -2077,7 +2077,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetComponentJson',
-    full_name='simma.Simulation.GetComponentJson',
+    full_name='simma_old.Simulation.GetComponentJson',
     index=10,
     containing_service=None,
     input_type=_GETCOMPONENTJSONREQUEST,
@@ -2087,7 +2087,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='RemoveComponent',
-    full_name='simma.Simulation.RemoveComponent',
+    full_name='simma_old.Simulation.RemoveComponent',
     index=11,
     containing_service=None,
     input_type=_REMOVECOMPONENTREQUEST,
@@ -2097,7 +2097,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='ReplaceComponent',
-    full_name='simma.Simulation.ReplaceComponent',
+    full_name='simma_old.Simulation.ReplaceComponent',
     index=12,
     containing_service=None,
     input_type=_REPLACECOMPONENTREQUEST,
@@ -2107,7 +2107,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetComponentNames',
-    full_name='simma.Simulation.GetComponentNames',
+    full_name='simma_old.Simulation.GetComponentNames',
     index=13,
     containing_service=None,
     input_type=_GETCOMPONENTNAMESREQUEST,
@@ -2117,7 +2117,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetEntityComponentNames',
-    full_name='simma.Simulation.GetEntityComponentNames',
+    full_name='simma_old.Simulation.GetEntityComponentNames',
     index=14,
     containing_service=None,
     input_type=_GETENTITYCOMPONENTNAMESREQUEST,
@@ -2127,7 +2127,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetSingletonJson',
-    full_name='simma.Simulation.GetSingletonJson',
+    full_name='simma_old.Simulation.GetSingletonJson',
     index=15,
     containing_service=None,
     input_type=_GETSINGLETONJSONREQUEST,
@@ -2137,7 +2137,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetSingletonJson',
-    full_name='simma.Simulation.SetSingletonJson',
+    full_name='simma_old.Simulation.SetSingletonJson',
     index=16,
     containing_service=None,
     input_type=_SETSINGLETONJSONREQUEST,
@@ -2147,7 +2147,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetSingletonNames',
-    full_name='simma.Simulation.GetSingletonNames',
+    full_name='simma_old.Simulation.GetSingletonNames',
     index=17,
     containing_service=None,
     input_type=_GETSINGLETONNAMESREQUEST,
@@ -2157,7 +2157,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetEvents',
-    full_name='simma.Simulation.GetEvents',
+    full_name='simma_old.Simulation.GetEvents',
     index=18,
     containing_service=None,
     input_type=_GETEVENTSREQUEST,
@@ -2167,7 +2167,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetStateBinary',
-    full_name='simma.Simulation.GetStateBinary',
+    full_name='simma_old.Simulation.GetStateBinary',
     index=19,
     containing_service=None,
     input_type=_GETSTATEBINARYREQUEST,
@@ -2177,7 +2177,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetStateBinary',
-    full_name='simma.Simulation.SetStateBinary',
+    full_name='simma_old.Simulation.SetStateBinary',
     index=20,
     containing_service=None,
     input_type=_SETSTATEBINARYREQUEST,
@@ -2187,7 +2187,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='RunCommand',
-    full_name='simma.Simulation.RunCommand',
+    full_name='simma_old.Simulation.RunCommand',
     index=21,
     containing_service=None,
     input_type=_RUNCOMMANDREQUEST,
@@ -2197,7 +2197,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetEditorToken',
-    full_name='simma.Simulation.SetEditorToken',
+    full_name='simma_old.Simulation.SetEditorToken',
     index=22,
     containing_service=None,
     input_type=_SETEDITORTOKENREQUEST,
@@ -2207,7 +2207,7 @@ _SIMULATION = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='IsEditing',
-    full_name='simma.Simulation.IsEditing',
+    full_name='simma_old.Simulation.IsEditing',
     index=23,
     containing_service=None,
     input_type=_ISEDITINGREQUEST,
