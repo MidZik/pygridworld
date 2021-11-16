@@ -234,25 +234,28 @@ async def serve():
     from pathlib import Path
 
     parser = argparse.ArgumentParser(description="Run a simma project server.")
-    parser.add_argument('--create', action='store_true')
-    parser.add_argument('project_path', type=Path, nargs='?', default=Path.cwd())
+    parser.add_argument('--create', action='store_true',
+                        help="If provided, create a project instead of running the server.")
+    parser.add_argument('project_path', type=Path, nargs='?', default=Path.cwd(),
+                        help="If provided, the path to the project to server or create. "
+                             "If not provided, uses current working directory.")
 
     args = parser.parse_args()
-    project_path = args.project_path.resolve(True)
+    project_path = args.project_path.resolve()
 
     if args.create:
         await Project.create(project_path)
-
-    project_service = ProjectService(project_path)
-    server = make_server(project_service)
-    print(f"Starting server with project {project_path}")
-    await server.start()
-    try:
-        await server.wait_for_termination()
-    finally:
-        print("Server terminating...")
-        await server.stop(5)
-        print("Server terminated")
+    else:
+        project_service = ProjectService(project_path)
+        server = make_server(project_service)
+        print(f"Starting server with project {project_path}")
+        await server.start()
+        try:
+            await server.wait_for_termination()
+        finally:
+            print("Server terminating...")
+            await server.stop(5)
+            print("Server terminated")
 
 
 if __name__ == "__main__":
