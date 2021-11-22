@@ -90,7 +90,7 @@ class PackedSimbin(BinaryProvider):
         binary_path = bin_dir / binary_name
         if not src_archive.is_file() or not binary_path.is_file() or not str(binary_path).startswith(str(bin_dir)):
             raise RuntimeError('PackedSimbin directory not formatted correctly.')
-        return PackedSimbin(path, name, binary_name)
+        return PackedSimbin(path.resolve(True), name, binary_name)
 
     @staticmethod
     async def create_from_local_simbin(path: Path, local_simbin: LocalSimbin):
@@ -110,7 +110,7 @@ class PackedSimbin(BinaryProvider):
             'pack_timestamp': pack_timestamp
         }
         await _utils.dump_json(meta, path / PackedSimbin.meta_file_name)
-        return PackedSimbin(path, name, binary_name)
+        return PackedSimbin(path.resolve(True), name, binary_name)
 
     def get_binary_path(self) -> Path:
         return self.path / self.binary_name
