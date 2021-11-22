@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1356</width>
-    <height>965</height>
+    <width>1282</width>
+    <height>880</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,332 +38,103 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="simulationTab">
+      <widget class="QWidget" name="processTab">
        <attribute name="title">
-        <string>Simulation</string>
+        <string>Processes</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QPushButton" name="startSimProcessButton">
-              <property name="palette">
-               <palette>
-                <active>
-                 <colorrole role="ButtonText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>0</red>
-                    <green>170</green>
-                    <blue>0</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </active>
-                <inactive>
-                 <colorrole role="ButtonText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>0</red>
-                    <green>170</green>
-                    <blue>0</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </inactive>
-                <disabled>
-                 <colorrole role="ButtonText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>120</red>
-                    <green>120</green>
-                    <blue>120</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </disabled>
-               </palette>
-              </property>
-              <property name="text">
-               <string>Start Simulation Process</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="showVisualizerButton">
-              <property name="text">
-               <string>Show Visualizer</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="killSimProcessButton">
-              <property name="palette">
-               <palette>
-                <active>
-                 <colorrole role="ButtonText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>170</red>
-                    <green>0</green>
-                    <blue>0</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </active>
-                <inactive>
-                 <colorrole role="ButtonText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>170</red>
-                    <green>0</green>
-                    <blue>0</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </inactive>
-                <disabled>
-                 <colorrole role="ButtonText">
-                  <brush brushstyle="SolidPattern">
-                   <color alpha="255">
-                    <red>120</red>
-                    <green>120</green>
-                    <blue>120</blue>
-                   </color>
-                  </brush>
-                 </colorrole>
-                </disabled>
-               </palette>
-              </property>
-              <property name="text">
-               <string>Kill Simulation Process</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QGroupBox" name="simulatorGroupBox">
+            <property name="title">
+             <string>Simulator</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_18">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="leftMargin">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="startSimulatorButton">
+               <property name="text">
+                <string>Start Simulator</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QPushButton" name="startSimButton">
-              <property name="text">
-               <string>Start</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="stopSimButton">
-              <property name="text">
-               <string>Stop</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="startEditSimButton">
-              <property name="text">
-               <string>Start Editing</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="commitEditsSimButton">
-              <property name="text">
-               <string>Commit Edits</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="discardEditsSimButton">
-              <property name="text">
-               <string>Discard Edits</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QGroupBox" name="creatorGroupBox">
+            <property name="title">
+             <string>Creator</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="leftMargin">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <widget class="QPushButton" name="startCreatorButton">
+                 <property name="text">
+                  <string>Start Creator</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,1">
+               <item>
+                <widget class="QLabel" name="label_8">
+                 <property name="text">
+                  <string>Creator Binary:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="startCreatorBinaryComboBox"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
-           <widget class="QTabWidget" name="tabWidget_2">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>10</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <widget class="QGroupBox" name="currentProcessesGroupBox">
+            <property name="title">
+             <string>Current Processes</string>
             </property>
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <widget class="QWidget" name="entitiesTab">
-             <attribute name="title">
-              <string>Entities</string>
-             </attribute>
-             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,1">
-              <item>
-               <layout class="QVBoxLayout" name="entityLayout">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_9">
-                  <item>
-                   <widget class="QPushButton" name="createEntityButton">
-                    <property name="text">
-                     <string>Create</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="destroyEntityButton">
-                    <property name="text">
-                     <string>Destroy</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QListWidget" name="entityList">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                    <horstretch>1</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QVBoxLayout" name="entityComponentLayout">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_10">
-                  <item>
-                   <widget class="QPushButton" name="assignComponentButton">
-                    <property name="text">
-                     <string>Assign</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="removeComponentButton">
-                    <property name="text">
-                     <string>Remove</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QListWidget" name="entityComponentList">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                    <horstretch>1</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QVBoxLayout" name="verticalLayout_5">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_11">
-                  <item>
-                   <spacer name="horizontalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="revertComStateButton">
-                    <property name="text">
-                     <string>Revert</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="saveComStateButton">
-                    <property name="text">
-                     <string>Save</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QPlainTextEdit" name="comStateTextEdit"/>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="singletonsTab">
-             <attribute name="title">
-              <string>Singletons</string>
-             </attribute>
-             <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,1">
-              <item>
-               <widget class="QListWidget" name="singletonList"/>
-              </item>
-              <item>
-               <layout class="QVBoxLayout" name="verticalLayout_2">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
-                  <item>
-                   <spacer name="horizontalSpacer_3">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="revertSingletonStateButton">
-                    <property name="text">
-                     <string>Revert</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="saveSingletonStateButton">
-                    <property name="text">
-                     <string>Save</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QPlainTextEdit" name="singletonStateTextEdit"/>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QListView" name="currentProcessesList"/>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -378,18 +149,31 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QPushButton" name="createTimelineAtSelectionButton">
+           <widget class="QPushButton" name="createCreatorAtSelection">
             <property name="text">
-             <string>Create Timeline at Selection</string>
+             <string>Create Timeline Creator at Selection</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="createSiblingTimelineButton">
+           <widget class="QPushButton" name="createSimulatorAtSelection">
             <property name="text">
-             <string>Create Sibling Timeline</string>
+             <string>Create Timeline Simulator at Selection</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QPushButton" name="deleteSelectedTimelineButton">
@@ -442,12 +226,12 @@
           <item>
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Current simulation:</string>
+             <string>Timeline Binary:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="currentTimelineSimLabel">
+           <widget class="QLabel" name="timelineBinaryLabel">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -455,60 +239,96 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;current sim&gt;</string>
+             <string>&lt;current binary&gt;</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="0,1,0">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Convert to simulation:</string>
+             <string>New Tag:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="convertToSimComboBox"/>
+           <widget class="QLineEdit" name="newTagLineEdit"/>
           </item>
           <item>
-           <widget class="QPushButton" name="convertToSimButton">
+           <widget class="QPushButton" name="newTagButton">
             <property name="text">
-             <string>Convert</string>
+             <string>Add New Tag</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="deleteTagsButton">
+            <property name="palette">
+             <palette>
+              <active>
+               <colorrole role="ButtonText">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>181</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="ButtonText">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>181</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="ButtonText">
+                <brush brushstyle="SolidPattern">
+                 <color alpha="255">
+                  <red>120</red>
+                  <green>120</green>
+                  <blue>120</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
+            </property>
+            <property name="text">
+             <string>Delete Tags</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_17">
-          <item>
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Tags:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="timelineTagsLineEdit"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="revertTimelineTagsButton">
-            <property name="text">
-             <string>Revert</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="saveTimelineTagsButton">
-            <property name="text">
-             <string>Save</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QListWidget" name="tagsListWidget">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::MultiSelection</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label">
@@ -532,24 +352,24 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="simRegistryTab">
+      <widget class="QWidget" name="binaryRegistryTab">
        <attribute name="title">
         <string>Simulation Registry</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <layout class="QHBoxLayout" name="simSourceLayout" stretch="0,1">
+         <layout class="QHBoxLayout" name="binarySourceLayout" stretch="0,1">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QPushButton" name="addSimSourceButton">
+             <widget class="QPushButton" name="addLocalSimbinButton">
               <property name="text">
-               <string>Add Source</string>
+               <string>Add Local Simbin</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="simSourceList"/>
+             <widget class="QListWidget" name="localSimbinList"/>
             </item>
            </layout>
           </item>
@@ -558,9 +378,9 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QPushButton" name="registerSimFromSourceButton">
+               <widget class="QPushButton" name="uploadBinaryFromSimbinButton">
                 <property name="text">
-                 <string>Register Simulation from Source</string>
+                 <string>Upload New Binary from Simbin</string>
                 </property>
                </widget>
               </item>
@@ -651,7 +471,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="sourceFileContentsTextEdit">
+             <widget class="QPlainTextEdit" name="simbinFileContentsTextEdit">
               <property name="readOnly">
                <bool>true</bool>
               </property>
@@ -788,22 +608,15 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1356</width>
+     <width>1282</width>
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuProject">
-    <property name="title">
-     <string>Project</string>
-    </property>
-    <addaction name="actionOpen_Project"/>
-   </widget>
-   <addaction name="menuProject"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionOpen_Project">
+  <action name="actionConnectToSimmaServer">
    <property name="text">
-    <string>Open Project</string>
+    <string>Connec to Simma Server</string>
    </property>
   </action>
  </widget>
