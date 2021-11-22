@@ -15,6 +15,7 @@ service Simma {
     rpc ModifyTimelineTags(ModifyTimelineTagsRequest) returns (ModifyTimelineTagsResponse) {}
     rpc DeleteTimeline (DeleteTimelineRequest) returns (DeleteTimelineResponse) {}
     rpc GetTimelineDetails (GetTimelineDetailsRequest) returns (GetTimelineDetailsResponse) {}
+    rpc UploadBinary (stream UploadBinaryRequest) returns (UploadBinaryResponse) {}
 }
 
 message TickList {
@@ -217,4 +218,16 @@ message GetTimelineDetailsResponse {
     int64 head_tick = 3;
     string creation_timestamp = 4;
     repeated string tags = 5;
+}
+
+message UploadBinaryRequest {
+    oneof message {
+        bytes data = 1;
+        string simbin_path = 2;
+    }
+}
+
+message UploadBinaryResponse {
+    string error = 1;
+    string binary_id = 2;
 }

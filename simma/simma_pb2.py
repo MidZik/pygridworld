@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11simma/simma.proto\x12\x05simma\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"Z\n\x10TimelinesRequest\x12\x19\n\x11\x66ilter_parent_ids\x18\x01 \x03(\t\x12\x14\n\x0crequire_tags\x18\x02 \x03(\t\x12\x15\n\rdisallow_tags\x18\x03 \x03(\t\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\t\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\";\n\x15TimelineTicksResponse\x12\"\n\ttick_list\x18\x01 \x01(\x0b\x32\x0f.simma.TickList\"\x87\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x87\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"n\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ntick_range\x18\x02 \x01(\x0b\x32\x10.simma.TickRange\x12\x1a\n\x12\x65vent_name_filters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"`\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12#\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x13.simma.EventMessage\"\xc0\x02\n\x18TimelineSimulatorRequest\x12\x36\n\x05start\x18\x04 \x01(\x0b\x32%.simma.TimelineSimulatorRequest.StartH\x00\x12O\n\x13save_state_to_point\x18\x05 \x01(\x0b\x32\x30.simma.TimelineSimulatorRequest.SaveStateToPointH\x00\x12\x42\n\x0cmove_to_tick\x18\x06 \x01(\x0b\x32*.simma.TimelineSimulatorRequest.MoveToTickH\x00\x1a\x1c\n\x05Start\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x1a\x12\n\x10SaveStateToPoint\x1a\x1a\n\nMoveToTick\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x42\t\n\x07message\"\xab\x03\n\x19TimelineSimulatorResponse\x12\x37\n\x05\x65rror\x18\x01 \x01(\x0b\x32&.simma.TimelineSimulatorResponse.ErrorH\x00\x12\x37\n\x05start\x18\x04 \x01(\x0b\x32&.simma.TimelineSimulatorResponse.StartH\x00\x12P\n\x13save_state_to_point\x18\x05 \x01(\x0b\x32\x31.simma.TimelineSimulatorResponse.SaveStateToPointH\x00\x12\x43\n\x0cmove_to_tick\x18\x06 \x01(\x0b\x32+.simma.TimelineSimulatorResponse.MoveToTickH\x00\x1a\x18\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x1a,\n\x05Start\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x12\n\nuser_token\x18\x02 \x01(\t\x1a$\n\x10SaveStateToPoint\x12\x10\n\x08new_tick\x18\x01 \x01(\x03\x1a\x0c\n\nMoveToTickB\t\n\x07message\"\x84\x05\n\x16TimelineCreatorRequest\x12;\n\tstart_new\x18\x04 \x01(\x0b\x32&.simma.TimelineCreatorRequest.StartNewH\x00\x12\x45\n\x0estart_existing\x18\x05 \x01(\x0b\x32+.simma.TimelineCreatorRequest.StartExistingH\x00\x12\x43\n\rstart_editing\x18\x06 \x01(\x0b\x32*.simma.TimelineCreatorRequest.StartEditingH\x00\x12\x41\n\x0cstop_editing\x18\x07 \x01(\x0b\x32).simma.TimelineCreatorRequest.StopEditingH\x00\x12=\n\nload_state\x18\x08 \x01(\x0b\x32\'.simma.TimelineCreatorRequest.LoadStateH\x00\x12O\n\x14save_to_new_timeline\x18\t \x01(\x0b\x32/.simma.TimelineCreatorRequest.SaveToNewTimelineH\x00\x1aH\n\x08StartNew\x12\x11\n\tbinary_id\x18\x01 \x01(\t\x12\x1b\n\x13initial_timeline_id\x18\x02 \x01(\t\x12\x0c\n\x04tick\x18\x03 \x01(\x03\x1a#\n\rStartExisting\x12\x12\n\ncreator_id\x18\x01 \x01(\t\x1a\x0e\n\x0cStartEditing\x1a\r\n\x0bStopEditing\x1a \n\tLoadState\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x1a\x13\n\x11SaveToNewTimelineB\t\n\x07message\"\xec\x05\n\x17TimelineCreatorResponse\x12\x35\n\x05\x65rror\x18\x01 \x01(\x0b\x32$.simma.TimelineCreatorResponse.ErrorH\x00\x12<\n\tstart_new\x18\x04 \x01(\x0b\x32\'.simma.TimelineCreatorResponse.StartNewH\x00\x12\x46\n\x0estart_existing\x18\x05 \x01(\x0b\x32,.simma.TimelineCreatorResponse.StartExistingH\x00\x12\x44\n\rstart_editing\x18\x06 \x01(\x0b\x32+.simma.TimelineCreatorResponse.StartEditingH\x00\x12\x42\n\x0cstop_editing\x18\x07 \x01(\x0b\x32*.simma.TimelineCreatorResponse.StopEditingH\x00\x12>\n\nload_state\x18\x08 \x01(\x0b\x32(.simma.TimelineCreatorResponse.LoadStateH\x00\x12P\n\x14save_to_new_timeline\x18\t \x01(\x0b\x32\x30.simma.TimelineCreatorResponse.SaveToNewTimelineH\x00\x1a\x18\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x1a\x43\n\x08StartNew\x12\x12\n\ncreator_id\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t\x12\x12\n\nuser_token\x18\x03 \x01(\t\x1a\x34\n\rStartExisting\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x12\n\nuser_token\x18\x02 \x01(\t\x1a\x0e\n\x0cStartEditing\x1a\r\n\x0bStopEditing\x1a\x0b\n\tLoadState\x1a,\n\x11SaveToNewTimeline\x12\x17\n\x0fnew_timeline_id\x18\x01 \x01(\tB\t\n\x07message\"]\n\x19ModifyTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12\x13\n\x0btags_to_add\x18\x02 \x03(\t\x12\x16\n\x0etags_to_remove\x18\x03 \x03(\t\"\x1c\n\x1aModifyTimelineTagsResponse\",\n\x15\x44\x65leteTimelineRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16\x44\x65leteTimelineResponse\"0\n\x19GetTimelineDetailsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\"\x7f\n\x1aGetTimelineDetailsResponse\x12\x11\n\tbinary_id\x18\x01 \x01(\t\x12\x11\n\tparent_id\x18\x02 \x01(\t\x12\x11\n\thead_tick\x18\x03 \x01(\x03\x12\x1a\n\x12\x63reation_timestamp\x18\x04 \x01(\t\x12\x0c\n\x04tags\x18\x05 \x03(\t2\xd4\x06\n\x05Simma\x12\x43\n\x0cGetTimelines\x12\x17.simma.TimelinesRequest\x1a\x18.simma.TimelinesResponse\"\x00\x12O\n\x10GetTimelineTicks\x12\x1b.simma.TimelineTicksRequest\x1a\x1c.simma.TimelineTicksResponse\"\x00\x12N\n\x0fGetTimelineData\x12\x1a.simma.TimelineDataRequest\x1a\x1b.simma.TimelineDataResponse\"\x00\x30\x01\x12N\n\x0fGetTimelineJson\x12\x1a.simma.TimelineJsonRequest\x1a\x1b.simma.TimelineJsonResponse\"\x00\x30\x01\x12T\n\x11GetTimelineEvents\x12\x1c.simma.TimelineEventsRequest\x1a\x1d.simma.TimelineEventsResponse\"\x00\x30\x01\x12\\\n\x11TimelineSimulator\x12\x1f.simma.TimelineSimulatorRequest\x1a .simma.TimelineSimulatorResponse\"\x00(\x01\x30\x01\x12V\n\x0fTimelineCreator\x12\x1d.simma.TimelineCreatorRequest\x1a\x1e.simma.TimelineCreatorResponse\"\x00(\x01\x30\x01\x12[\n\x12ModifyTimelineTags\x12 .simma.ModifyTimelineTagsRequest\x1a!.simma.ModifyTimelineTagsResponse\"\x00\x12O\n\x0e\x44\x65leteTimeline\x12\x1c.simma.DeleteTimelineRequest\x1a\x1d.simma.DeleteTimelineResponse\"\x00\x12[\n\x12GetTimelineDetails\x12 .simma.GetTimelineDetailsRequest\x1a!.simma.GetTimelineDetailsResponse\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x11simma/simma.proto\x12\x05simma\"\x19\n\x08TickList\x12\r\n\x05ticks\x18\x01 \x03(\x03\"1\n\tTickRange\x12\x12\n\nstart_tick\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_tick\x18\x02 \x01(\x03\"Z\n\x10TimelinesRequest\x12\x19\n\x11\x66ilter_parent_ids\x18\x01 \x03(\t\x12\x14\n\x0crequire_tags\x18\x02 \x03(\t\x12\x15\n\rdisallow_tags\x18\x03 \x03(\t\")\n\x11TimelinesResponse\x12\x14\n\x0ctimeline_ids\x18\x01 \x03(\t\"+\n\x14TimelineTicksRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\";\n\x15TimelineTicksResponse\x12\"\n\ttick_list\x18\x01 \x01(\x0b\x32\x0f.simma.TickList\"\x87\x01\n\x13TimelineDataRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineDataResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\x87\x01\n\x13TimelineJsonRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ttick_list\x18\x02 \x01(\x0b\x32\x0f.simma.TickListH\x00\x12&\n\ntick_range\x18\x03 \x01(\x0b\x32\x10.simma.TickRangeH\x00\x42\r\n\x0btick_option\"2\n\x14TimelineJsonResponse\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x12\x0c\n\x04json\x18\x02 \x01(\t\"n\n\x15TimelineEventsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12$\n\ntick_range\x18\x02 \x01(\x0b\x32\x10.simma.TickRange\x12\x1a\n\x12\x65vent_name_filters\x18\x03 \x03(\t\"*\n\x0c\x45ventMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04json\x18\x02 \x01(\t\"`\n\x16TimelineEventsResponse\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12\x0c\n\x04tick\x18\x02 \x01(\x03\x12#\n\x06\x65vents\x18\x03 \x03(\x0b\x32\x13.simma.EventMessage\"\xc0\x02\n\x18TimelineSimulatorRequest\x12\x36\n\x05start\x18\x04 \x01(\x0b\x32%.simma.TimelineSimulatorRequest.StartH\x00\x12O\n\x13save_state_to_point\x18\x05 \x01(\x0b\x32\x30.simma.TimelineSimulatorRequest.SaveStateToPointH\x00\x12\x42\n\x0cmove_to_tick\x18\x06 \x01(\x0b\x32*.simma.TimelineSimulatorRequest.MoveToTickH\x00\x1a\x1c\n\x05Start\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x1a\x12\n\x10SaveStateToPoint\x1a\x1a\n\nMoveToTick\x12\x0c\n\x04tick\x18\x01 \x01(\x03\x42\t\n\x07message\"\xab\x03\n\x19TimelineSimulatorResponse\x12\x37\n\x05\x65rror\x18\x01 \x01(\x0b\x32&.simma.TimelineSimulatorResponse.ErrorH\x00\x12\x37\n\x05start\x18\x04 \x01(\x0b\x32&.simma.TimelineSimulatorResponse.StartH\x00\x12P\n\x13save_state_to_point\x18\x05 \x01(\x0b\x32\x31.simma.TimelineSimulatorResponse.SaveStateToPointH\x00\x12\x43\n\x0cmove_to_tick\x18\x06 \x01(\x0b\x32+.simma.TimelineSimulatorResponse.MoveToTickH\x00\x1a\x18\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x1a,\n\x05Start\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x12\n\nuser_token\x18\x02 \x01(\t\x1a$\n\x10SaveStateToPoint\x12\x10\n\x08new_tick\x18\x01 \x01(\x03\x1a\x0c\n\nMoveToTickB\t\n\x07message\"\x84\x05\n\x16TimelineCreatorRequest\x12;\n\tstart_new\x18\x04 \x01(\x0b\x32&.simma.TimelineCreatorRequest.StartNewH\x00\x12\x45\n\x0estart_existing\x18\x05 \x01(\x0b\x32+.simma.TimelineCreatorRequest.StartExistingH\x00\x12\x43\n\rstart_editing\x18\x06 \x01(\x0b\x32*.simma.TimelineCreatorRequest.StartEditingH\x00\x12\x41\n\x0cstop_editing\x18\x07 \x01(\x0b\x32).simma.TimelineCreatorRequest.StopEditingH\x00\x12=\n\nload_state\x18\x08 \x01(\x0b\x32\'.simma.TimelineCreatorRequest.LoadStateH\x00\x12O\n\x14save_to_new_timeline\x18\t \x01(\x0b\x32/.simma.TimelineCreatorRequest.SaveToNewTimelineH\x00\x1aH\n\x08StartNew\x12\x11\n\tbinary_id\x18\x01 \x01(\t\x12\x1b\n\x13initial_timeline_id\x18\x02 \x01(\t\x12\x0c\n\x04tick\x18\x03 \x01(\x03\x1a#\n\rStartExisting\x12\x12\n\ncreator_id\x18\x01 \x01(\t\x1a\x0e\n\x0cStartEditing\x1a\r\n\x0bStopEditing\x1a \n\tLoadState\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x1a\x13\n\x11SaveToNewTimelineB\t\n\x07message\"\xec\x05\n\x17TimelineCreatorResponse\x12\x35\n\x05\x65rror\x18\x01 \x01(\x0b\x32$.simma.TimelineCreatorResponse.ErrorH\x00\x12<\n\tstart_new\x18\x04 \x01(\x0b\x32\'.simma.TimelineCreatorResponse.StartNewH\x00\x12\x46\n\x0estart_existing\x18\x05 \x01(\x0b\x32,.simma.TimelineCreatorResponse.StartExistingH\x00\x12\x44\n\rstart_editing\x18\x06 \x01(\x0b\x32+.simma.TimelineCreatorResponse.StartEditingH\x00\x12\x42\n\x0cstop_editing\x18\x07 \x01(\x0b\x32*.simma.TimelineCreatorResponse.StopEditingH\x00\x12>\n\nload_state\x18\x08 \x01(\x0b\x32(.simma.TimelineCreatorResponse.LoadStateH\x00\x12P\n\x14save_to_new_timeline\x18\t \x01(\x0b\x32\x30.simma.TimelineCreatorResponse.SaveToNewTimelineH\x00\x1a\x18\n\x05\x45rror\x12\x0f\n\x07message\x18\x01 \x01(\t\x1a\x43\n\x08StartNew\x12\x12\n\ncreator_id\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t\x12\x12\n\nuser_token\x18\x03 \x01(\t\x1a\x34\n\rStartExisting\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x12\n\nuser_token\x18\x02 \x01(\t\x1a\x0e\n\x0cStartEditing\x1a\r\n\x0bStopEditing\x1a\x0b\n\tLoadState\x1a,\n\x11SaveToNewTimeline\x12\x17\n\x0fnew_timeline_id\x18\x01 \x01(\tB\t\n\x07message\"]\n\x19ModifyTimelineTagsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\x12\x13\n\x0btags_to_add\x18\x02 \x03(\t\x12\x16\n\x0etags_to_remove\x18\x03 \x03(\t\"\x1c\n\x1aModifyTimelineTagsResponse\",\n\x15\x44\x65leteTimelineRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\x05\"\x18\n\x16\x44\x65leteTimelineResponse\"0\n\x19GetTimelineDetailsRequest\x12\x13\n\x0btimeline_id\x18\x01 \x01(\t\"\x7f\n\x1aGetTimelineDetailsResponse\x12\x11\n\tbinary_id\x18\x01 \x01(\t\x12\x11\n\tparent_id\x18\x02 \x01(\t\x12\x11\n\thead_tick\x18\x03 \x01(\x03\x12\x1a\n\x12\x63reation_timestamp\x18\x04 \x01(\t\x12\x0c\n\x04tags\x18\x05 \x03(\t\"G\n\x13UploadBinaryRequest\x12\x0e\n\x04\x64\x61ta\x18\x01 \x01(\x0cH\x00\x12\x15\n\x0bsimbin_path\x18\x02 \x01(\tH\x00\x42\t\n\x07message\"8\n\x14UploadBinaryResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\t\x12\x11\n\tbinary_id\x18\x02 \x01(\t2\xa1\x07\n\x05Simma\x12\x43\n\x0cGetTimelines\x12\x17.simma.TimelinesRequest\x1a\x18.simma.TimelinesResponse\"\x00\x12O\n\x10GetTimelineTicks\x12\x1b.simma.TimelineTicksRequest\x1a\x1c.simma.TimelineTicksResponse\"\x00\x12N\n\x0fGetTimelineData\x12\x1a.simma.TimelineDataRequest\x1a\x1b.simma.TimelineDataResponse\"\x00\x30\x01\x12N\n\x0fGetTimelineJson\x12\x1a.simma.TimelineJsonRequest\x1a\x1b.simma.TimelineJsonResponse\"\x00\x30\x01\x12T\n\x11GetTimelineEvents\x12\x1c.simma.TimelineEventsRequest\x1a\x1d.simma.TimelineEventsResponse\"\x00\x30\x01\x12\\\n\x11TimelineSimulator\x12\x1f.simma.TimelineSimulatorRequest\x1a .simma.TimelineSimulatorResponse\"\x00(\x01\x30\x01\x12V\n\x0fTimelineCreator\x12\x1d.simma.TimelineCreatorRequest\x1a\x1e.simma.TimelineCreatorResponse\"\x00(\x01\x30\x01\x12[\n\x12ModifyTimelineTags\x12 .simma.ModifyTimelineTagsRequest\x1a!.simma.ModifyTimelineTagsResponse\"\x00\x12O\n\x0e\x44\x65leteTimeline\x12\x1c.simma.DeleteTimelineRequest\x1a\x1d.simma.DeleteTimelineResponse\"\x00\x12[\n\x12GetTimelineDetails\x12 .simma.GetTimelineDetailsRequest\x1a!.simma.GetTimelineDetailsResponse\"\x00\x12K\n\x0cUploadBinary\x12\x1a.simma.UploadBinaryRequest\x1a\x1b.simma.UploadBinaryResponse\"\x00(\x01\x62\x06proto3'
 )
 
 
@@ -1634,6 +1634,89 @@ _GETTIMELINEDETAILSRESPONSE = _descriptor.Descriptor(
   serialized_end=3506,
 )
 
+
+_UPLOADBINARYREQUEST = _descriptor.Descriptor(
+  name='UploadBinaryRequest',
+  full_name='simma.UploadBinaryRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='data', full_name='simma.UploadBinaryRequest.data', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='simbin_path', full_name='simma.UploadBinaryRequest.simbin_path', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='message', full_name='simma.UploadBinaryRequest.message',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=3508,
+  serialized_end=3579,
+)
+
+
+_UPLOADBINARYRESPONSE = _descriptor.Descriptor(
+  name='UploadBinaryResponse',
+  full_name='simma.UploadBinaryResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='error', full_name='simma.UploadBinaryResponse.error', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='binary_id', full_name='simma.UploadBinaryResponse.binary_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=3581,
+  serialized_end=3637,
+)
+
 _TIMELINETICKSRESPONSE.fields_by_name['tick_list'].message_type = _TICKLIST
 _TIMELINEDATAREQUEST.fields_by_name['tick_list'].message_type = _TICKLIST
 _TIMELINEDATAREQUEST.fields_by_name['tick_range'].message_type = _TICKRANGE
@@ -1753,6 +1836,12 @@ _TIMELINECREATORRESPONSE.fields_by_name['load_state'].containing_oneof = _TIMELI
 _TIMELINECREATORRESPONSE.oneofs_by_name['message'].fields.append(
   _TIMELINECREATORRESPONSE.fields_by_name['save_to_new_timeline'])
 _TIMELINECREATORRESPONSE.fields_by_name['save_to_new_timeline'].containing_oneof = _TIMELINECREATORRESPONSE.oneofs_by_name['message']
+_UPLOADBINARYREQUEST.oneofs_by_name['message'].fields.append(
+  _UPLOADBINARYREQUEST.fields_by_name['data'])
+_UPLOADBINARYREQUEST.fields_by_name['data'].containing_oneof = _UPLOADBINARYREQUEST.oneofs_by_name['message']
+_UPLOADBINARYREQUEST.oneofs_by_name['message'].fields.append(
+  _UPLOADBINARYREQUEST.fields_by_name['simbin_path'])
+_UPLOADBINARYREQUEST.fields_by_name['simbin_path'].containing_oneof = _UPLOADBINARYREQUEST.oneofs_by_name['message']
 DESCRIPTOR.message_types_by_name['TickList'] = _TICKLIST
 DESCRIPTOR.message_types_by_name['TickRange'] = _TICKRANGE
 DESCRIPTOR.message_types_by_name['TimelinesRequest'] = _TIMELINESREQUEST
@@ -1776,6 +1865,8 @@ DESCRIPTOR.message_types_by_name['DeleteTimelineRequest'] = _DELETETIMELINEREQUE
 DESCRIPTOR.message_types_by_name['DeleteTimelineResponse'] = _DELETETIMELINERESPONSE
 DESCRIPTOR.message_types_by_name['GetTimelineDetailsRequest'] = _GETTIMELINEDETAILSREQUEST
 DESCRIPTOR.message_types_by_name['GetTimelineDetailsResponse'] = _GETTIMELINEDETAILSRESPONSE
+DESCRIPTOR.message_types_by_name['UploadBinaryRequest'] = _UPLOADBINARYREQUEST
+DESCRIPTOR.message_types_by_name['UploadBinaryResponse'] = _UPLOADBINARYRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 TickList = _reflection.GeneratedProtocolMessageType('TickList', (_message.Message,), {
@@ -2099,6 +2190,20 @@ GetTimelineDetailsResponse = _reflection.GeneratedProtocolMessageType('GetTimeli
   })
 _sym_db.RegisterMessage(GetTimelineDetailsResponse)
 
+UploadBinaryRequest = _reflection.GeneratedProtocolMessageType('UploadBinaryRequest', (_message.Message,), {
+  'DESCRIPTOR' : _UPLOADBINARYREQUEST,
+  '__module__' : 'simma.simma_pb2'
+  # @@protoc_insertion_point(class_scope:simma.UploadBinaryRequest)
+  })
+_sym_db.RegisterMessage(UploadBinaryRequest)
+
+UploadBinaryResponse = _reflection.GeneratedProtocolMessageType('UploadBinaryResponse', (_message.Message,), {
+  'DESCRIPTOR' : _UPLOADBINARYRESPONSE,
+  '__module__' : 'simma.simma_pb2'
+  # @@protoc_insertion_point(class_scope:simma.UploadBinaryResponse)
+  })
+_sym_db.RegisterMessage(UploadBinaryResponse)
+
 
 
 _SIMMA = _descriptor.ServiceDescriptor(
@@ -2108,8 +2213,8 @@ _SIMMA = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=3509,
-  serialized_end=4361,
+  serialized_start=3640,
+  serialized_end=4569,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetTimelines',
@@ -2208,6 +2313,16 @@ _SIMMA = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_GETTIMELINEDETAILSREQUEST,
     output_type=_GETTIMELINEDETAILSRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='UploadBinary',
+    full_name='simma.Simma.UploadBinary',
+    index=10,
+    containing_service=None,
+    input_type=_UPLOADBINARYREQUEST,
+    output_type=_UPLOADBINARYRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

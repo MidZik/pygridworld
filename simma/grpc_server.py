@@ -1,8 +1,11 @@
 import asyncio
 import grpc
 import logging
+from pathlib import Path
+from tempfile import TemporaryFile, TemporaryDirectory
 from typing import AsyncIterable
 from uuid import UUID
+import zipfile
 
 from simma.service import ProjectService, Project
 import simma.simma_pb2 as pb2
@@ -226,6 +229,25 @@ class Service(pb2_grpc.SimmaServicer):
                                               head_tick=timeline_info.head_tick,
                                               creation_timestamp=str(timeline_info.creation_time),
                                               tags=timeline_tags)
+
+    async def UploadBinary(self, request_iterator, context):
+        with TemporaryFile() as temp_file, TemporaryDirectory() as temp_dir:
+            temp_dir = Path(temp_dir)
+            simbin_path = None
+            async for request in request_iterator:
+                if len(request.data) > 0:
+                    temp_file.write(request.data)
+                else:
+                    simbin_path = request.simbin_path
+                    break
+            temp_file.seek(0)
+            zip_file = zipfile.ZipFile(temp_file)
+            await asyncio.to_thread(zip_file.extractall, temp_dir)
+            simbin_path = (temp_dir / simbin_path).resolve()
+            if not simbin_path.is_file() or not str(simbin_path).startswith(str(temp_dir)):
+                return pb2.UploadBinaryResponse(error="simbin_path was not valid.")
+            binary_id = await self._service.add_local_binary(simbin_path)
+            return pb2.UploadBinaryResponse(binary_id=str(binary_id))
 
 
 def make_server(project_service: ProjectService, address='[::]:4969'):
