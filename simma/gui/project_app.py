@@ -1,18 +1,26 @@
 """
 @author: Matt Idzik (MidZik)
 """
+import asyncio
+import appdirs
 import argparse
 from collections import defaultdict, deque
-from typing import Union
+from pathlib import Path
+from typing import Union, Optional
 
 from simma.gui import window, command_prompt_dock_widget as cmd_widget, process_controls
 from simma.grpc_client import Client as SimmaClient, SimulatorContext, CreatorContext, TimelineDetails
 from simma.simulation.client import Client as ProcessClient
 from simma.gui.GUI import create_gui_process
+from simma.binary import LocalSimbin
 from PySide2 import QtCore, QtWidgets, QtGui
 
 
 _UserRole = QtCore.Qt.UserRole
+
+
+def _user_data_path():
+    return Path(appdirs.user_data_dir('simma', False))
 
 
 class _WorkerSignals(QtCore.QObject):
@@ -117,9 +125,27 @@ class ProjectApp(QtCore.QObject):
         ui.setupUi(self._main_window)
         self._ui = ui
 
+
+        self.timelines_model = QtGui.QStandardItemModel(0, 1)
+        self.local_simbins_model = QtGui.QStandardItemModel(0, 1)
+
+        self._local_simbins = {}
+
+        _user_data_path().mkdir(exist_ok=True)
+        simbin_paths_file = Path(_user_data_path() / 'simbins.txt')
+        if not simbin_paths_file.exists():
+            simbin_paths_file.touch()
+
+        self.refresh_timelines_model()
+        self.refresh_local_simbins_model()
+
+        ui.timelineTree.setModel(self.timelines_model)
+        ui.localSimbinList.setModel(self.local_simbins_model)
+
+
         # Navigation
-        ui.timelineTree.itemSelectionChanged.connect(self._on_timeline_tree_selected_item_changed)
-        ui.timelineTree.itemExpanded.connect(self._on_timeline_tree_item_expanded)
+        ui.timelineTree.selectionModel().selectionChanged.connect(self._on_timeline_tree_selection_changed)
+        ui.timelineTree.expanded.connect(self._on_timeline_tree_expanded)
         ui.timelinePointList.itemSelectionChanged.connect(self._on_timeline_point_list_selected_item_changed)
 
         # processes tab
@@ -135,7 +161,7 @@ class ProjectApp(QtCore.QObject):
 
         # Simulation Registry Tab
         ui.addLocalSimbinButton.clicked.connect(self._add_local_simbin)
-        ui.localSimbinList.itemSelectionChanged.connect(self._on_selected_local_simbin_changed)
+        ui.localSimbinList.selectionModel().selectionChanged.connect(self._on_local_simbin_list_selection_changed)
 
         ui.uploadBinaryFromSimbinButton.clicked.connect(self._upload_binary)
         ui.removeSimSourceButton.clicked.connect(self._delete_selected_sim_source)
@@ -146,23 +172,29 @@ class ProjectApp(QtCore.QObject):
         ui.discardRegisteredSimDescButton.clicked.connect(self._discard_registered_sim_description)
         ui.unregisterSimButton.clicked.connect(self._unregister_selected_sim_registration)
 
-        self._timeline_tree_item_map = {}
-        self.refresh_timeline_tree()
-
-        self._process_widgets = {}
-
-    def refresh_timeline_tree(self):
-        self._timeline_tree_item_map.clear()
+    def refresh_timelines_model(self):
+        self.timelines_model.clear()
         timelines = self._client.get_timelines(filter_parents=(None,))
-        root_item = self._ui.timelineTree.invisibleRootItem()
 
         timeline_details = [self._client.get_timeline_details(timeline_id) for timeline_id in timelines]
 
+        parent_item = self.timelines_model.invisibleRootItem()
         for detail in timeline_details:
-            item = QtWidgets.QTreeWidgetItem(root_item)
-            item.setText(0, f"[{detail.head_tick}] {detail.timeline_id}")
-            item.setData(0, _UserRole, detail)
-            self._timeline_tree_item_map[detail.timeline_id] = item
+            item = QtGui.QStandardItem(f"[{detail.head_tick}] {detail.timeline_id}")
+            item.setData(_UserRole, detail)
+            parent_item.appendRow(item)
+
+    def refresh_local_simbins_model(self):
+        self.local_simbins_model.clear()
+        simbin_paths_file = Path(_user_data_path() / 'simbins.txt')
+        with simbin_paths_file.open() as f:
+            for path_string in f.readlines():
+                if path_string:
+                    path = Path(path_string)
+                    simbin: LocalSimbin = asyncio.run(LocalSimbin.load(path))
+                    item = QtGui.QStandardItem(f"{simbin.name} [{path}]")
+                    item.setData(simbin)
+                    self.local_simbins_model.appendRow(item)
 
     def _make_timeline_item(self, timeline_details: TimelineDetails):
         if timeline_details.timeline_id in self._timeline_tree_widget_map:
@@ -175,23 +207,29 @@ class ProjectApp(QtCore.QObject):
         self._timeline_tree_widget_map[timeline_details.timeline_id] = result_item
         return result_item
 
-    def get_selected_timeline_id(self):
-        items = self._ui.timelineTree.selectedItems()
-        return items[0].data(0, _UserRole) if items else None
+    def get_selected_timeline_details(self) -> Optional[TimelineDetails]:
+        selection_model = self._ui.timelineTree.selectionModel()
+        if selection_model.hasSelection():
+            index = selection_model.selectedRows()[0]
+            item = self.timelines_model.itemFromIndex(index)
+            return item.data()
+        else:
+            return None
 
     def get_selected_timeline_tick(self):
         items = self._ui.timelinePointList.selectedItems()
         return items[0].text() if items else None
 
-    def _on_timeline_tree_selected_item_changed(self):
+    def _on_timeline_tree_selection_changed(self):
         ui = self._ui
         ui.timelinePointList.clear()
 
-        selected_timeline_id = self.get_selected_timeline_id()
-        if selected_timeline_id is not None:
-            ui.timelinePointList.addItems(self._client.get_timeline_ticks(selected_timeline_id))
+        selected_timeline_details = self.get_selected_timeline_details()
+        if selected_timeline_details is not None:
+            ui.timelinePointList.addItems(self._client.get_timeline_ticks(selected_timeline_details.timeline_id))
 
-    def _on_timeline_tree_item_expanded(self, item):
+    def _on_timeline_tree_expanded(self, index):
+        item = self.timelines_model.itemFromIndex(index)
         detail = item.getData(0, _UserRole)
         item.takeChildren()
         child_timelines = self._client.get_timelines(filter_parents=(detail.timeline_id,))
@@ -227,9 +265,22 @@ class ProjectApp(QtCore.QObject):
         pass
 
     def _add_local_simbin(self):
-        pass
+        local_simbin_path, _ = QtWidgets.QFileDialog.getOpenFileName(self._main_window, filter="Simbin (*.simbin)")
+        if not local_simbin_path:
+            return
 
-    def _on_selected_local_simbin_changed(self):
+        if local_simbin_path in self._local_simbins:
+            return
+
+        simbin = asyncio.run(LocalSimbin.load(Path(local_simbin_path)))
+        with (_user_data_path() / 'simbins.txt').open('a') as f:
+            f.write(local_simbin_path)
+        self._local_simbins[local_simbin_path] = simbin
+
+        item = QtWidgets.QListWidgetItem(local_simbin_path)
+        self._ui.localSimbinList.addItem(item)
+
+    def _on_local_simbin_list_selection_changed(self, index):
         pass
 
     def _upload_binary(self):

@@ -20,15 +20,10 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QTreeWidget" name="timelineTree">
+      <widget class="QTreeView" name="timelineTree">
        <property name="headerHidden">
         <bool>true</bool>
        </property>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
-        </property>
-       </column>
       </widget>
       <widget class="QListWidget" name="timelinePointList"/>
      </widget>
@@ -36,7 +31,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="processTab">
        <attribute name="title">
@@ -369,7 +364,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="localSimbinList"/>
+             <widget class="QListView" name="localSimbinList"/>
             </item>
            </layout>
           </item>

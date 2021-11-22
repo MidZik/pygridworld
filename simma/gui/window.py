@@ -27,10 +27,7 @@ class Ui_MainWindow(object):
         self.splitter = QSplitter(self.centralwidget)
         self.splitter.setObjectName(u"splitter")
         self.splitter.setOrientation(Qt.Vertical)
-        self.timelineTree = QTreeWidget(self.splitter)
-        __qtreewidgetitem = QTreeWidgetItem()
-        __qtreewidgetitem.setText(0, u"1");
-        self.timelineTree.setHeaderItem(__qtreewidgetitem)
+        self.timelineTree = QTreeView(self.splitter)
         self.timelineTree.setObjectName(u"timelineTree")
         self.timelineTree.setHeaderHidden(True)
         self.splitter.addWidget(self.timelineTree)
@@ -243,7 +240,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addWidget(self.addLocalSimbinButton)
 
-        self.localSimbinList = QListWidget(self.binaryRegistryTab)
+        self.localSimbinList = QListView(self.binaryRegistryTab)
         self.localSimbinList.setObjectName(u"localSimbinList")
 
         self.verticalLayout_6.addWidget(self.localSimbinList)
@@ -391,7 +388,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
