@@ -125,9 +125,10 @@ class ProjectApp(QtCore.QObject):
         ui.setupUi(self._main_window)
         self._ui = ui
 
-
+        # models
         self.timelines_model = QtGui.QStandardItemModel(0, 1)
         self.local_simbins_model = QtGui.QStandardItemModel(0, 1)
+        self.points_model = QtGui.QStandardItemModel(0, 1)
 
         self._local_simbins = {}
 
@@ -141,12 +142,12 @@ class ProjectApp(QtCore.QObject):
 
         ui.timelineTree.setModel(self.timelines_model)
         ui.localSimbinList.setModel(self.local_simbins_model)
+        ui.timelinePointList.setModel(self.points_model)
 
-
+        # signals
         # Navigation
         ui.timelineTree.selectionModel().selectionChanged.connect(self._on_timeline_tree_selection_changed)
         ui.timelineTree.expanded.connect(self._on_timeline_tree_expanded)
-        ui.timelinePointList.itemSelectionChanged.connect(self._on_timeline_point_list_selected_item_changed)
 
         # processes tab
         ui.startSimulatorButton.clicked.connect(self._start_simulator)
@@ -196,17 +197,6 @@ class ProjectApp(QtCore.QObject):
                     item.setData(simbin)
                     self.local_simbins_model.appendRow(item)
 
-    def _make_timeline_item(self, timeline_details: TimelineDetails):
-        if timeline_details.timeline_id in self._timeline_tree_widget_map:
-            raise ValueError('Timeline already has an item associated with it.')
-
-        parent_item = self._timeline_tree_widget_map[timeline_details.parent_id]
-        result_item = QtWidgets.QTreeWidgetItem(parent_item)
-        result_item.setText(0, f"[{timeline_details.head_tick}] {timeline_details.timeline_id}")
-        result_item.setData(0, _UserRole, timeline_details)
-        self._timeline_tree_widget_map[timeline_details.timeline_id] = result_item
-        return result_item
-
     def get_selected_timeline_details(self) -> Optional[TimelineDetails]:
         selection_model = self._ui.timelineTree.selectionModel()
         if selection_model.hasSelection():
@@ -226,7 +216,11 @@ class ProjectApp(QtCore.QObject):
 
         selected_timeline_details = self.get_selected_timeline_details()
         if selected_timeline_details is not None:
-            ui.timelinePointList.addItems(self._client.get_timeline_ticks(selected_timeline_details.timeline_id))
+            self.points_model.clear()
+            self.points_model.appendRow(
+                [QtGui.QStandardItem(tick) for tick in
+                 self._client.get_timeline_ticks(selected_timeline_details.timeline_id)]
+            )
 
     def _on_timeline_tree_expanded(self, index):
         item = self.timelines_model.itemFromIndex(index)
@@ -239,9 +233,6 @@ class ProjectApp(QtCore.QObject):
             child_item.setText(0, f"[{child_detail.head_tick}] {child_detail.timeline_id}")
             child_item.setData(0, _UserRole, child_detail)
             self._timeline_tree_item_map[child_detail.timeline_id] = item
-
-    def _on_timeline_point_list_selected_item_changed(self):
-        pass
 
     def _start_simulator(self):
         pass

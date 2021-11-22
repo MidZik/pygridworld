@@ -31,7 +31,7 @@ class Ui_MainWindow(object):
         self.timelineTree.setObjectName(u"timelineTree")
         self.timelineTree.setHeaderHidden(True)
         self.splitter.addWidget(self.timelineTree)
-        self.timelinePointList = QListWidget(self.splitter)
+        self.timelinePointList = QListView(self.splitter)
         self.timelinePointList.setObjectName(u"timelinePointList")
         self.splitter.addWidget(self.timelinePointList)
 
