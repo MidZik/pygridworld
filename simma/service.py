@@ -295,13 +295,13 @@ class ProjectService:
         temp_path = self._project.get_temp_path()
         try:
             if source_path is None:
-                await process.create_default(str(temp_path), 'bin', str(target_binary.binary_path))
+                await process.create_default(str(temp_path), 'bin', str(target_binary.get_binary_path()))
             else:
                 if source_binary.binary_id == target_binary.binary_id:
                     await asyncio.to_thread(shutil.copy2, source_path, temp_path)
                 else:
-                    await process.simple_convert(str(source_path), 'bin', str(source_binary.binary_path),
-                                                 str(temp_path), 'bin', str(target_binary.binary_path))
+                    await process.simple_convert(str(source_path), 'bin', str(source_binary.get_binary_path()),
+                                                 str(temp_path), 'bin', str(target_binary.get_binary_path()))
             return temp_path
         except BaseException:
             temp_path.unlink(missing_ok=True)

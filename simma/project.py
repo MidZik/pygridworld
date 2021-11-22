@@ -8,7 +8,7 @@ import shutil
 from typing import Optional
 from uuid import uuid4, UUID
 
-from .binary import LocalSimbin
+from .binary import LocalSimbin, PackedSimbin
 
 
 def _user_data_path():
@@ -22,7 +22,10 @@ class BinaryInfo:
     creation_time: datetime
     description_head: str
 
-    binary_path: Path
+    packed_simbin: PackedSimbin
+
+    def get_binary_path(self):
+        return self.packed_simbin.get_binary_path()
 
 
 @dataclass
@@ -37,16 +40,6 @@ class TimelineInfo:
 
 
 class Project:
-    class BinaryDir:
-        def __init__(self, root: Path):
-            self.root = root
-
-        def src(self):
-            return self.root / 'src'
-
-        def bin(self):
-            return self.root / 'bin'
-
     def __init__(self, path: Path):
         self._path = path.resolve()
 
@@ -91,9 +84,6 @@ class Project:
 
     def _temp_data_path(self):
         return self._path / 'temp'
-
-    def _bin_dir(self, binary_id: UUID):
-        return Project.BinaryDir(self._binary_data_path(binary_id))
 
     def _db_path(self):
         return self._path / 'project.db'
@@ -182,31 +172,24 @@ class Project:
         local_simbin = await LocalSimbin.load(simbin_path)
 
         binary_id = uuid4()
-        binary_dir = self._bin_dir(binary_id)
-        binary_dir.root.mkdir(exist_ok=False)
-        binary_dir.src().mkdir()
-        binary_dir.bin().mkdir()
+        packed_simbin_path = self._binary_data_path(binary_id)
 
         try:
-            await local_simbin.copy_binary_files(binary_dir.bin())
-            await local_simbin.create_archive(binary_dir.src() / 'code.tar.gz')
+            packed_simbin = await PackedSimbin.create_from_local_simbin(packed_simbin_path, local_simbin)
 
-            name = local_simbin.name
-            binary_file_name = local_simbin.get_binary_path().name
             creation_time = datetime.utcnow()
-            binary_path = (binary_dir.src() / binary_file_name).resolve(True)
 
             async with self._db_connect() as db:
                 await db.execute('INSERT INTO binary VALUES (?,?,?,?,?)',
                                  (str(binary_id),
-                                  name,
-                                  binary_file_name,
+                                  packed_simbin.name,
+                                  packed_simbin.binary_name,
                                   str(creation_time),
                                   ""))
                 await db.commit()
-            return BinaryInfo(binary_id, name, creation_time, "", binary_path)
+            return BinaryInfo(binary_id, packed_simbin.name, creation_time, "", packed_simbin)
         except BaseException:
-            await asyncio.to_thread(shutil.rmtree, binary_dir.root)
+            await asyncio.to_thread(shutil.rmtree, packed_simbin_path)
             raise
 
     async def get_binary_info(self, binary_id: UUID):
@@ -219,9 +202,9 @@ class Project:
                 (str(binary_id),)
             )
             name, filename, creation_timestamp, description_head = await cursor.fetchone()
-            binary_path = (self._bin_dir(binary_id).src() / filename).resolve(True)
+            packed_binary = await PackedSimbin.load_dir(self._binary_data_path(binary_id))
             creation_time = datetime.fromisoformat(creation_timestamp)
-            return BinaryInfo(binary_id, name, creation_time, description_head, binary_path)
+            return BinaryInfo(binary_id, name, creation_time, description_head, packed_binary)
 
     async def get_binary_description(self, binary_id: UUID):
         async with self._db_connect() as db:
