@@ -1,9 +1,11 @@
-import grpc
-
-import simma.simma_pb2 as pb2
-import simma.simma_pb2_grpc as pb2_grpc
 from collections import namedtuple
+import grpc
 from queue import Queue
+import shutil
+import tempfile
+
+from . import simma_pb2 as pb2, simma_pb2_grpc as pb2_grpc
+from .binary import PackedSimbin
 
 
 Event = namedtuple('Event', 'name, json')
@@ -289,3 +291,16 @@ class Client:
                                head_tick=response.head_tick,
                                creation_timestamp=response.creation_timestamp,
                                tags=tuple(response.tags))
+
+    def upload_packed_simbin(self, packed_simbin: PackedSimbin):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            archive_name = shutil.make_archive(f"{temp_dir}\\packed_simbin", "zip", str(packed_simbin.path), '.')
+
+            def reader():
+                with open(archive_name, 'rb') as archive:
+                    while len(data := archive.read(1_000_000)) > 0:
+                        yield pb2.UploadPackedSimbinRequest(data=data)
+                    yield pb2.UploadPackedSimbinRequest()
+
+            response = self._stub.UploadPackedSimbin(reader())
+        return response.binary_id

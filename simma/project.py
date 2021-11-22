@@ -176,9 +176,30 @@ class Project:
 
         try:
             packed_simbin = await PackedSimbin.create_from_local_simbin(packed_simbin_path, local_simbin)
-
             creation_time = datetime.utcnow()
+            async with self._db_connect() as db:
+                await db.execute('INSERT INTO binary VALUES (?,?,?,?,?)',
+                                 (str(binary_id),
+                                  packed_simbin.name,
+                                  packed_simbin.binary_name,
+                                  str(creation_time),
+                                  ""))
+                await db.commit()
+            return BinaryInfo(binary_id, packed_simbin.name, creation_time, "", packed_simbin)
+        except BaseException:
+            await asyncio.to_thread(shutil.rmtree, packed_simbin_path)
+            raise
 
+    async def add_binary_from_packed_simbin(self, external_packed_simbin: PackedSimbin, move=False):
+        binary_id = uuid4()
+        packed_simbin_path = self._binary_data_path(binary_id)
+        try:
+            if move is True:
+                external_packed_simbin.path.rename(packed_simbin_path)
+            else:
+                await asyncio.to_thread(shutil.copytree, external_packed_simbin.path, packed_simbin_path)
+            packed_simbin = await PackedSimbin.load_dir(packed_simbin_path)
+            creation_time = datetime.utcnow()
             async with self._db_connect() as db:
                 await db.execute('INSERT INTO binary VALUES (?,?,?,?,?)',
                                  (str(binary_id),

@@ -8,8 +8,9 @@ from secrets import token_urlsafe
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
-from .simulation import process
+from .binary import PackedSimbin
 from .project import Project, BinaryInfo
+from .simulation import process
 
 
 RunningContextT = TypeVar('RunningContextT', bound='RunningContext')
@@ -272,6 +273,9 @@ class ProjectService:
 
     async def add_local_binary(self, simbin_path: Path):
         return await self._project.add_binary(simbin_path)
+
+    async def add_binary_from_packed_simbin(self, packed_simbin: PackedSimbin, move=False):
+        return await self._project.add_binary_from_packed_simbin(packed_simbin, move=move)
 
     async def get_binary(self, binary_id: UUID):
         return await self._project.get_binary_info(binary_id)

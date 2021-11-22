@@ -66,10 +66,10 @@ class SimmaStub(object):
                 request_serializer=simma_dot_simma__pb2.GetTimelineDetailsRequest.SerializeToString,
                 response_deserializer=simma_dot_simma__pb2.GetTimelineDetailsResponse.FromString,
                 )
-        self.UploadBinary = channel.stream_unary(
-                '/simma.Simma/UploadBinary',
-                request_serializer=simma_dot_simma__pb2.UploadBinaryRequest.SerializeToString,
-                response_deserializer=simma_dot_simma__pb2.UploadBinaryResponse.FromString,
+        self.UploadPackedSimbin = channel.stream_unary(
+                '/simma.Simma/UploadPackedSimbin',
+                request_serializer=simma_dot_simma__pb2.UploadPackedSimbinRequest.SerializeToString,
+                response_deserializer=simma_dot_simma__pb2.UploadPackedSimbinResponse.FromString,
                 )
 
 
@@ -138,7 +138,7 @@ class SimmaServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def UploadBinary(self, request_iterator, context):
+    def UploadPackedSimbin(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -197,10 +197,10 @@ def add_SimmaServicer_to_server(servicer, server):
                     request_deserializer=simma_dot_simma__pb2.GetTimelineDetailsRequest.FromString,
                     response_serializer=simma_dot_simma__pb2.GetTimelineDetailsResponse.SerializeToString,
             ),
-            'UploadBinary': grpc.stream_unary_rpc_method_handler(
-                    servicer.UploadBinary,
-                    request_deserializer=simma_dot_simma__pb2.UploadBinaryRequest.FromString,
-                    response_serializer=simma_dot_simma__pb2.UploadBinaryResponse.SerializeToString,
+            'UploadPackedSimbin': grpc.stream_unary_rpc_method_handler(
+                    servicer.UploadPackedSimbin,
+                    request_deserializer=simma_dot_simma__pb2.UploadPackedSimbinRequest.FromString,
+                    response_serializer=simma_dot_simma__pb2.UploadPackedSimbinResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -385,7 +385,7 @@ class Simma(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def UploadBinary(request_iterator,
+    def UploadPackedSimbin(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -395,8 +395,8 @@ class Simma(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/simma.Simma/UploadBinary',
-            simma_dot_simma__pb2.UploadBinaryRequest.SerializeToString,
-            simma_dot_simma__pb2.UploadBinaryResponse.FromString,
+        return grpc.experimental.stream_unary(request_iterator, target, '/simma.Simma/UploadPackedSimbin',
+            simma_dot_simma__pb2.UploadPackedSimbinRequest.SerializeToString,
+            simma_dot_simma__pb2.UploadPackedSimbinResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
