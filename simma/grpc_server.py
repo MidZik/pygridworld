@@ -1,5 +1,6 @@
 import asyncio
 import grpc
+import logging
 from typing import AsyncIterable
 from uuid import UUID
 
@@ -8,12 +9,16 @@ import simma.simma_pb2 as pb2
 import simma.simma_pb2_grpc as pb2_grpc
 
 
+_logger = logging.getLogger(__name__)
+
+
 class Service(pb2_grpc.SimmaServicer):
     def __init__(self, project_service: ProjectService):
         self._service = project_service
     
     async def GetTimelines(self, request: pb2.TimelinesRequest, context):
-        filter_parent_ids = (UUID(item) for item in request.filter_parent_ids)
+        _logger.debug(request)
+        filter_parent_ids = (UUID(item) if item else None for item in request.filter_parent_ids)
         require_tags = {tag for tag in request.require_tags}
         disallow_tags = {tag for tag in request.disallow_tags}
 
@@ -21,6 +26,7 @@ class Service(pb2_grpc.SimmaServicer):
 
         response = pb2.TimelinesResponse()
         response.timeline_ids[:] = [info.timeline_id for info in found_timelines]
+        _logger.debug(response)
         return response
 
     async def GetTimelineTicks(self, request: pb2.TimelineTicksRequest, context):
@@ -250,13 +256,21 @@ async def serve():
         server = make_server(project_service)
         print(f"Starting server with project {project_path}")
         await server.start()
-        try:
-            await server.wait_for_termination()
-        finally:
-            print("Server terminating...")
+
+        async def graceful_shutdown():
+            _logger.info("Server shutting down gracefully...")
             await server.stop(5)
-            print("Server terminated")
+            _logger.info("Graceful server shutdown complete.")
 
+        _cleanup_coroutines.append(graceful_shutdown())
+        await server.wait_for_termination()
 
+_cleanup_coroutines = []
 if __name__ == "__main__":
-    asyncio.run(serve())
+    logging.basicConfig(level=logging.DEBUG)
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(serve())
+    finally:
+        loop.run_until_complete(*_cleanup_coroutines)
+        loop.close()

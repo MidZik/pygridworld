@@ -9,7 +9,7 @@ from queue import Queue
 Event = namedtuple('Event', 'name, json')
 RpcError = grpc.RpcError
 StatusCode = grpc.StatusCode
-TimelineDetails = namedtuple('TimelineDetails', 'binary_id, parent_id, head_tick, creation_timestamp, tags')
+TimelineDetails = namedtuple('TimelineDetails', 'timeline_id, binary_id, parent_id, head_tick, creation_timestamp, tags')
 
 
 class SimulatorContext:
@@ -79,8 +79,11 @@ class SimulatorContext:
         response = self._send_command(pb2.TimelineSimulatorRequest.MoveToTick(tick=tick))
         return self._extract_response(response)
 
+    def disconnect(self):
+        self._send_command(None)
 
-class _CreatorContext:
+
+class CreatorContext:
     request_command_map = {
         pb2.TimelineCreatorRequest.StartNew: 'start_new',
         pb2.TimelineCreatorRequest.StartExisting: 'start_existing',
@@ -100,7 +103,7 @@ class _CreatorContext:
     @staticmethod
     def _make_request(command):
         command_class = type(command)
-        kwargs = {_CreatorContext.request_command_map[command_class]: command}
+        kwargs = {CreatorContext.request_command_map[command_class]: command}
         return pb2.TimelineSimulatorRequest(**kwargs)
 
     @staticmethod
@@ -148,8 +151,11 @@ class _CreatorContext:
         response = self._send_command(pb2.TimelineCreatorResponse.SaveToNewTimeline())
         return self._extract_response(response)
 
+    def disconnect(self):
+        self._send_command(None)
 
-class NewCreatorContext(_CreatorContext):
+
+class NewCreatorContext(CreatorContext):
     def __init__(self, stub: pb2_grpc.SimmaStub, binary_id, initial_timeline_id, tick):
         super().__init__(stub)
         success, response = self._start_new_creator(binary_id, initial_timeline_id, tick)
@@ -166,7 +172,7 @@ class NewCreatorContext(_CreatorContext):
         return self._extract_response(response)
 
 
-class ExistingCreatorContext(_CreatorContext):
+class ExistingCreatorContext(CreatorContext):
     def __init__(self, stub: pb2_grpc.SimmaStub, creator_id):
         super().__init__(stub)
         success, response = self._start_existing_creator(creator_id)
@@ -201,14 +207,14 @@ class Client:
 
     def get_timelines(self, *, filter_parents=(), require_tags=(), disallow_tags=()):
         request = pb2.TimelinesRequest()
-        request.filter_parent_ids[:] = filter_parents
+        request.filter_parent_ids[:] = (str(parent) if parent else "" for parent in filter_parents)
         request.require_tags[:] = require_tags
         request.disallow_tags[:] = disallow_tags
 
         response = self._stub.GetTimelines(request)
         return list(response.timeline_ids)
 
-    def get_timeline_ticks(self, timeline_id):
+    def get_timeline_ticks(self, timeline_id) -> list[int]:
         response = self._stub.GetTimelineTicks(pb2.TimelineTicksRequest(timeline_id=timeline_id))
         return list(response.tick_list.ticks)
 
@@ -273,11 +279,12 @@ class Client:
         request = pb2.DeleteTimelineRequest(timeline_id=timeline_id)
         self._stub.DeleteTimeline(request)
 
-    def get_timeline_details(self, timeline_id: list[int]):
+    def get_timeline_details(self, timeline_id: str):
         request = pb2.GetTimelineDetailsRequest(timeline_id=timeline_id)
         response = self._stub.GetTimelineDetails(request)
 
-        return TimelineDetails(binary_id=response.binary_id,
+        return TimelineDetails(timeline_id=timeline_id,
+                               binary_id=response.binary_id,
                                parent_id=response.parent_id,
                                head_tick=response.head_tick,
                                creation_timestamp=response.creation_timestamp,
