@@ -472,7 +472,9 @@ class ProjectService:
             async with creator.running() as running_context:
                 yield creator_id, running_context
         finally:
-            pass
+            container.user_count -= 1
+            if container.user_count == 0:
+                del self._timeline_creators[creator_id]
 
     @asynccontextmanager
     async def existing_timeline_creator(self, creator_id: UUID):
