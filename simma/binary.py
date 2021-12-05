@@ -50,12 +50,15 @@ class LocalSimbin(BinaryProvider):
         if destination.exists():
             raise FileExistsError(f'Cannot create archive at destination {destination}: already exists.')
         if self.archive_method == 'git-archive-working':
+            read, write = os.pipe()
             git = await asyncio.create_subprocess_exec('git', 'ls-files', '-o', '-c', '--exclude-standard',
                                                        cwd=self.path.parent,
-                                                       stdout=subprocess.PIPE)
+                                                       stdout=write)
+            os.close(write)
             tar = await asyncio.create_subprocess_exec('tar', 'T', '-', '-czf', str(destination),
                                                        cwd=self.path.parent,
-                                                       stdin=git.stdout)
+                                                       stdin=read)
+            os.close(read)
             if await git.wait():
                 raise RuntimeError("git encountered an error.")
             if await tar.wait():
