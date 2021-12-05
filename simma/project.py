@@ -275,6 +275,8 @@ class Project:
                 (str(binary_id),)
             )
             await db.commit()
+        binary_dir_path = self._binary_data_path(binary_id)
+        await asyncio.to_thread(shutil.rmtree, binary_dir_path, ignore_errors=True)
 
     async def create_timeline(self,
                               temp_head_path: Path,
