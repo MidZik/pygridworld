@@ -1,10 +1,11 @@
 import asyncio
 import functools
 import grpc
+import inspect
 import logging
 from pathlib import Path
 from tempfile import TemporaryFile, TemporaryDirectory
-from typing import AsyncIterable
+from typing import AsyncIterable, AsyncGenerator
 from uuid import UUID
 import zipfile
 
@@ -17,13 +18,27 @@ _logger = logging.getLogger(__name__)
 
 
 def _server_method_logger(f):
-    @functools.wraps(f)
-    async def wrapper(*args, **kwargs):
-        _logger.debug(args)
-        _logger.debug(kwargs)
-        result = await f(*args, **kwargs)
-        _logger.debug(result)
-        return result
+    if inspect.iscoroutinefunction(f):
+        print(f"Wrapping {f.__name__} as coroutinefunction")
+        @functools.wraps(f)
+        async def wrapper(*args, **kwargs):
+            _logger.debug(args[1:])
+            _logger.debug(kwargs)
+            result = await f(*args, **kwargs)
+            _logger.debug(result)
+            return result
+    elif inspect.isasyncgenfunction(f):
+        print(f"Wrapping {f.__name__} as asyncgenfunction")
+        @functools.wraps(f)
+        async def wrapper(*args, **kwargs):
+            _logger.debug(args[1:])
+            _logger.debug(kwargs)
+            async for result in f(*args, **kwargs):
+                _logger.debug(result)
+                yield result
+    else:
+        raise ValueError("Function is not a coroutinefunction or asyncgenfunction")
+
     return wrapper
 
 
@@ -268,14 +283,25 @@ class Service(pb2_grpc.SimmaServicer):
 
     @_server_method_logger
     async def GetBinaryDetails(self, request, context):
-        _logger.debug(request)
-        binary_id = UUID(request.binary_id)
+        """Returns all binary details if no binary_id is specified, otherwise returns 0 or 1 binary detail,
+        depending on if the binary_id exists"""
+        if not request.binary_id:
+            all_details = self._service.get_all_binaries()
 
-        details = await self._service.get_binary(binary_id)
+            async for details in all_details:
+                yield pb2.GetBinaryDetailsResponse(binary_id=str(details.binary_id),
+                                                   name=details.name,
+                                                   creation_timestamp=str(details.creation_time),
+                                                   description_head=details.description_head)
+        else:
+            binary_id = UUID(request.binary_id)
 
-        return pb2.GetBinaryDetailsResponse(name=details.name,
-                                            creation_timestamp=str(details.creation_time),
-                                            description_head=details.description_head)
+            details = await self._service.get_binary(binary_id)
+
+            yield pb2.GetBinaryDetailsResponse(binary_id=str(details.binary_id),
+                                               name=details.name,
+                                               creation_timestamp=str(details.creation_time),
+                                               description_head=details.description_head)
 
     @_server_method_logger
     async def GetBinaryDescription(self, request, context):
@@ -293,6 +319,12 @@ class Service(pb2_grpc.SimmaServicer):
         await self._service.set_binary_description(binary_id, description)
 
         return pb2.SetBinaryDescriptionResponse()
+
+    @_server_method_logger
+    async def DeleteBinary(self, request, context):
+        binary_id = UUID(request.binary_id)
+        await self._service.delete_binary(binary_id)
+        return pb2.DeleteBinaryResponse()
 
 
 def make_server(project_service: ProjectService, address='[::]:4969'):

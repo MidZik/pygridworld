@@ -280,6 +280,9 @@ class ProjectService:
     async def get_binary(self, binary_id: UUID):
         return await self._project.get_binary_info(binary_id)
 
+    def get_all_binaries(self):
+        return self._project.get_all_binary_infos()
+
     async def get_binary_description(self, binary_id: UUID):
         return await self._project.get_binary_description(binary_id)
 
@@ -297,15 +300,17 @@ class ProjectService:
                                           source_binary: BinaryInfo,
                                           target_binary: BinaryInfo):
         temp_path = self._project.get_temp_path()
+        source_packed_simbin = await source_binary.get_packed_simbin() if source_binary else None
+        target_packed_simbin = await target_binary.get_packed_simbin() if target_binary else None
         try:
             if source_path is None:
-                await process.create_default(str(temp_path), 'bin', str(target_binary.get_binary_path()))
+                await process.create_default(str(temp_path), 'bin', str(target_packed_simbin.get_binary_path()))
             else:
                 if source_binary.binary_id == target_binary.binary_id:
                     await asyncio.to_thread(shutil.copy2, source_path, temp_path)
                 else:
-                    await process.simple_convert(str(source_path), 'bin', str(source_binary.get_binary_path()),
-                                                 str(temp_path), 'bin', str(target_binary.get_binary_path()))
+                    await process.simple_convert(str(source_path), 'bin', str(source_packed_simbin.get_binary_path()),
+                                                 str(temp_path), 'bin', str(target_packed_simbin.get_binary_path()))
             return temp_path
         except BaseException:
             temp_path.unlink(missing_ok=True)

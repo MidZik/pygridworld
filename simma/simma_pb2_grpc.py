@@ -71,7 +71,7 @@ class SimmaStub(object):
                 request_serializer=simma_dot_simma__pb2.UploadPackedSimbinRequest.SerializeToString,
                 response_deserializer=simma_dot_simma__pb2.UploadPackedSimbinResponse.FromString,
                 )
-        self.GetBinaryDetails = channel.unary_unary(
+        self.GetBinaryDetails = channel.unary_stream(
                 '/simma.Simma/GetBinaryDetails',
                 request_serializer=simma_dot_simma__pb2.GetBinaryDetailsRequest.SerializeToString,
                 response_deserializer=simma_dot_simma__pb2.GetBinaryDetailsResponse.FromString,
@@ -85,6 +85,11 @@ class SimmaStub(object):
                 '/simma.Simma/SetBinaryDescription',
                 request_serializer=simma_dot_simma__pb2.SetBinaryDescriptionRequest.SerializeToString,
                 response_deserializer=simma_dot_simma__pb2.SetBinaryDescriptionResponse.FromString,
+                )
+        self.DeleteBinary = channel.unary_unary(
+                '/simma.Simma/DeleteBinary',
+                request_serializer=simma_dot_simma__pb2.DeleteBinaryRequest.SerializeToString,
+                response_deserializer=simma_dot_simma__pb2.DeleteBinaryResponse.FromString,
                 )
 
 
@@ -177,6 +182,12 @@ class SimmaServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteBinary(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SimmaServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -235,7 +246,7 @@ def add_SimmaServicer_to_server(servicer, server):
                     request_deserializer=simma_dot_simma__pb2.UploadPackedSimbinRequest.FromString,
                     response_serializer=simma_dot_simma__pb2.UploadPackedSimbinResponse.SerializeToString,
             ),
-            'GetBinaryDetails': grpc.unary_unary_rpc_method_handler(
+            'GetBinaryDetails': grpc.unary_stream_rpc_method_handler(
                     servicer.GetBinaryDetails,
                     request_deserializer=simma_dot_simma__pb2.GetBinaryDetailsRequest.FromString,
                     response_serializer=simma_dot_simma__pb2.GetBinaryDetailsResponse.SerializeToString,
@@ -249,6 +260,11 @@ def add_SimmaServicer_to_server(servicer, server):
                     servicer.SetBinaryDescription,
                     request_deserializer=simma_dot_simma__pb2.SetBinaryDescriptionRequest.FromString,
                     response_serializer=simma_dot_simma__pb2.SetBinaryDescriptionResponse.SerializeToString,
+            ),
+            'DeleteBinary': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteBinary,
+                    request_deserializer=simma_dot_simma__pb2.DeleteBinaryRequest.FromString,
+                    response_serializer=simma_dot_simma__pb2.DeleteBinaryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -460,7 +476,7 @@ class Simma(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma.Simma/GetBinaryDetails',
+        return grpc.experimental.unary_stream(request, target, '/simma.Simma/GetBinaryDetails',
             simma_dot_simma__pb2.GetBinaryDetailsRequest.SerializeToString,
             simma_dot_simma__pb2.GetBinaryDetailsResponse.FromString,
             options, channel_credentials,
@@ -497,5 +513,22 @@ class Simma(object):
         return grpc.experimental.unary_unary(request, target, '/simma.Simma/SetBinaryDescription',
             simma_dot_simma__pb2.SetBinaryDescriptionRequest.SerializeToString,
             simma_dot_simma__pb2.SetBinaryDescriptionResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteBinary(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/simma.Simma/DeleteBinary',
+            simma_dot_simma__pb2.DeleteBinaryRequest.SerializeToString,
+            simma_dot_simma__pb2.DeleteBinaryResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -22,10 +22,10 @@ class BinaryInfo:
     creation_time: datetime
     description_head: str
 
-    packed_simbin: PackedSimbin
+    packed_simbin_dir: Path
 
-    def get_binary_path(self):
-        return self.packed_simbin.get_binary_path()
+    async def get_packed_simbin(self):
+        return PackedSimbin.load_dir(self.packed_simbin_dir)
 
 
 @dataclass
@@ -214,18 +214,31 @@ class Project:
             raise
 
     async def get_binary_info(self, binary_id: UUID):
-        """Returns (name, creation_timestamp, description_head).
-        Description_head is the first 100 characters of the description. To get the full description use
-        `get_binary_description`."""
+        """Returns a BinaryInfo object if the given binary exists. Otherwise returns None."""
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT name, filename, creation_timestamp, substr(description, 0, 100) FROM binary WHERE id = ?',
                 (str(binary_id),)
             )
-            name, filename, creation_timestamp, description_head = await cursor.fetchone()
-            packed_binary = await PackedSimbin.load_dir(self._binary_data_path(binary_id))
-            creation_time = datetime.fromisoformat(creation_timestamp)
-            return BinaryInfo(binary_id, name, creation_time, description_head, packed_binary)
+            result = await cursor.fetchone()
+            if result is None:
+                return None
+            else:
+                name, filename, creation_timestamp, description_head = result
+                creation_time = datetime.fromisoformat(creation_timestamp)
+                return BinaryInfo(binary_id, name, creation_time, description_head, self._binary_data_path(binary_id))
+
+    async def get_all_binary_infos(self):
+        """Yields a BinaryInfo object for every binary in the database."""
+        async with self._db_connect() as db:
+            cursor: aiosqlite.Cursor = await db.execute(
+                'SELECT id, name, filename, creation_timestamp, substr(description, 0, 100) FROM binary'
+            )
+            while (result := await cursor.fetchone()) is not None:
+                binary_id, name, filename, creation_timestamp, description_head = result
+                binary_id = UUID(binary_id)
+                creation_time = datetime.fromisoformat(creation_timestamp)
+                yield BinaryInfo(binary_id, name, creation_time, description_head, self._binary_data_path(binary_id))
 
     async def get_binary_description(self, binary_id: UUID):
         async with self._db_connect() as db:

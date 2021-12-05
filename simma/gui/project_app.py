@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Union, Optional
 
 from simma.gui import window, command_prompt_dock_widget as cmd_widget, process_controls
-from simma.grpc_client import Client as SimmaClient, SimulatorContext, CreatorContext, TimelineDetails
+from simma.grpc_client import Client as SimmaClient, SimulatorContext, CreatorContext, TimelineDetails, BinaryDetails
 from simma.simulation.client import Client as ProcessClient
 from simma.gui.GUI import create_gui_process
 from simma.binary import LocalSimbin, PackedSimbin
@@ -140,6 +140,7 @@ class ProjectApp(QtCore.QObject):
 
         self.refresh_timelines_model()
         self.refresh_local_simbins_model()
+        self.refresh_binaries_model()
 
         ui.timelineTree.setModel(self.timelines_model)
         ui.timelinePointList.setModel(self.points_model)
@@ -199,6 +200,14 @@ class ProjectApp(QtCore.QObject):
                     item.setData(simbin)
                     self.local_simbins_model.appendRow(item)
 
+    def refresh_binaries_model(self):
+        self.binaries_model.clear()
+        binary_details = self._client.get_binary_details()
+        for detail in binary_details:
+            item = QtGui.QStandardItem(f"{detail.name} ({detail.binary_id})")
+            item.setData(detail)
+            self.binaries_model.appendRow(item)
+
     def get_selected_timeline_details(self) -> Optional[TimelineDetails]:
         selection_model = self._ui.timelineTree.selectionModel()
         if selection_model.hasSelection():
@@ -217,8 +226,14 @@ class ProjectApp(QtCore.QObject):
         else:
             return None
 
-    def get_selected_binary_details(self):
-        pass
+    def get_selected_binary_item(self) -> Optional[QtGui.QStandardItem]:
+        selection_model = self._ui.binaryList.selectionModel()
+        if selection_model.hasSelection():
+            index = selection_model.selectedRows()[0]
+            item = self.binaries_model.itemFromIndex(index)
+            return item
+        else:
+            return None
 
     def get_selected_timeline_tick(self):
         items = self._ui.timelinePointList.selectedItems()
@@ -314,7 +329,10 @@ class ProjectApp(QtCore.QObject):
         pass
 
     def _delete_selected_binary(self):
-        pass
+        item = self.get_selected_binary_item()
+        if item is not None:
+            self._client.delete_binary(item.data().binary_id)
+            self.binaries_model.removeRow(item.row())
 
     def run(self):
         self._main_window.show()

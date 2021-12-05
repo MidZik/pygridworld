@@ -306,14 +306,25 @@ class Client:
             response = self._stub.UploadPackedSimbin(reader())
         return response.binary_id
 
-    def get_binary_details(self, binary_id: str):
+    def get_binary_details(self, binary_id: str = None):
         request = pb2.GetBinaryDetailsRequest(binary_id=binary_id)
-        response = self._stub.GetBinaryDetails(request)
+        responses = self._stub.GetBinaryDetails(request)
 
-        return BinaryDetails(binary_id=binary_id,
-                             name=response.name,
-                             creation_timestamp=response.creation_timestamp,
-                             description_head=response.description_head)
+        if not binary_id:
+            return (BinaryDetails(binary_id=response.binary_id,
+                                  name=response.name,
+                                  creation_timestamp=response.creation_timestamp,
+                                  description_head=response.description_head)
+                    for response in responses)
+        else:
+            response = next(responses, None)
+            if response:
+                return BinaryDetails(binary_id=response.binary_id,
+                                     name=response.name,
+                                     creation_timestamp=response.creation_timestamp,
+                                     description_head=response.description_head)
+            else:
+                return None
 
     def get_binary_description(self, binary_id: str):
         request = pb2.GetBinaryDescriptionRequest(binary_id=binary_id)
@@ -324,3 +335,7 @@ class Client:
     def set_binary_description(self, binary_id: str, description: str):
         request = pb2.SetBinaryDescriptionRequest(binary_id=binary_id, description=description)
         self._stub.SetBinaryDescription(request)
+
+    def delete_binary(self, binary_id: str):
+        request = pb2.DeleteBinaryRequest(binary_id=binary_id)
+        self._stub.DeleteBinary(request)
