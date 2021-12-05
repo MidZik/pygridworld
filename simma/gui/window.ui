@@ -479,21 +479,21 @@
         <item>
          <layout class="QHBoxLayout" name="registeredSimsLayout" stretch="0,1">
           <item>
-           <widget class="QListWidget" name="registeredSimList"/>
+           <widget class="QListView" name="binaryList"/>
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_14">
               <item>
-               <widget class="QPushButton" name="saveRegisteredSimDescButton">
+               <widget class="QPushButton" name="saveBinaryDescButton">
                 <property name="text">
                  <string>Save</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="discardRegisteredSimDescButton">
+               <widget class="QPushButton" name="discardBinaryDescButton">
                 <property name="text">
                  <string>Discard</string>
                 </property>
@@ -513,7 +513,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="unregisterSimButton">
+               <widget class="QPushButton" name="deleteBinaryButton">
                 <property name="palette">
                  <palette>
                   <active>
@@ -552,7 +552,7 @@
                  </palette>
                 </property>
                 <property name="text">
-                 <string>Unregister</string>
+                 <string>Delete Binary</string>
                 </property>
                </widget>
               </item>
@@ -566,7 +566,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="registeredSimDescriptionTextEdit"/>
+             <widget class="QPlainTextEdit" name="bianryDescriptionTextEdit"/>
             </item>
             <item>
              <widget class="QLabel" name="label_4">
@@ -576,7 +576,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="registeredSimMetadataTextEdit">
+             <widget class="QPlainTextEdit" name="binaryMetadataTextEdit">
               <property name="readOnly">
                <bool>true</bool>
               </property>

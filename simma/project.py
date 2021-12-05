@@ -194,7 +194,7 @@ class Project:
         binary_id = uuid4()
         packed_simbin_path = self._binary_data_path(binary_id)
         try:
-            if move is True:
+            if move is True and external_packed_simbin.path.drive == packed_simbin_path.drive:
                 external_packed_simbin.path.rename(packed_simbin_path)
             else:
                 await asyncio.to_thread(shutil.copytree, external_packed_simbin.path, packed_simbin_path)

@@ -16,6 +16,9 @@ service Simma {
     rpc DeleteTimeline (DeleteTimelineRequest) returns (DeleteTimelineResponse) {}
     rpc GetTimelineDetails (GetTimelineDetailsRequest) returns (GetTimelineDetailsResponse) {}
     rpc UploadPackedSimbin (stream UploadPackedSimbinRequest) returns (UploadPackedSimbinResponse) {}
+    rpc GetBinaryDetails (GetBinaryDetailsRequest) returns (GetBinaryDetailsResponse) {}
+    rpc GetBinaryDescription (GetBinaryDescriptionRequest) returns (GetBinaryDescriptionResponse) {}
+    rpc SetBinaryDescription (SetBinaryDescriptionRequest) returns (SetBinaryDescriptionResponse) {}
 }
 
 message TickList {
@@ -226,4 +229,30 @@ message UploadPackedSimbinRequest {
 
 message UploadPackedSimbinResponse {
     string binary_id = 1;
+}
+
+message GetBinaryDetailsRequest {
+    string binary_id = 1;
+}
+
+message GetBinaryDetailsResponse {
+    string name = 1;
+    string creation_timestamp =  2;
+    string description_head = 3;
+}
+
+message GetBinaryDescriptionRequest {
+    string binary_id = 1;
+}
+
+message GetBinaryDescriptionResponse {
+    string description = 1;
+}
+
+message SetBinaryDescriptionRequest {
+    string binary_id = 1;
+    string description = 2;
+}
+
+message SetBinaryDescriptionResponse {
 }

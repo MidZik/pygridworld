@@ -12,6 +12,7 @@ Event = namedtuple('Event', 'name, json')
 RpcError = grpc.RpcError
 StatusCode = grpc.StatusCode
 TimelineDetails = namedtuple('TimelineDetails', 'timeline_id, binary_id, parent_id, head_tick, creation_timestamp, tags')
+BinaryDetails = namedtuple('BinaryDetails', 'binary_id, name, creation_timestamp, description_head')
 
 
 class SimulatorContext:
@@ -304,3 +305,22 @@ class Client:
 
             response = self._stub.UploadPackedSimbin(reader())
         return response.binary_id
+
+    def get_binary_details(self, binary_id: str):
+        request = pb2.GetBinaryDetailsRequest(binary_id=binary_id)
+        response = self._stub.GetBinaryDetails(request)
+
+        return BinaryDetails(binary_id=binary_id,
+                             name=response.name,
+                             creation_timestamp=response.creation_timestamp,
+                             description_head=response.description_head)
+
+    def get_binary_description(self, binary_id: str):
+        request = pb2.GetBinaryDescriptionRequest(binary_id=binary_id)
+        response = self._stub.GetBinaryDescription(request)
+
+        return response.description
+
+    def set_binary_description(self, binary_id: str, description: str):
+        request = pb2.SetBinaryDescriptionRequest(binary_id=binary_id, description=description)
+        self._stub.SetBinaryDescription(request)

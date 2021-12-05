@@ -308,38 +308,38 @@ class Ui_MainWindow(object):
 
         self.registeredSimsLayout = QHBoxLayout()
         self.registeredSimsLayout.setObjectName(u"registeredSimsLayout")
-        self.registeredSimList = QListWidget(self.binaryRegistryTab)
-        self.registeredSimList.setObjectName(u"registeredSimList")
+        self.binaryList = QListView(self.binaryRegistryTab)
+        self.binaryList.setObjectName(u"binaryList")
 
-        self.registeredSimsLayout.addWidget(self.registeredSimList)
+        self.registeredSimsLayout.addWidget(self.binaryList)
 
         self.verticalLayout_9 = QVBoxLayout()
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
         self.horizontalLayout_14 = QHBoxLayout()
         self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
-        self.saveRegisteredSimDescButton = QPushButton(self.binaryRegistryTab)
-        self.saveRegisteredSimDescButton.setObjectName(u"saveRegisteredSimDescButton")
+        self.saveBinaryDescButton = QPushButton(self.binaryRegistryTab)
+        self.saveBinaryDescButton.setObjectName(u"saveBinaryDescButton")
 
-        self.horizontalLayout_14.addWidget(self.saveRegisteredSimDescButton)
+        self.horizontalLayout_14.addWidget(self.saveBinaryDescButton)
 
-        self.discardRegisteredSimDescButton = QPushButton(self.binaryRegistryTab)
-        self.discardRegisteredSimDescButton.setObjectName(u"discardRegisteredSimDescButton")
+        self.discardBinaryDescButton = QPushButton(self.binaryRegistryTab)
+        self.discardBinaryDescButton.setObjectName(u"discardBinaryDescButton")
 
-        self.horizontalLayout_14.addWidget(self.discardRegisteredSimDescButton)
+        self.horizontalLayout_14.addWidget(self.discardBinaryDescButton)
 
         self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_14.addItem(self.horizontalSpacer_5)
 
-        self.unregisterSimButton = QPushButton(self.binaryRegistryTab)
-        self.unregisterSimButton.setObjectName(u"unregisterSimButton")
+        self.deleteBinaryButton = QPushButton(self.binaryRegistryTab)
+        self.deleteBinaryButton.setObjectName(u"deleteBinaryButton")
         palette3 = QPalette()
         palette3.setBrush(QPalette.Active, QPalette.ButtonText, brush)
         palette3.setBrush(QPalette.Inactive, QPalette.ButtonText, brush)
         palette3.setBrush(QPalette.Disabled, QPalette.ButtonText, brush1)
-        self.unregisterSimButton.setPalette(palette3)
+        self.deleteBinaryButton.setPalette(palette3)
 
-        self.horizontalLayout_14.addWidget(self.unregisterSimButton)
+        self.horizontalLayout_14.addWidget(self.deleteBinaryButton)
 
 
         self.verticalLayout_9.addLayout(self.horizontalLayout_14)
@@ -349,22 +349,22 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_9.addWidget(self.label_3)
 
-        self.registeredSimDescriptionTextEdit = QPlainTextEdit(self.binaryRegistryTab)
-        self.registeredSimDescriptionTextEdit.setObjectName(u"registeredSimDescriptionTextEdit")
+        self.bianryDescriptionTextEdit = QPlainTextEdit(self.binaryRegistryTab)
+        self.bianryDescriptionTextEdit.setObjectName(u"bianryDescriptionTextEdit")
 
-        self.verticalLayout_9.addWidget(self.registeredSimDescriptionTextEdit)
+        self.verticalLayout_9.addWidget(self.bianryDescriptionTextEdit)
 
         self.label_4 = QLabel(self.binaryRegistryTab)
         self.label_4.setObjectName(u"label_4")
 
         self.verticalLayout_9.addWidget(self.label_4)
 
-        self.registeredSimMetadataTextEdit = QPlainTextEdit(self.binaryRegistryTab)
-        self.registeredSimMetadataTextEdit.setObjectName(u"registeredSimMetadataTextEdit")
-        self.registeredSimMetadataTextEdit.setReadOnly(True)
-        self.registeredSimMetadataTextEdit.setBackgroundVisible(False)
+        self.binaryMetadataTextEdit = QPlainTextEdit(self.binaryRegistryTab)
+        self.binaryMetadataTextEdit.setObjectName(u"binaryMetadataTextEdit")
+        self.binaryMetadataTextEdit.setReadOnly(True)
+        self.binaryMetadataTextEdit.setBackgroundVisible(False)
 
-        self.verticalLayout_9.addWidget(self.registeredSimMetadataTextEdit)
+        self.verticalLayout_9.addWidget(self.binaryMetadataTextEdit)
 
 
         self.registeredSimsLayout.addLayout(self.verticalLayout_9)
@@ -418,12 +418,12 @@ class Ui_MainWindow(object):
         self.uploadBinaryFromSimbinButton.setText(QCoreApplication.translate("MainWindow", u"Upload New Binary from Simbin", None))
         self.removeSimSourceButton.setText(QCoreApplication.translate("MainWindow", u"Remove Source", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Source File Path:", None))
-        self.saveRegisteredSimDescButton.setText(QCoreApplication.translate("MainWindow", u"Save", None))
-        self.discardRegisteredSimDescButton.setText(QCoreApplication.translate("MainWindow", u"Discard", None))
-        self.unregisterSimButton.setText(QCoreApplication.translate("MainWindow", u"Unregister", None))
+        self.saveBinaryDescButton.setText(QCoreApplication.translate("MainWindow", u"Save", None))
+        self.discardBinaryDescButton.setText(QCoreApplication.translate("MainWindow", u"Discard", None))
+        self.deleteBinaryButton.setText(QCoreApplication.translate("MainWindow", u"Delete Binary", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Description:", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Metadata:", None))
-        self.registeredSimMetadataTextEdit.setPlainText("")
+        self.binaryMetadataTextEdit.setPlainText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.binaryRegistryTab), QCoreApplication.translate("MainWindow", u"Simulation Registry", None))
     # retranslateUi
 

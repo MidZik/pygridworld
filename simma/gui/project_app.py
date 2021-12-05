@@ -2,6 +2,8 @@
 @author: Matt Idzik (MidZik)
 """
 import asyncio
+import tempfile
+
 import appdirs
 import argparse
 from collections import defaultdict, deque
@@ -12,7 +14,7 @@ from simma.gui import window, command_prompt_dock_widget as cmd_widget, process_
 from simma.grpc_client import Client as SimmaClient, SimulatorContext, CreatorContext, TimelineDetails
 from simma.simulation.client import Client as ProcessClient
 from simma.gui.GUI import create_gui_process
-from simma.binary import LocalSimbin
+from simma.binary import LocalSimbin, PackedSimbin
 from PySide2 import QtCore, QtWidgets, QtGui
 
 
@@ -127,10 +129,9 @@ class ProjectApp(QtCore.QObject):
 
         # models
         self.timelines_model = QtGui.QStandardItemModel(0, 1)
-        self.local_simbins_model = QtGui.QStandardItemModel(0, 1)
         self.points_model = QtGui.QStandardItemModel(0, 1)
-
-        self._local_simbins = {}
+        self.local_simbins_model = QtGui.QStandardItemModel(0, 1)
+        self.binaries_model = QtGui.QStandardItemModel(0, 1)
 
         _user_data_path().mkdir(exist_ok=True)
         simbin_paths_file = Path(_user_data_path() / 'simbins.txt')
@@ -141,8 +142,9 @@ class ProjectApp(QtCore.QObject):
         self.refresh_local_simbins_model()
 
         ui.timelineTree.setModel(self.timelines_model)
-        ui.localSimbinList.setModel(self.local_simbins_model)
         ui.timelinePointList.setModel(self.points_model)
+        ui.localSimbinList.setModel(self.local_simbins_model)
+        ui.binaryList.setModel(self.binaries_model)
 
         # signals
         # Navigation
@@ -167,11 +169,11 @@ class ProjectApp(QtCore.QObject):
         ui.uploadBinaryFromSimbinButton.clicked.connect(self._upload_binary)
         ui.removeSimSourceButton.clicked.connect(self._delete_selected_sim_source)
 
-        ui.registeredSimList.itemSelectionChanged.connect(self._on_selected_registered_sim_changed)
+        ui.binaryList.selectionModel().selectionChanged.connect(self._on_binary_selection_changed)
 
-        ui.saveRegisteredSimDescButton.clicked.connect(self._save_registered_sim_description)
-        ui.discardRegisteredSimDescButton.clicked.connect(self._discard_registered_sim_description)
-        ui.unregisterSimButton.clicked.connect(self._unregister_selected_sim_registration)
+        ui.saveBinaryDescButton.clicked.connect(self._save_binary_description)
+        ui.discardBinaryDescButton.clicked.connect(self._discard_binary_description)
+        ui.deleteBinaryButton.clicked.connect(self._delete_selected_binary)
 
     def refresh_timelines_model(self):
         self.timelines_model.clear()
@@ -182,7 +184,7 @@ class ProjectApp(QtCore.QObject):
         parent_item = self.timelines_model.invisibleRootItem()
         for detail in timeline_details:
             item = QtGui.QStandardItem(f"[{detail.head_tick}] {detail.timeline_id}")
-            item.setData(_UserRole, detail)
+            item.setData(detail)
             parent_item.appendRow(item)
 
     def refresh_local_simbins_model(self):
@@ -206,6 +208,18 @@ class ProjectApp(QtCore.QObject):
         else:
             return None
 
+    def get_selected_local_simbin(self) -> Optional[LocalSimbin]:
+        selection_model = self._ui.localSimbinList.selectionModel()
+        if selection_model.hasSelection():
+            index = selection_model.selectedRows()[0]
+            item = self.local_simbins_model.itemFromIndex(index)
+            return item.data()
+        else:
+            return None
+
+    def get_selected_binary_details(self):
+        pass
+
     def get_selected_timeline_tick(self):
         items = self._ui.timelinePointList.selectedItems()
         return items[0].text() if items else None
@@ -224,15 +238,14 @@ class ProjectApp(QtCore.QObject):
 
     def _on_timeline_tree_expanded(self, index):
         item = self.timelines_model.itemFromIndex(index)
-        detail = item.getData(0, _UserRole)
-        item.takeChildren()
+        detail = item.data()
+        item.removeRows(0, item.rowCount())
         child_timelines = self._client.get_timelines(filter_parents=(detail.timeline_id,))
         child_details = [self._client.get_timeline_details(timeline_id) for timeline_id in child_timelines]
         for child_detail in child_details:
-            child_item = QtWidgets.QTreeWidgetItem(item)
-            child_item.setText(0, f"[{child_detail.head_tick}] {child_detail.timeline_id}")
-            child_item.setData(0, _UserRole, child_detail)
-            self._timeline_tree_item_map[child_detail.timeline_id] = item
+            child_item = QtGui.QStandardItem(f"[{detail.head_tick}] {detail.timeline_id}")
+            child_item.setData(child_detail)
+            item.appendRow(child_item)
 
     def _start_simulator(self):
         pass
@@ -260,36 +273,47 @@ class ProjectApp(QtCore.QObject):
         if not local_simbin_path:
             return
 
-        if local_simbin_path in self._local_simbins:
+        existing_items = self.local_simbins_model.findItems(local_simbin_path, QtCore.Qt.MatchContains)
+        if existing_items:
             return
 
         simbin = asyncio.run(LocalSimbin.load(Path(local_simbin_path)))
         with (_user_data_path() / 'simbins.txt').open('a') as f:
             f.write(local_simbin_path)
-        self._local_simbins[local_simbin_path] = simbin
-
-        item = QtWidgets.QListWidgetItem(local_simbin_path)
-        self._ui.localSimbinList.addItem(item)
+        item = QtGui.QStandardItem(f"{simbin.name} [{local_simbin_path}]")
+        item.setData(simbin)
+        self.local_simbins_model.appendRow(item)
 
     def _on_local_simbin_list_selection_changed(self, index):
         pass
 
     def _upload_binary(self):
-        pass
+        selected_local_simbin = self.get_selected_local_simbin()
+        if selected_local_simbin is None:
+            return
+        print("uploading...")
+        with tempfile.TemporaryDirectory() as temp_packed_simbin_dir:
+            packed_simbin = asyncio.run(
+                PackedSimbin.create_from_local_simbin(Path(temp_packed_simbin_dir), selected_local_simbin))
+            binary_id = self._client.upload_packed_simbin(packed_simbin)
+        binary_details = self._client.get_binary_details(binary_id)
+        item = QtGui.QStandardItem(f"{binary_details.name} [{binary_id}]")
+        item.setData(binary_details)
+        self.binaries_model.appendRow(item)
 
     def _delete_selected_sim_source(self):
         pass
 
-    def _on_selected_registered_sim_changed(self):
+    def _on_binary_selection_changed(self):
         pass
 
-    def _save_registered_sim_description(self):
+    def _save_binary_description(self):
         pass
 
-    def _discard_registered_sim_description(self):
+    def _discard_binary_description(self):
         pass
 
-    def _unregister_selected_sim_registration(self):
+    def _delete_selected_binary(self):
         pass
 
     def run(self):

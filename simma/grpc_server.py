@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import grpc
 import logging
 from pathlib import Path
@@ -15,12 +16,23 @@ from .service import ProjectService, Project
 _logger = logging.getLogger(__name__)
 
 
+def _server_method_logger(f):
+    @functools.wraps(f)
+    async def wrapper(*args, **kwargs):
+        _logger.debug(args)
+        _logger.debug(kwargs)
+        result = await f(*args, **kwargs)
+        _logger.debug(result)
+        return result
+    return wrapper
+
+
 class Service(pb2_grpc.SimmaServicer):
     def __init__(self, project_service: ProjectService):
         self._service = project_service
-    
+
+    @_server_method_logger
     async def GetTimelines(self, request: pb2.TimelinesRequest, context):
-        _logger.debug(request)
         filter_parent_ids = (UUID(item) if item else None for item in request.filter_parent_ids)
         require_tags = {tag for tag in request.require_tags}
         disallow_tags = {tag for tag in request.disallow_tags}
@@ -29,9 +41,9 @@ class Service(pb2_grpc.SimmaServicer):
 
         response = pb2.TimelinesResponse()
         response.timeline_ids[:] = [info.timeline_id for info in found_timelines]
-        _logger.debug(response)
         return response
 
+    @_server_method_logger
     async def GetTimelineTicks(self, request: pb2.TimelineTicksRequest, context):
         timeline_id = UUID(request.timeline_id)
 
@@ -41,6 +53,7 @@ class Service(pb2_grpc.SimmaServicer):
         response.tick_list.ticks[:] = (tick for tick, _ in points)
         return response
 
+    @_server_method_logger
     async def GetTimelineData(self, request: pb2.TimelineDataRequest, context):
         timeline_id = UUID(request.timeline_id)
         tick_option = request.WhichOneof('tick_option')
@@ -66,6 +79,7 @@ class Service(pb2_grpc.SimmaServicer):
                 data = await asyncio.to_thread(point_path.read_bytes)
                 yield pb2.TimelineDataResponse(tick=tick, data=data)
 
+    @_server_method_logger
     async def GetTimelineJson(self, request: pb2.TimelineJsonRequest, context):
         timeline_id = UUID(request.timeline_id)
         tick_option = request.WhichOneof('tick_option')
@@ -92,6 +106,7 @@ class Service(pb2_grpc.SimmaServicer):
                     json = await json_generator.asend(str(point_path))
                     yield pb2.TimelineJsonResponse(tick=tick, json=json)
 
+    @_server_method_logger
     async def GetTimelineEvents(self, request: pb2.TimelineEventsRequest, context):
         timeline_id = UUID(request.timeline_id)
         start_tick = request.tick_range.start_tick
@@ -116,6 +131,7 @@ class Service(pb2_grpc.SimmaServicer):
         if cur_response is not None:
             yield cur_response
 
+    @_server_method_logger
     async def TimelineSimulator(self, request_iterable: AsyncIterable[pb2.TimelineSimulatorRequest], context):
         iterator = aiter(request_iterable)
         first_request = await anext(iterator)
@@ -146,6 +162,7 @@ class Service(pb2_grpc.SimmaServicer):
                     yield pb2.TimelineSimulatorResponse(
                         error=pb2.TimelineSimulatorResponse.Error(message="Unexpected simulator request message."))
 
+    @_server_method_logger
     async def TimelineCreator(self, request_iterable: AsyncIterable[pb2.TimelineCreatorRequest], context):
         iterator = aiter(request_iterable)
         first_request = await anext(iterator)
@@ -202,6 +219,7 @@ class Service(pb2_grpc.SimmaServicer):
                     yield pb2.TimelineCreatorResponse(
                         error=pb2.TimelineCreatorResponse.Error(message="Unexpected creator request message."))
 
+    @_server_method_logger
     async def ModifyTimelineTags(self, request: pb2.ModifyTimelineTagsRequest, context):
         timeline_id = UUID(request.timeline_id)
         tags_to_add = set(request.tags_to_add)
@@ -211,6 +229,7 @@ class Service(pb2_grpc.SimmaServicer):
 
         return pb2.ModifyTimelineTagsResponse()
 
+    @_server_method_logger
     async def DeleteTimeline(self, request: pb2.DeleteTimelineRequest, context):
         timeline_id = UUID(request.timeline_id)
 
@@ -218,6 +237,7 @@ class Service(pb2_grpc.SimmaServicer):
 
         return pb2.DeleteTimelineResponse()
 
+    @_server_method_logger
     async def GetTimelineDetails(self, request: pb2.GetTimelineDetailsRequest, context):
         timeline_id = UUID(request.timeline_id)
 
@@ -230,7 +250,8 @@ class Service(pb2_grpc.SimmaServicer):
                                               creation_timestamp=str(timeline_info.creation_time),
                                               tags=timeline_tags)
 
-    async def UploadBinary(self, request_iterator, context):
+    @_server_method_logger
+    async def UploadPackedSimbin(self, request_iterator, context):
         with TemporaryFile() as temp_file, TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
             async for request in request_iterator:
@@ -242,8 +263,36 @@ class Service(pb2_grpc.SimmaServicer):
             zip_file = zipfile.ZipFile(temp_file)
             await asyncio.to_thread(zip_file.extractall, temp_dir)
             packed_simbin = await PackedSimbin.load_dir(temp_dir)
-            binary_id = await self._service.add_binary_from_packed_simbin(packed_simbin, move=True)
-            return pb2.UploadPackedSimbinResponse(binary_id=str(binary_id))
+            binary_info = await self._service.add_binary_from_packed_simbin(packed_simbin, move=True)
+            return pb2.UploadPackedSimbinResponse(binary_id=str(binary_info.binary_id))
+
+    @_server_method_logger
+    async def GetBinaryDetails(self, request, context):
+        _logger.debug(request)
+        binary_id = UUID(request.binary_id)
+
+        details = await self._service.get_binary(binary_id)
+
+        return pb2.GetBinaryDetailsResponse(name=details.name,
+                                            creation_timestamp=str(details.creation_time),
+                                            description_head=details.description_head)
+
+    @_server_method_logger
+    async def GetBinaryDescription(self, request, context):
+        binary_id = UUID(request.binary_id)
+
+        description = await self._service.get_binary_description(binary_id)
+
+        return pb2.GetBinaryDescriptionResponse(description=description)
+
+    @_server_method_logger
+    async def SetBinaryDescription(self, request, context):
+        binary_id = UUID(request.binary_id)
+        description = request.description
+
+        await self._service.set_binary_description(binary_id, description)
+
+        return pb2.SetBinaryDescriptionResponse()
 
 
 def make_server(project_service: ProjectService, address='[::]:4969'):

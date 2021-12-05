@@ -71,6 +71,21 @@ class SimmaStub(object):
                 request_serializer=simma_dot_simma__pb2.UploadPackedSimbinRequest.SerializeToString,
                 response_deserializer=simma_dot_simma__pb2.UploadPackedSimbinResponse.FromString,
                 )
+        self.GetBinaryDetails = channel.unary_unary(
+                '/simma.Simma/GetBinaryDetails',
+                request_serializer=simma_dot_simma__pb2.GetBinaryDetailsRequest.SerializeToString,
+                response_deserializer=simma_dot_simma__pb2.GetBinaryDetailsResponse.FromString,
+                )
+        self.GetBinaryDescription = channel.unary_unary(
+                '/simma.Simma/GetBinaryDescription',
+                request_serializer=simma_dot_simma__pb2.GetBinaryDescriptionRequest.SerializeToString,
+                response_deserializer=simma_dot_simma__pb2.GetBinaryDescriptionResponse.FromString,
+                )
+        self.SetBinaryDescription = channel.unary_unary(
+                '/simma.Simma/SetBinaryDescription',
+                request_serializer=simma_dot_simma__pb2.SetBinaryDescriptionRequest.SerializeToString,
+                response_deserializer=simma_dot_simma__pb2.SetBinaryDescriptionResponse.FromString,
+                )
 
 
 class SimmaServicer(object):
@@ -144,6 +159,24 @@ class SimmaServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetBinaryDetails(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetBinaryDescription(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SetBinaryDescription(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SimmaServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -201,6 +234,21 @@ def add_SimmaServicer_to_server(servicer, server):
                     servicer.UploadPackedSimbin,
                     request_deserializer=simma_dot_simma__pb2.UploadPackedSimbinRequest.FromString,
                     response_serializer=simma_dot_simma__pb2.UploadPackedSimbinResponse.SerializeToString,
+            ),
+            'GetBinaryDetails': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetBinaryDetails,
+                    request_deserializer=simma_dot_simma__pb2.GetBinaryDetailsRequest.FromString,
+                    response_serializer=simma_dot_simma__pb2.GetBinaryDetailsResponse.SerializeToString,
+            ),
+            'GetBinaryDescription': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetBinaryDescription,
+                    request_deserializer=simma_dot_simma__pb2.GetBinaryDescriptionRequest.FromString,
+                    response_serializer=simma_dot_simma__pb2.GetBinaryDescriptionResponse.SerializeToString,
+            ),
+            'SetBinaryDescription': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetBinaryDescription,
+                    request_deserializer=simma_dot_simma__pb2.SetBinaryDescriptionRequest.FromString,
+                    response_serializer=simma_dot_simma__pb2.SetBinaryDescriptionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -398,5 +446,56 @@ class Simma(object):
         return grpc.experimental.stream_unary(request_iterator, target, '/simma.Simma/UploadPackedSimbin',
             simma_dot_simma__pb2.UploadPackedSimbinRequest.SerializeToString,
             simma_dot_simma__pb2.UploadPackedSimbinResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetBinaryDetails(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/simma.Simma/GetBinaryDetails',
+            simma_dot_simma__pb2.GetBinaryDetailsRequest.SerializeToString,
+            simma_dot_simma__pb2.GetBinaryDetailsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetBinaryDescription(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/simma.Simma/GetBinaryDescription',
+            simma_dot_simma__pb2.GetBinaryDescriptionRequest.SerializeToString,
+            simma_dot_simma__pb2.GetBinaryDescriptionResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SetBinaryDescription(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/simma.Simma/SetBinaryDescription',
+            simma_dot_simma__pb2.SetBinaryDescriptionRequest.SerializeToString,
+            simma_dot_simma__pb2.SetBinaryDescriptionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
