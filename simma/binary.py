@@ -1,12 +1,13 @@
+from abc import ABC, abstractmethod
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
 import json
-from typing import Optional
-from abc import ABC, abstractmethod
+import os
+from pathlib import Path
 import shutil
-import asyncio
 import subprocess
+from typing import Optional
 
 from . import _utils
 
@@ -94,7 +95,10 @@ class PackedSimbin(BinaryProvider):
 
     @staticmethod
     async def create_from_local_simbin(path: Path, local_simbin: LocalSimbin):
-        path.mkdir(exist_ok=False)
+        path.mkdir(exist_ok=True)
+        if path.is_dir():
+            if next(path.iterdir(), None) is not None:
+                raise FileExistsError("Cannot create PackedSimbin in non-empty directory.")
         src_archive = path / PackedSimbin.archive_file_name
         bin_dir = path / 'bin'
         bin_dir.mkdir()
