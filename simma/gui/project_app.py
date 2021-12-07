@@ -208,30 +208,35 @@ class ProjectApp(QtCore.QObject):
             item.setData(detail)
             self.binaries_model.appendRow(item)
 
-    def get_selected_timeline_details(self) -> Optional[TimelineDetails]:
+    def get_selected_timeline_item(self) -> Optional[QtGui.QStandardItem]:
         selection_model = self._ui.timelineTree.selectionModel()
         if selection_model.hasSelection():
             index = selection_model.selectedRows()[0]
-            item = self.timelines_model.itemFromIndex(index)
-            return item.data()
+            return self.timelines_model.itemFromIndex(index)
+        else:
+            return None
+
+    def get_selected_timeline_details(self) -> Optional[TimelineDetails]:
+        item = self.get_selected_timeline_item()
+        return item.data() if item else None
+
+    def get_selected_local_simbin_item(self) -> Optional[QtGui.QStandardItem]:
+        selection_model = self._ui.localSimbinList.selectionModel()
+        if selection_model.hasSelection():
+            index = selection_model.selectedRows()[0]
+            return self.local_simbins_model.itemFromIndex(index)
         else:
             return None
 
     def get_selected_local_simbin(self) -> Optional[LocalSimbin]:
-        selection_model = self._ui.localSimbinList.selectionModel()
-        if selection_model.hasSelection():
-            index = selection_model.selectedRows()[0]
-            item = self.local_simbins_model.itemFromIndex(index)
-            return item.data()
-        else:
-            return None
+        item = self.get_selected_local_simbin_item()
+        return item.data() if item else None
 
     def get_selected_binary_item(self) -> Optional[QtGui.QStandardItem]:
         selection_model = self._ui.binaryList.selectionModel()
         if selection_model.hasSelection():
             index = selection_model.selectedRows()[0]
-            item = self.binaries_model.itemFromIndex(index)
-            return item
+            return self.binaries_model.itemFromIndex(index)
         else:
             return None
 
