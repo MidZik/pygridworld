@@ -247,7 +247,9 @@ class Project:
                 (str(binary_id),)
             )
             description = await cursor.fetchone()
-            return description
+            if description is None:
+                raise LookupError("No binary with the given binary id was found.")
+            return description[0]
 
     async def set_binary_description(self, binary_id: UUID, description: str):
         if len(description) > 20000:
