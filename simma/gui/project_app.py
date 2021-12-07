@@ -235,6 +235,10 @@ class ProjectApp(QtCore.QObject):
         else:
             return None
 
+    def get_selected_binary_details(self) -> Optional[BinaryDetails]:
+        item = self.get_selected_binary_item()
+        return item.data() if item else None
+
     def get_selected_timeline_tick(self):
         items = self._ui.timelinePointList.selectedItems()
         return items[0].text() if items else None
@@ -319,14 +323,27 @@ class ProjectApp(QtCore.QObject):
     def _delete_selected_sim_source(self):
         pass
 
-    def _on_binary_selection_changed(self):
-        pass
+    def _on_binary_selection_changed(self, index):
+        binary_details = self.get_selected_binary_details()
+        ui = self._ui
+        if binary_details is None:
+            ui.binaryDescriptionTextEdit.setPlainText("")
+        else:
+            desc = self._client.get_binary_description(binary_details.binary_id)
+            ui.binaryDescriptionTextEdit.setPlainText(desc)
 
     def _save_binary_description(self):
-        pass
+        binary_details = self.get_selected_binary_details()
+        ui = self._ui
+        if binary_details is not None:
+            self._client.set_binary_description(binary_details.binary_id, ui.binaryDescriptionTextEdit.toPlainText())
 
     def _discard_binary_description(self):
-        pass
+        binary_details = self.get_selected_binary_details()
+        ui = self._ui
+        if binary_details is not None:
+            desc = self._client.get_binary_description(binary_details.binary_id)
+            ui.binaryDescriptionTextEdit.setPlainText(desc)
 
     def _delete_selected_binary(self):
         item = self.get_selected_binary_item()
