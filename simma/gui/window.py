@@ -349,10 +349,10 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_9.addWidget(self.label_3)
 
-        self.bianryDescriptionTextEdit = QPlainTextEdit(self.binaryRegistryTab)
-        self.bianryDescriptionTextEdit.setObjectName(u"bianryDescriptionTextEdit")
+        self.binaryDescriptionTextEdit = QPlainTextEdit(self.binaryRegistryTab)
+        self.binaryDescriptionTextEdit.setObjectName(u"binaryDescriptionTextEdit")
 
-        self.verticalLayout_9.addWidget(self.bianryDescriptionTextEdit)
+        self.verticalLayout_9.addWidget(self.binaryDescriptionTextEdit)
 
         self.label_4 = QLabel(self.binaryRegistryTab)
         self.label_4.setObjectName(u"label_4")

@@ -566,7 +566,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="bianryDescriptionTextEdit"/>
+             <widget class="QPlainTextEdit" name="binaryDescriptionTextEdit"/>
             </item>
             <item>
              <widget class="QLabel" name="label_4">
