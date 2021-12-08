@@ -31,7 +31,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="processTab">
        <attribute name="title">
@@ -144,16 +144,22 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QPushButton" name="createCreatorAtSelection">
+           <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Create Timeline Creator at Selection</string>
+             <string>Timeline Binary:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="createSimulatorAtSelection">
+           <widget class="QLabel" name="timelineBinaryLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
-             <string>Create Timeline Simulator at Selection</string>
+             <string>&lt;current binary&gt;</string>
             </property>
            </widget>
           </item>
@@ -211,30 +217,6 @@
             </property>
             <property name="text">
              <string>Delete Selected Timeline</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,1">
-          <item>
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Timeline Binary:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="timelineBinaryLabel">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>&lt;current binary&gt;</string>
             </property>
            </widget>
           </item>

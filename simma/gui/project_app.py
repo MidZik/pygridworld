@@ -144,6 +144,9 @@ class ProjectApp(QtCore.QObject):
 
         ui.timelineTree.setModel(self.timelines_model)
         ui.timelinePointList.setModel(self.points_model)
+
+        ui.startCreatorBinaryComboBox.setModel(self.binaries_model)
+
         ui.localSimbinList.setModel(self.local_simbins_model)
         ui.binaryList.setModel(self.binaries_model)
 
@@ -153,12 +156,10 @@ class ProjectApp(QtCore.QObject):
         ui.timelineTree.expanded.connect(self._on_timeline_tree_expanded)
 
         # processes tab
-        ui.startSimulatorButton.clicked.connect(self._start_simulator)
-        ui.startCreatorButton.clicked.connect(self._start_creator)
+        ui.startSimulatorButton.clicked.connect(self._create_simulator_at_selection)
+        ui.startCreatorButton.clicked.connect(self._create_creator_at_selection)
 
         # Timeline Tab
-        ui.createCreatorAtSelection.clicked.connect(self._create_creator_at_selection)
-        ui.createSimulatorAtSelection.clicked.connect(self._create_simulator_at_selection)
         ui.deleteSelectedTimelineButton.clicked.connect(self._delete_selected_timeline)
         ui.newTagButton.clicked.connect(self._add_new_tag_to_selected_timeline)
         ui.deleteTagsButton.clicked.connect(self._delete_tags_from_selected_timeline)
@@ -270,12 +271,6 @@ class ProjectApp(QtCore.QObject):
             child_item = QtGui.QStandardItem(f"[{detail.head_tick}] {detail.timeline_id}")
             child_item.setData(child_detail)
             item.appendRow(child_item)
-
-    def _start_simulator(self):
-        pass
-
-    def _start_creator(self):
-        pass
 
     def _create_creator_at_selection(self):
         pass

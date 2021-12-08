@@ -117,15 +117,19 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.createCreatorAtSelection = QPushButton(self.timelineTab)
-        self.createCreatorAtSelection.setObjectName(u"createCreatorAtSelection")
+        self.label_7 = QLabel(self.timelineTab)
+        self.label_7.setObjectName(u"label_7")
 
-        self.horizontalLayout_4.addWidget(self.createCreatorAtSelection)
+        self.horizontalLayout_4.addWidget(self.label_7)
 
-        self.createSimulatorAtSelection = QPushButton(self.timelineTab)
-        self.createSimulatorAtSelection.setObjectName(u"createSimulatorAtSelection")
+        self.timelineBinaryLabel = QLabel(self.timelineTab)
+        self.timelineBinaryLabel.setObjectName(u"timelineBinaryLabel")
+        font = QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.timelineBinaryLabel.setFont(font)
 
-        self.horizontalLayout_4.addWidget(self.createSimulatorAtSelection)
+        self.horizontalLayout_4.addWidget(self.timelineBinaryLabel)
 
         self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -147,26 +151,6 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
-
-        self.horizontalLayout_16 = QHBoxLayout()
-        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
-        self.label_7 = QLabel(self.timelineTab)
-        self.label_7.setObjectName(u"label_7")
-
-        self.horizontalLayout_16.addWidget(self.label_7)
-
-        self.timelineBinaryLabel = QLabel(self.timelineTab)
-        self.timelineBinaryLabel.setObjectName(u"timelineBinaryLabel")
-        font = QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.timelineBinaryLabel.setFont(font)
-
-        self.horizontalLayout_16.addWidget(self.timelineBinaryLabel)
-
-        self.horizontalLayout_16.setStretch(1, 1)
-
-        self.verticalLayout.addLayout(self.horizontalLayout_16)
 
         self.horizontalLayout_8 = QHBoxLayout()
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
@@ -388,7 +372,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -404,11 +388,9 @@ class Ui_MainWindow(object):
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"Creator Binary:", None))
         self.currentProcessesGroupBox.setTitle(QCoreApplication.translate("MainWindow", u"Current Processes", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.processTab), QCoreApplication.translate("MainWindow", u"Processes", None))
-        self.createCreatorAtSelection.setText(QCoreApplication.translate("MainWindow", u"Create Timeline Creator at Selection", None))
-        self.createSimulatorAtSelection.setText(QCoreApplication.translate("MainWindow", u"Create Timeline Simulator at Selection", None))
-        self.deleteSelectedTimelineButton.setText(QCoreApplication.translate("MainWindow", u"Delete Selected Timeline", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Timeline Binary:", None))
         self.timelineBinaryLabel.setText(QCoreApplication.translate("MainWindow", u"<current binary>", None))
+        self.deleteSelectedTimelineButton.setText(QCoreApplication.translate("MainWindow", u"Delete Selected Timeline", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"New Tag:", None))
         self.newTagButton.setText(QCoreApplication.translate("MainWindow", u"Add New Tag", None))
         self.deleteTagsButton.setText(QCoreApplication.translate("MainWindow", u"Delete Tags", None))
