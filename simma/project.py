@@ -25,7 +25,7 @@ class BinaryInfo:
     packed_simbin_dir: Path
 
     async def get_packed_simbin(self):
-        return PackedSimbin.load_dir(self.packed_simbin_dir)
+        return await PackedSimbin.load_dir(self.packed_simbin_dir)
 
 
 @dataclass
