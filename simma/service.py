@@ -114,7 +114,8 @@ class TimelineSimulator(ProcessOwner['TimelineSimulatorRunningContext']):
     async def _get_binary_path(self):
         timeline_info = await self.project.get_timeline_info(self.timeline_id)
         binary_info = await self.project.get_binary_info(timeline_info.binary_id)
-        return binary_info.binary_path
+        packed_simbin = await binary_info.get_packed_simbin()
+        return packed_simbin.get_binary_path()
 
     async def _init_process(self, client: process.Client):
         points = await self.project.get_timeline_points(self.timeline_id)
@@ -128,7 +129,10 @@ class TimelineSimulator(ProcessOwner['TimelineSimulatorRunningContext']):
 
 
 class TimelineCreator(ProcessOwner['TimelineCreatorRunningContext']):
-    def __init__(self, project: Project, binary_id: UUID, initial_timeline_id: UUID, tick: int):
+    def __init__(self, project: Project, binary_id: UUID, initial_timeline_id: UUID = None, tick: int = 0):
+        if initial_timeline_id is None and tick != 0:
+            raise ValueError("If no initial timeline is specified, tick must be 0.")
+
         super().__init__()
         self.project = project
         self.binary_id = binary_id
@@ -141,21 +145,23 @@ class TimelineCreator(ProcessOwner['TimelineCreatorRunningContext']):
 
     async def _get_binary_path(self) -> Path:
         binary_info = await self.project.get_binary_info(self.binary_id)
-        return binary_info.binary_path
+        packed_simbin = await binary_info.get_packed_simbin()
+        return packed_simbin.get_binary_path()
 
     async def _init_process(self, client: process.Client):
-        timeline_info = await self.project.get_timeline_info(self.initial_timeline_id)
-        if self.tick == timeline_info.head_tick:
-            self.parent_id = timeline_info.parent_id
-        else:
-            self.parent_id = self.initial_timeline_id
+        if self.initial_timeline_id is not None:
+            timeline_info = await self.project.get_timeline_info(self.initial_timeline_id)
+            if self.tick == timeline_info.head_tick:
+                self.parent_id = timeline_info.parent_id
+            else:
+                self.parent_id = self.initial_timeline_id
 
-        point_path = await self.project.get_timeline_point(self.initial_timeline_id, self.tick)
-        state_binary = await asyncio.to_thread(point_path.read_bytes)
-        async with self.editor_token_context() as etc:
-            etc.set_editor(self.owner_token)
-            await client.set_state_binary(state_binary)
-            etc.set_editor(token_urlsafe(32))
+            point_path = await self.project.get_timeline_point(self.initial_timeline_id, self.tick)
+            state_binary = await asyncio.to_thread(point_path.read_bytes)
+            async with self.editor_token_context() as etc:
+                etc.set_editor(self.owner_token)
+                await client.set_state_binary(state_binary)
+                etc.set_editor(token_urlsafe(32))
 
     def _get_running_context(self, user_token: str):
         return TimelineCreatorRunningContext(self, user_token)
@@ -467,7 +473,7 @@ class ProjectService:
                 del self._timeline_simulators[timeline_id]
 
     @asynccontextmanager
-    async def new_timeline_creator(self, binary_id: UUID, initial_timeline_id: UUID, tick: int):
+    async def new_timeline_creator(self, binary_id: UUID, initial_timeline_id: UUID = None, tick: int = 0):
         creator_id = uuid4()
         container = ProcessContainer(0, TimelineCreator(self._project, binary_id, initial_timeline_id, tick))
         self._timeline_creators[creator_id] = container
