@@ -148,8 +148,8 @@ class Service(pb2_grpc.SimmaServicer):
 
     @_server_method_logger
     async def TimelineSimulator(self, request_iterable: AsyncIterable[pb2.TimelineSimulatorRequest], context):
-        iterator = aiter(request_iterable)
-        first_request = await anext(iterator)
+        iterator = request_iterable.__aiter__()
+        first_request = await iterator.__anext__()
         message = first_request.WhichOneof('message')
         if message != 'start':
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -179,13 +179,16 @@ class Service(pb2_grpc.SimmaServicer):
 
     @_server_method_logger
     async def TimelineCreator(self, request_iterable: AsyncIterable[pb2.TimelineCreatorRequest], context):
-        iterator = aiter(request_iterable)
-        first_request = await anext(iterator)
+        iterator = request_iterable.__aiter__()
+        first_request = await iterator.__anext__()
         message = first_request.WhichOneof('message')
         if message == 'start_new':
             start_new_request = first_request.start_new
             binary_id = UUID(start_new_request.binary_id)
-            initial_timeline_id = UUID(start_new_request.initial_timeline_id)
+            if start_new_request.initial_timeline_id:
+                initial_timeline_id = UUID(start_new_request.initial_timeline_id)
+            else:
+                initial_timeline_id = None
             tick = start_new_request.tick
             context_manager = self._service.new_timeline_creator(binary_id, initial_timeline_id, tick)
         elif message == 'start_existing':
@@ -200,7 +203,7 @@ class Service(pb2_grpc.SimmaServicer):
             if message == 'start_new':
                 creator_id, creator = result
                 start_new_response = pb2.TimelineCreatorResponse.StartNew(
-                    creator_id=creator_id, address=creator.get_process_address(), user_token=creator.user_token)
+                    creator_id=str(creator_id), address=creator.get_process_address(), user_token=creator.user_token)
                 yield pb2.TimelineCreatorResponse(start_new=start_new_response)
             elif message == 'start_existing':
                 creator = result
