@@ -62,7 +62,10 @@ class SimulatorContext:
         self._command_queue.put(command)
         try:
             return next(self._responses)
-        except (StopIteration, grpc.RpcError):
+        except StopIteration:
+            self._responses = None
+            return None
+        except grpc.RpcError:
             self._responses = None
             raise
 
@@ -107,7 +110,7 @@ class CreatorContext:
     def _make_request(command):
         command_class = type(command)
         kwargs = {CreatorContext.request_command_map[command_class]: command}
-        return pb2.TimelineSimulatorRequest(**kwargs)
+        return pb2.TimelineCreatorRequest(**kwargs)
 
     @staticmethod
     def _extract_response(response):
@@ -130,7 +133,10 @@ class CreatorContext:
         self._command_queue.put(command)
         try:
             return next(self._responses)
-        except (StopIteration, grpc.RpcError):
+        except StopIteration:
+            self._responses = None
+            return None
+        except grpc.RpcError:
             self._responses = None
             raise
 
