@@ -120,4 +120,4 @@ class PackedSimbin(BinaryProvider):
         return PackedSimbin(path.resolve(True), name, binary_name)
 
     def get_binary_path(self) -> Path:
-        return self.path / self.binary_name
+        return self.path / 'bin' / self.binary_name
