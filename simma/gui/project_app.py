@@ -57,12 +57,12 @@ class SimCommandPromptValidator(QtGui.QValidator):
 
 
 class ProcessControlsWidget(QtWidgets.QWidget):
-    def __init__(self, parent, process_context: Union[SimulatorContext, CreatorContext]):
-        super().__init__(parent)
-
+    def __init__(self, app: 'ProjectApp', process_context: Union[SimulatorContext, CreatorContext]):
+        super().__init__()
         ui = process_controls.Ui_Form()
         ui.setupUi(self)
         self._ui = ui
+        self._app = app
 
         # Universal controls
         ui.showVisualizerButton.clicked.connect(self._show_visualizer_for_current_timeline)
@@ -107,7 +107,76 @@ class ProcessControlsWidget(QtWidgets.QWidget):
         elif isinstance(process_context, CreatorContext):
             ui.simulatorControlsGroupBox.hide()
 
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
         self.process_client = ProcessClient(process_context.address, process_context.user_token)
+        self.viz = None
+
+    def _show_visualizer_for_current_timeline(self):
+        if self.viz is None or not self.viz.is_alive():
+            self.viz = create_gui_process(self.process_context.address, "")
+            self.viz.start()
+
+    def _disconnect(self):
+        self.deleteLater()
+
+    def _go_to_selected_tick(self):
+        selected_tick = self._app.get_selected_timeline_tick()
+        # TODO
+
+    def _save_to_point(self):
+        pass
+
+    def _start_simulator(self):
+        pass
+
+    def _stop_simulator(self):
+        pass
+
+    def _start_editing(self):
+        pass
+
+    def _stop_editing(self):
+        pass
+
+    def _go_to_selected_timeline(self):
+        pass
+
+    def _save_as_new_timeline(self):
+        pass
+
+    def _create_entity(self):
+        pass
+
+    def _destroy_selected_entity(self):
+        pass
+
+    def _on_selected_entity_changed(self):
+        pass
+
+    def _on_assign_component_triggered(self):
+        pass
+
+    def _remove_selected_component(self):
+        pass
+
+    def _on_selected_component_changed(self):
+        pass
+
+    def _revert_selected_com_state(self):
+        pass
+
+    def _save_selected_com_state(self):
+        pass
+
+    def _on_selected_singleton_changed(self):
+        pass
+
+    def _revert_selected_singleton_state(self):
+        pass
+
+    def _save_selected_singleton_state(self):
+        pass
 
 
 class ProjectApp(QtCore.QObject):
@@ -122,6 +191,8 @@ class ProjectApp(QtCore.QObject):
         self._server_address = cmd_parse.positionalArguments()[0]
 
         self._client = SimmaClient(self._server_address)
+
+        self._visualizations = {}
 
         ui = window.Ui_MainWindow()
         ui.setupUi(self._main_window)
@@ -273,7 +344,23 @@ class ProjectApp(QtCore.QObject):
             item.appendRow(child_item)
 
     def _create_creator_at_selection(self):
-        pass
+        timeline = self.get_selected_timeline_details()
+        binary: BinaryDetails = self._ui.startCreatorBinaryComboBox.currentData(_UserRole + 1)
+        print(timeline)
+        print(binary)
+        if binary is None:
+            return
+        if timeline is None:
+            context = self._client.new_timeline_creator(binary.binary_id, None, 0)
+            widget = ProcessControlsWidget(self._main_window, context)
+            self._visualizations[widget] = context
+
+            def cleanup():
+                print("Cleanup started")
+                context.disconnect()
+                del self._visualizations[widget]
+            widget.destroyed.connect(cleanup)
+            widget.show()
 
     def _create_simulator_at_selection(self):
         pass

@@ -31,9 +31,8 @@ class Client:
     def make_channel(address):
         return grpc.aio.insecure_channel(address)
 
-    def __init__(self, address, token):
-        self._channel = Client.make_channel(address)
-        self.address = address
+    def __init__(self, channel, token):
+        self._channel = channel
         self.token = token
 
     def _create_metadata(self, *items):
