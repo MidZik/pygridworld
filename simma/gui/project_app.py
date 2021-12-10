@@ -12,7 +12,7 @@ from typing import Union, Optional
 
 from simma.gui import window, command_prompt_dock_widget as cmd_widget, process_controls
 from simma.grpc_client import Client as SimmaClient, SimulatorContext, CreatorContext, TimelineDetails, BinaryDetails
-from simma.simulation.client import Client as ProcessClient
+from simma.simulation.client import SyncClient as ProcessSyncClient
 from simma.gui.GUI import create_gui_process
 from simma.binary import LocalSimbin, PackedSimbin
 from PySide2 import QtCore, QtWidgets, QtGui
@@ -109,7 +109,9 @@ class ProcessControlsWidget(QtWidgets.QWidget):
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-        self.process_client = ProcessClient(process_context.address, process_context.user_token)
+        self.process_client = ProcessSyncClient(
+            ProcessSyncClient.make_channel(process_context.address),
+            process_context.user_token)
         self.viz = None
 
     def _show_visualizer_for_current_timeline(self):

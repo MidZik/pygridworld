@@ -4,11 +4,14 @@ Created on Fri May  3 18:24:23 2019
 
 @author: Matt Idzik (MidZik)
 """
-from simma.sim_client import SimulationClient, RpcError
+
+import asyncio
 import json
 from multiprocessing import Process
-from weakref import WeakValueDictionary
 import pyglet
+from weakref import WeakValueDictionary
+
+from ..simulation.client import SyncClient, RpcError
 
 
 def _get_asset_path(asset):
@@ -71,7 +74,7 @@ class WorldWindow(pyglet.window.Window):
 
 
 def window_app(address, token):
-    sim_client = SimulationClient(SimulationClient.make_channel(address), token)
+    sim_client = SyncClient(SyncClient.make_channel(address), token)
 
     window = WorldWindow()
 
@@ -79,7 +82,8 @@ def window_app(address, token):
         try:
             state_json, _ = sim_client.get_state_json()
             state_obj = json.loads(state_json)
-        except RpcError:
+        except RpcError as e:
+            print(e)
             # grpc doesn't provide easy-to-use exceptions so for now just handle all grpc errors cleanly
             window.close()
             return
