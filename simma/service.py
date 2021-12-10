@@ -61,7 +61,7 @@ class ProcessOwner(Generic[RunningContextT]):
                 self.owner_token = token_urlsafe(32)
                 binary_path = await self._get_binary_path()
                 self.process = await process.start_simulation_process(binary_path, self.owner_token)
-                self.client = self.process.make_client()
+                self.client = self.process.make_client(self.owner_token)
                 await self._init_process(self.client)
         running_context = None
         new_user_token = token_urlsafe(32)
@@ -223,7 +223,7 @@ class TimelineCreatorRunningContext(RunningContext[TimelineCreator]):
             async with self.owner.editor_token_context() as etc:
                 # resetting the editor token to a random token ensures that
                 # the simulation cannot run while no editor is assigned.
-                etc.set_editor(token_urlsafe(32))
+                await etc.set_editor(token_urlsafe(32))
                 self.owner.current_editor = None
 
 
