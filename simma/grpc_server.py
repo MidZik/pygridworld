@@ -36,6 +36,7 @@ def _server_method_logger(f):
             async for result in f(*args, **kwargs):
                 _logger.debug(result)
                 yield result
+            _logger.debug(f"{f.__name__} generator complete.")
     else:
         raise ValueError("Function is not a coroutinefunction or asyncgenfunction")
 
@@ -213,7 +214,7 @@ class Service(pb2_grpc.SimmaServicer):
             async for request in iterator:
                 message = request.WhichOneof('message')
                 if message == 'start_editing':
-                    with creator.editor(creator.user_token) as editor:
+                    async with creator.editor(creator.user_token) as editor:
                         yield pb2.TimelineCreatorResponse(start_editing=pb2.TimelineCreatorResponse.StartEditing())
                         async for editor_request in iterator:
                             message = editor_request.WhichOneof('message')
