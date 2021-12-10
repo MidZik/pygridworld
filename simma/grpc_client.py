@@ -7,39 +7,27 @@ import tempfile
 from . import simma_pb2 as pb2, simma_pb2_grpc as pb2_grpc
 from .binary import PackedSimbin
 
-
 Event = namedtuple('Event', 'name, json')
 RpcError = grpc.RpcError
 StatusCode = grpc.StatusCode
-TimelineDetails = namedtuple('TimelineDetails', 'timeline_id, binary_id, parent_id, head_tick, creation_timestamp, tags')
+TimelineDetails = namedtuple('TimelineDetails',
+                             'timeline_id, binary_id, parent_id, head_tick, creation_timestamp, tags')
 BinaryDetails = namedtuple('BinaryDetails', 'binary_id, name, creation_timestamp, description_head')
 
 
-class SimulatorContext:
-    request_command_map = {
-        pb2.TimelineSimulatorRequest.Start: 'start',
-        pb2.TimelineSimulatorRequest.SaveStateToPoint: 'save_state_to_point',
-        pb2.TimelineSimulatorRequest.MoveToTick: 'move_to_tick'
-    }
+class ProcessContext:
+    request_command_map = {}
+    request_type = None
 
-    def __init__(self, stub: pb2_grpc.SimmaStub, timeline_id):
-        self._stub = stub
-
+    def __init__(self, process_method):
         self._command_queue = Queue(maxsize=1)
+        self._responses = process_method(self._request_provider())
 
-        self._responses = self._stub.TimelineSimulator(self._request_provider())
-
-        success, response = self._start_simulator(timeline_id)
-        if not success:
-            raise RuntimeError("Failed to start simulator")
-        self.address = response.address
-        self.user_token = response.user_token
-
-    @staticmethod
-    def _make_request(command):
+    @classmethod
+    def _make_request(cls, command):
         command_class = type(command)
-        kwargs = {SimulatorContext.request_command_map[command_class]: command}
-        return pb2.TimelineSimulatorRequest(**kwargs)
+        kwargs = {cls.request_command_map[command_class]: command}
+        return cls.request_type(**kwargs)
 
     @staticmethod
     def _extract_response(response):
@@ -61,7 +49,11 @@ class SimulatorContext:
 
         self._command_queue.put(command)
         try:
-            return next(self._responses)
+            success, response = self._extract_response(next(self._responses))
+            if not success:
+                raise RuntimeError(f"Command error: {response.message}")
+            else:
+                return response
         except StopIteration:
             self._responses = None
             return None
@@ -73,92 +65,64 @@ class SimulatorContext:
         if self._responses is None:
             raise RuntimeError("Edit context is dead. Create a new context.")
 
-    def _start_simulator(self, timeline_id):
-        response = self._send_command(pb2.TimelineSimulatorRequest.Start(timeline_id=timeline_id))
-        return self._extract_response(response)
 
-    def save_state_to_point(self):
+class SimulatorContext(ProcessContext):
+    request_type = pb2.TimelineSimulatorRequest
+    request_command_map = {
+        request_type.Start: 'start',
+        request_type.SaveStateToPoint: 'save_state_to_point',
+        request_type.MoveToTick: 'move_to_tick'
+    }
+
+    def __init__(self, stub: pb2_grpc.SimmaStub, timeline_id):
+        super().__init__(stub.TimelineSimulator)
+
+        self.address, self.user_token = self._start_simulator(timeline_id)
+
+    def _start_simulator(self, timeline_id) -> tuple[str, str]:
+        """Returns (address, user_token)"""
+        response = self._send_command(pb2.TimelineSimulatorRequest.Start(timeline_id=timeline_id))
+        return response.address, response.user_token
+
+    def save_state_to_point(self) -> str:
+        """Returns the tick of the new point"""
         response = self._send_command(pb2.TimelineSimulatorRequest.SaveStateToPoint())
-        return self._extract_response(response)
+        return response.new_tick
 
     def move_to_tick(self, tick: int):
-        response = self._send_command(pb2.TimelineSimulatorRequest.MoveToTick(tick=tick))
-        return self._extract_response(response)
+        self._send_command(pb2.TimelineSimulatorRequest.MoveToTick(tick=tick))
 
     def disconnect(self):
         self._send_command(None)
 
 
-class CreatorContext:
+class CreatorContext(ProcessContext):
+    request_type = pb2.TimelineCreatorRequest
     request_command_map = {
-        pb2.TimelineCreatorRequest.StartNew: 'start_new',
-        pb2.TimelineCreatorRequest.StartExisting: 'start_existing',
-        pb2.TimelineCreatorRequest.StartEditing: 'start_editing',
-        pb2.TimelineCreatorRequest.StopEditing: 'stop_editing',
-        pb2.TimelineCreatorRequest.LoadState: 'load_state',
-        pb2.TimelineCreatorRequest.SaveToNewTimeline: 'save_to_new_timeline',
+        request_type.StartNew: 'start_new',
+        request_type.StartExisting: 'start_existing',
+        request_type.StartEditing: 'start_editing',
+        request_type.StopEditing: 'stop_editing',
+        request_type.LoadState: 'load_state',
+        request_type.SaveToNewTimeline: 'save_to_new_timeline',
     }
 
     def __init__(self, stub: pb2_grpc.SimmaStub):
-        self._stub = stub
-
-        self._command_queue = Queue(maxsize=1)
-
-        self._responses = self._stub.TimelineCreator(self._request_provider())
-
-    @staticmethod
-    def _make_request(command):
-        command_class = type(command)
-        kwargs = {CreatorContext.request_command_map[command_class]: command}
-        return pb2.TimelineCreatorRequest(**kwargs)
-
-    @staticmethod
-    def _extract_response(response):
-        """Returns (success, response_command), where response is a bool indicating if the operation
-        was successful or not, and the response_command is the actual response to the command."""
-        message = response.WhichOneof('message')
-        return message != 'error', getattr(response, message)
-
-    def _request_provider(self):
-        command = self._command_queue.get()
-        while command is not None:
-            yield self._make_request(command)
-            self._command_queue.task_done()
-            command = self._command_queue.get()
-        self._command_queue.task_done()
-
-    def _send_command(self, command):
-        self._assert_context_alive()
-
-        self._command_queue.put(command)
-        try:
-            return next(self._responses)
-        except StopIteration:
-            self._responses = None
-            return None
-        except grpc.RpcError:
-            self._responses = None
-            raise
-
-    def _assert_context_alive(self):
-        if self._responses is None:
-            raise RuntimeError("Edit context is dead. Create a new context.")
+        super().__init__(stub.TimelineCreator)
 
     def start_editing(self):
-        response = self._send_command(pb2.TimelineCreatorRequest.StartEditing())
-        return self._extract_response(response)
+        self._send_command(pb2.TimelineCreatorRequest.StartEditing())
 
     def stop_editing(self):
-        response = self._send_command(pb2.TimelineCreatorResponse.StopEditing())
-        return self._extract_response(response)
+        self._send_command(pb2.TimelineCreatorRequest.StopEditing())
 
     def load_state(self, timeline_id):
-        response = self._send_command(pb2.TimelineCreatorResponse.LoadState(timeline_id=timeline_id))
-        return self._extract_response(response)
+        self._send_command(pb2.TimelineCreatorRequest.LoadState(timeline_id=timeline_id))
 
-    def save_state_to_new_timeline(self):
-        response = self._send_command(pb2.TimelineCreatorResponse.SaveToNewTimeline())
-        return self._extract_response(response)
+    def save_state_to_new_timeline(self) -> str:
+        """Returns the timeline id of the new timeline"""
+        response = self._send_command(pb2.TimelineCreatorRequest.SaveToNewTimeline())
+        return response.new_timeline_id
 
     def disconnect(self):
         self._send_command(None)
@@ -167,32 +131,24 @@ class CreatorContext:
 class NewCreatorContext(CreatorContext):
     def __init__(self, stub: pb2_grpc.SimmaStub, binary_id, initial_timeline_id, tick):
         super().__init__(stub)
-        success, response = self._start_new_creator(binary_id, initial_timeline_id, tick)
-        if not success:
-            raise RuntimeError("Failed to start simulator")
-        self.creator_id = response.creator_id
-        self.address = response.address
-        self.user_token = response.user_token
+        self.creator_id, self.address, self.user_token = self._start_new_creator(binary_id, initial_timeline_id, tick)
 
-    def _start_new_creator(self, binary_id, initial_timeline_id, tick):
+    def _start_new_creator(self, binary_id, initial_timeline_id, tick) -> tuple[str, str, str]:
+        """Returns (creator_id, address, user_token)"""
         response = self._send_command(pb2.TimelineCreatorRequest.StartNew(binary_id=binary_id,
                                                                           initial_timeline_id=initial_timeline_id,
                                                                           tick=tick))
-        return self._extract_response(response)
+        return response.creator_id, response.address, response.user_token
 
 
 class ExistingCreatorContext(CreatorContext):
     def __init__(self, stub: pb2_grpc.SimmaStub, creator_id):
         super().__init__(stub)
-        success, response = self._start_existing_creator(creator_id)
-        if not success:
-            raise RuntimeError("Failed to start simulator")
-        self.address = response.address
-        self.user_token = response.user_token
+        self.address, self.user_token = self._start_existing_creator(creator_id)
 
-    def _start_existing_creator(self, creator_id):
+    def _start_existing_creator(self, creator_id) -> tuple[str, str]:
         response = self._send_command(pb2.TimelineCreatorRequest.StartExisting(creator_id=creator_id))
-        return self._extract_response(response)
+        return response.address, response.user_token
 
 
 class Client:
