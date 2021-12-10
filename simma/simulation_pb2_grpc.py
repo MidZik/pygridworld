@@ -17,122 +17,122 @@ class SimulationStub(object):
             channel: A grpc.Channel.
         """
         self.GetTick = channel.unary_unary(
-                '/simma_old.Simulation/GetTick',
+                '/simma.simulation.Simulation/GetTick',
                 request_serializer=simma_dot_simulation__pb2.GetTickRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetTickResponse.FromString,
                 )
         self.GetStateJson = channel.unary_unary(
-                '/simma_old.Simulation/GetStateJson',
+                '/simma.simulation.Simulation/GetStateJson',
                 request_serializer=simma_dot_simulation__pb2.GetStateJsonRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetStateJsonResponse.FromString,
                 )
         self.SetStateJson = channel.unary_unary(
-                '/simma_old.Simulation/SetStateJson',
+                '/simma.simulation.Simulation/SetStateJson',
                 request_serializer=simma_dot_simulation__pb2.SetStateJsonRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.SetStateJsonResponse.FromString,
                 )
         self.CreateEntity = channel.unary_unary(
-                '/simma_old.Simulation/CreateEntity',
+                '/simma.simulation.Simulation/CreateEntity',
                 request_serializer=simma_dot_simulation__pb2.CreateEntityRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.CreateEntityResponse.FromString,
                 )
         self.DestroyEntity = channel.unary_unary(
-                '/simma_old.Simulation/DestroyEntity',
+                '/simma.simulation.Simulation/DestroyEntity',
                 request_serializer=simma_dot_simulation__pb2.DestroyEntityRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.DestroyEntityResponse.FromString,
                 )
         self.GetAllEntities = channel.unary_unary(
-                '/simma_old.Simulation/GetAllEntities',
+                '/simma.simulation.Simulation/GetAllEntities',
                 request_serializer=simma_dot_simulation__pb2.GetAllEntitiesRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetAllEntitiesResponse.FromString,
                 )
         self.StartSimulation = channel.unary_unary(
-                '/simma_old.Simulation/StartSimulation',
+                '/simma.simulation.Simulation/StartSimulation',
                 request_serializer=simma_dot_simulation__pb2.StartSimulationRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.StartSimulationResponse.FromString,
                 )
         self.StopSimulation = channel.unary_unary(
-                '/simma_old.Simulation/StopSimulation',
+                '/simma.simulation.Simulation/StopSimulation',
                 request_serializer=simma_dot_simulation__pb2.StopSimulationRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.StopSimulationResponse.FromString,
                 )
         self.IsRunning = channel.unary_unary(
-                '/simma_old.Simulation/IsRunning',
+                '/simma.simulation.Simulation/IsRunning',
                 request_serializer=simma_dot_simulation__pb2.IsRunningRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.IsRunningResponse.FromString,
                 )
         self.AssignComponent = channel.unary_unary(
-                '/simma_old.Simulation/AssignComponent',
+                '/simma.simulation.Simulation/AssignComponent',
                 request_serializer=simma_dot_simulation__pb2.AssignComponentRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.AssignComponentResponse.FromString,
                 )
         self.GetComponentJson = channel.unary_unary(
-                '/simma_old.Simulation/GetComponentJson',
+                '/simma.simulation.Simulation/GetComponentJson',
                 request_serializer=simma_dot_simulation__pb2.GetComponentJsonRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetComponentJsonResponse.FromString,
                 )
         self.RemoveComponent = channel.unary_unary(
-                '/simma_old.Simulation/RemoveComponent',
+                '/simma.simulation.Simulation/RemoveComponent',
                 request_serializer=simma_dot_simulation__pb2.RemoveComponentRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.RemoveComponentResponse.FromString,
                 )
         self.ReplaceComponent = channel.unary_unary(
-                '/simma_old.Simulation/ReplaceComponent',
+                '/simma.simulation.Simulation/ReplaceComponent',
                 request_serializer=simma_dot_simulation__pb2.ReplaceComponentRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.ReplaceComponentResponse.FromString,
                 )
         self.GetComponentNames = channel.unary_unary(
-                '/simma_old.Simulation/GetComponentNames',
+                '/simma.simulation.Simulation/GetComponentNames',
                 request_serializer=simma_dot_simulation__pb2.GetComponentNamesRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetComponentNamesResponse.FromString,
                 )
         self.GetEntityComponentNames = channel.unary_unary(
-                '/simma_old.Simulation/GetEntityComponentNames',
+                '/simma.simulation.Simulation/GetEntityComponentNames',
                 request_serializer=simma_dot_simulation__pb2.GetEntityComponentNamesRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetEntityComponentNamesResponse.FromString,
                 )
         self.GetSingletonJson = channel.unary_unary(
-                '/simma_old.Simulation/GetSingletonJson',
+                '/simma.simulation.Simulation/GetSingletonJson',
                 request_serializer=simma_dot_simulation__pb2.GetSingletonJsonRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetSingletonJsonResponse.FromString,
                 )
         self.SetSingletonJson = channel.unary_unary(
-                '/simma_old.Simulation/SetSingletonJson',
+                '/simma.simulation.Simulation/SetSingletonJson',
                 request_serializer=simma_dot_simulation__pb2.SetSingletonJsonRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.SetSingletonJsonResponse.FromString,
                 )
         self.GetSingletonNames = channel.unary_unary(
-                '/simma_old.Simulation/GetSingletonNames',
+                '/simma.simulation.Simulation/GetSingletonNames',
                 request_serializer=simma_dot_simulation__pb2.GetSingletonNamesRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetSingletonNamesResponse.FromString,
                 )
         self.GetEvents = channel.unary_stream(
-                '/simma_old.Simulation/GetEvents',
+                '/simma.simulation.Simulation/GetEvents',
                 request_serializer=simma_dot_simulation__pb2.GetEventsRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetEventsResponse.FromString,
                 )
         self.GetStateBinary = channel.unary_unary(
-                '/simma_old.Simulation/GetStateBinary',
+                '/simma.simulation.Simulation/GetStateBinary',
                 request_serializer=simma_dot_simulation__pb2.GetStateBinaryRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.GetStateBinaryResponse.FromString,
                 )
         self.SetStateBinary = channel.unary_unary(
-                '/simma_old.Simulation/SetStateBinary',
+                '/simma.simulation.Simulation/SetStateBinary',
                 request_serializer=simma_dot_simulation__pb2.SetStateBinaryRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.SetStateBinaryResponse.FromString,
                 )
         self.RunCommand = channel.unary_unary(
-                '/simma_old.Simulation/RunCommand',
+                '/simma.simulation.Simulation/RunCommand',
                 request_serializer=simma_dot_simulation__pb2.RunCommandRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.RunCommandResponse.FromString,
                 )
         self.SetEditorToken = channel.unary_unary(
-                '/simma_old.Simulation/SetEditorToken',
+                '/simma.simulation.Simulation/SetEditorToken',
                 request_serializer=simma_dot_simulation__pb2.SetEditorTokenRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.SetEditorTokenResponse.FromString,
                 )
         self.IsEditing = channel.unary_unary(
-                '/simma_old.Simulation/IsEditing',
+                '/simma.simulation.Simulation/IsEditing',
                 request_serializer=simma_dot_simulation__pb2.IsEditingRequest.SerializeToString,
                 response_deserializer=simma_dot_simulation__pb2.IsEditingResponse.FromString,
                 )
@@ -412,7 +412,7 @@ def add_SimulationServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'simma_old.Simulation', rpc_method_handlers)
+            'simma.simulation.Simulation', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -433,7 +433,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetTick',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetTick',
             simma_dot_simulation__pb2.GetTickRequest.SerializeToString,
             simma_dot_simulation__pb2.GetTickResponse.FromString,
             options, channel_credentials,
@@ -450,7 +450,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetStateJson',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetStateJson',
             simma_dot_simulation__pb2.GetStateJsonRequest.SerializeToString,
             simma_dot_simulation__pb2.GetStateJsonResponse.FromString,
             options, channel_credentials,
@@ -467,7 +467,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/SetStateJson',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/SetStateJson',
             simma_dot_simulation__pb2.SetStateJsonRequest.SerializeToString,
             simma_dot_simulation__pb2.SetStateJsonResponse.FromString,
             options, channel_credentials,
@@ -484,7 +484,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/CreateEntity',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/CreateEntity',
             simma_dot_simulation__pb2.CreateEntityRequest.SerializeToString,
             simma_dot_simulation__pb2.CreateEntityResponse.FromString,
             options, channel_credentials,
@@ -501,7 +501,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/DestroyEntity',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/DestroyEntity',
             simma_dot_simulation__pb2.DestroyEntityRequest.SerializeToString,
             simma_dot_simulation__pb2.DestroyEntityResponse.FromString,
             options, channel_credentials,
@@ -518,7 +518,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetAllEntities',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetAllEntities',
             simma_dot_simulation__pb2.GetAllEntitiesRequest.SerializeToString,
             simma_dot_simulation__pb2.GetAllEntitiesResponse.FromString,
             options, channel_credentials,
@@ -535,7 +535,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/StartSimulation',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/StartSimulation',
             simma_dot_simulation__pb2.StartSimulationRequest.SerializeToString,
             simma_dot_simulation__pb2.StartSimulationResponse.FromString,
             options, channel_credentials,
@@ -552,7 +552,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/StopSimulation',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/StopSimulation',
             simma_dot_simulation__pb2.StopSimulationRequest.SerializeToString,
             simma_dot_simulation__pb2.StopSimulationResponse.FromString,
             options, channel_credentials,
@@ -569,7 +569,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/IsRunning',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/IsRunning',
             simma_dot_simulation__pb2.IsRunningRequest.SerializeToString,
             simma_dot_simulation__pb2.IsRunningResponse.FromString,
             options, channel_credentials,
@@ -586,7 +586,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/AssignComponent',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/AssignComponent',
             simma_dot_simulation__pb2.AssignComponentRequest.SerializeToString,
             simma_dot_simulation__pb2.AssignComponentResponse.FromString,
             options, channel_credentials,
@@ -603,7 +603,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetComponentJson',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetComponentJson',
             simma_dot_simulation__pb2.GetComponentJsonRequest.SerializeToString,
             simma_dot_simulation__pb2.GetComponentJsonResponse.FromString,
             options, channel_credentials,
@@ -620,7 +620,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/RemoveComponent',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/RemoveComponent',
             simma_dot_simulation__pb2.RemoveComponentRequest.SerializeToString,
             simma_dot_simulation__pb2.RemoveComponentResponse.FromString,
             options, channel_credentials,
@@ -637,7 +637,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/ReplaceComponent',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/ReplaceComponent',
             simma_dot_simulation__pb2.ReplaceComponentRequest.SerializeToString,
             simma_dot_simulation__pb2.ReplaceComponentResponse.FromString,
             options, channel_credentials,
@@ -654,7 +654,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetComponentNames',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetComponentNames',
             simma_dot_simulation__pb2.GetComponentNamesRequest.SerializeToString,
             simma_dot_simulation__pb2.GetComponentNamesResponse.FromString,
             options, channel_credentials,
@@ -671,7 +671,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetEntityComponentNames',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetEntityComponentNames',
             simma_dot_simulation__pb2.GetEntityComponentNamesRequest.SerializeToString,
             simma_dot_simulation__pb2.GetEntityComponentNamesResponse.FromString,
             options, channel_credentials,
@@ -688,7 +688,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetSingletonJson',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetSingletonJson',
             simma_dot_simulation__pb2.GetSingletonJsonRequest.SerializeToString,
             simma_dot_simulation__pb2.GetSingletonJsonResponse.FromString,
             options, channel_credentials,
@@ -705,7 +705,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/SetSingletonJson',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/SetSingletonJson',
             simma_dot_simulation__pb2.SetSingletonJsonRequest.SerializeToString,
             simma_dot_simulation__pb2.SetSingletonJsonResponse.FromString,
             options, channel_credentials,
@@ -722,7 +722,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetSingletonNames',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetSingletonNames',
             simma_dot_simulation__pb2.GetSingletonNamesRequest.SerializeToString,
             simma_dot_simulation__pb2.GetSingletonNamesResponse.FromString,
             options, channel_credentials,
@@ -739,7 +739,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/simma_old.Simulation/GetEvents',
+        return grpc.experimental.unary_stream(request, target, '/simma.simulation.Simulation/GetEvents',
             simma_dot_simulation__pb2.GetEventsRequest.SerializeToString,
             simma_dot_simulation__pb2.GetEventsResponse.FromString,
             options, channel_credentials,
@@ -756,7 +756,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/GetStateBinary',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/GetStateBinary',
             simma_dot_simulation__pb2.GetStateBinaryRequest.SerializeToString,
             simma_dot_simulation__pb2.GetStateBinaryResponse.FromString,
             options, channel_credentials,
@@ -773,7 +773,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/SetStateBinary',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/SetStateBinary',
             simma_dot_simulation__pb2.SetStateBinaryRequest.SerializeToString,
             simma_dot_simulation__pb2.SetStateBinaryResponse.FromString,
             options, channel_credentials,
@@ -790,7 +790,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/RunCommand',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/RunCommand',
             simma_dot_simulation__pb2.RunCommandRequest.SerializeToString,
             simma_dot_simulation__pb2.RunCommandResponse.FromString,
             options, channel_credentials,
@@ -807,7 +807,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/SetEditorToken',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/SetEditorToken',
             simma_dot_simulation__pb2.SetEditorTokenRequest.SerializeToString,
             simma_dot_simulation__pb2.SetEditorTokenResponse.FromString,
             options, channel_credentials,
@@ -824,7 +824,7 @@ class Simulation(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/simma_old.Simulation/IsEditing',
+        return grpc.experimental.unary_unary(request, target, '/simma.simulation.Simulation/IsEditing',
             simma_dot_simulation__pb2.IsEditingRequest.SerializeToString,
             simma_dot_simulation__pb2.IsEditingResponse.FromString,
             options, channel_credentials,
