@@ -235,8 +235,8 @@ class Project:
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT id, name, filename, creation_timestamp, substr(description, 0, 100) FROM binary'
             )
-            while (result := await cursor.fetchone()) is not None:
-                binary_id, name, filename, creation_timestamp, description_head = result
+            while row := await cursor.fetchone():
+                binary_id, name, filename, creation_timestamp, description_head = row
                 binary_id = UUID(binary_id)
                 creation_time = datetime.fromisoformat(creation_timestamp)
                 yield BinaryInfo(binary_id, name, creation_time, description_head, self._binary_data_path(binary_id))
@@ -383,8 +383,7 @@ class Project:
                 )
                 """)
             result = []
-            row = await cursor.fetchone()
-            while row:
+            while row := await cursor.fetchone():
                 timeline_id, binary_id, parent_id, head_tick, creation_timestamp = row
                 creation_time = datetime.fromisoformat(creation_timestamp)
                 result.append(TimelineInfo(timeline_id, binary_id, parent_id, head_tick, creation_time,
@@ -497,7 +496,7 @@ class Project:
     async def get_timeline_tags(self, timeline_id: UUID):
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
-                'SELECT tag FROM tag WHERE timeline_id = ? ORDER BY tag ASC',
+                'SELECT tag FROM timeline_tag WHERE timeline_id = ? ORDER BY tag ASC',
                 (timeline_id,)
             )
             results = await cursor.fetchall()
