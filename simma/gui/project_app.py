@@ -2,6 +2,7 @@
 @author: Matt Idzik (MidZik)
 """
 import asyncio
+import json
 import tempfile
 
 import appdirs
@@ -83,13 +84,13 @@ class ProcessControlsWidget(QtWidgets.QWidget):
         # Entities Subtab
         ui.createEntityButton.clicked.connect(self._create_entity)
         ui.destroyEntityButton.clicked.connect(self._destroy_selected_entity)
-        ui.entityList.itemSelectionChanged.connect(self._on_selected_entity_changed)
+        ui.entityList.itemSelectionChanged.connect(self._refresh_entity_component_list)
 
         assign_component_menu = QtWidgets.QMenu(ui.assignComponentButton)
         ui.assignComponentButton.setMenu(assign_component_menu)
         assign_component_menu.triggered.connect(self._on_assign_component_triggered)
         ui.removeComponentButton.clicked.connect(self._remove_selected_component)
-        ui.entityComponentList.itemSelectionChanged.connect(self._on_selected_component_changed)
+        ui.entityComponentList.itemSelectionChanged.connect(self._refresh_entity_component_json)
 
         ui.revertComStateButton.clicked.connect(self._revert_selected_com_state)
         ui.saveComStateButton.clicked.connect(self._save_selected_com_state)
@@ -104,6 +105,14 @@ class ProcessControlsWidget(QtWidgets.QWidget):
 
         if isinstance(process_context, SimulatorContext):
             ui.creatorControlsGroupBox.hide()
+            ui.createEntityButton.hide()
+            ui.destroyEntityButton.hide()
+            ui.assignComponentButton.hide()
+            ui.removeComponentButton.hide()
+            ui.revertComStateButton.hide()
+            ui.saveComStateButton.hide()
+            ui.revertSingletonStateButton.hide()
+            ui.saveSingletonStateButton.hide()
         elif isinstance(process_context, CreatorContext):
             ui.simulatorControlsGroupBox.hide()
 
@@ -113,6 +122,80 @@ class ProcessControlsWidget(QtWidgets.QWidget):
             ProcessSyncClient.make_channel(process_context.address),
             process_context.user_token)
         self.viz = None
+
+        self._last_selected_eid = None
+        self._last_selected_component = None
+
+        self._refresh_entity_list()
+
+    def get_selected_eid(self):
+        items = self._ui.entityList.selectedItems()
+        if len(items) != 1:
+            return None
+        else:
+            return int(items[0].text())
+
+    def get_selected_component_name(self) -> Optional[str]:
+        items = self._ui.entityComponentList.selectedItems()
+        if len(items) != 1:
+            return None
+        else:
+            return items[0].text()
+
+    def get_selected_singleton_name(self) -> Optional[str]:
+        items = self._ui.singletonList.selectedItems()
+        if items:
+            return items[0].text()
+        else:
+            return None
+
+    def _refresh_entity_list(self):
+        ui = self._ui
+        ui.entityList.clear()
+        entities, _ = self.process_client.get_all_entities()
+        for eid in entities:
+            ui.entityList.addItem(str(eid))
+            if eid == self._last_selected_eid:
+                ui.entityList.setCurrentRow(ui.entityList.count() - 1)
+
+    def _refresh_entity_component_list(self):
+        ui = self._ui
+        ui.entityComponentList.clear()
+        assign_components_button_menu = ui.assignComponentButton.menu()
+        assign_components_button_menu.clear()
+
+        eid = self.get_selected_eid()
+        if eid is not None:
+            self._last_selected_eid = eid
+            components = self.process_client.get_component_names()
+            entity_components, _ = self.process_client.get_entity_component_names(eid)
+            missing_component_names = [c for c in components if c not in entity_components]
+            for c in missing_component_names:
+                assign_components_button_menu.addAction(c)
+            for c in entity_components:
+                ui.entityComponentList.addItem(c)
+                if c == self._last_selected_component:
+                    ui.entityComponentList.setCurrentRow(ui.entityComponentList.count() - 1)
+
+    def _refresh_entity_component_json(self):
+        ui = self._ui
+        ui.comStateTextEdit.clear()
+        eid = self.get_selected_eid()
+        component = self.get_selected_component_name()
+        if eid is not None and component is not None:
+            self._last_selected_component = component
+            state_json, _ = self.process_client.get_component_json(eid, component)
+            state = json.loads(state_json)
+            state_json = json.dumps(state, indent=2) # pretty print
+            ui.comStateTextEdit.setPlainText(state_json)
+
+    def _refresh_singletons_list(self):
+        ui = self._ui
+        ui.singletonList.clear()
+
+        singletons = self.process_client.get_singleton_names()
+        for singleton in singletons:
+            ui.singletonList.addItem(singleton)
 
     def _show_visualizer_for_current_timeline(self):
         if self.viz is None or not self.viz.is_alive():
@@ -127,43 +210,50 @@ class ProcessControlsWidget(QtWidgets.QWidget):
         # TODO
 
     def _save_to_point(self):
-        pass
+        self.process_context.save_state_to_point()
 
     def _start_simulator(self):
-        pass
+        self.process_client.start_simulation()
 
     def _stop_simulator(self):
-        pass
+        self.process_client.stop_simulation()
 
     def _start_editing(self):
-        pass
+        self.process_context.start_editing()
 
     def _stop_editing(self):
-        pass
+        self.process_context.stop_editing()
 
     def _go_to_selected_timeline(self):
-        pass
+        timeline_details = self._app.get_selected_timeline_details()
+        if timeline_details is not None:
+            self.process_context.load_state(timeline_details.timeline_id)
 
     def _save_as_new_timeline(self):
-        pass
+        self.process_context.save_state_to_new_timeline()
 
     def _create_entity(self):
-        pass
+        self.process_client.create_entity()
+        self._refresh_entity_list()
 
     def _destroy_selected_entity(self):
-        pass
+        eid = self.get_selected_eid()
+        if eid is not None:
+            self.process_client.destroy_entity(eid)
+            self._refresh_entity_list()
 
-    def _on_selected_entity_changed(self):
-        pass
-
-    def _on_assign_component_triggered(self):
-        pass
+    def _on_assign_component_triggered(self, action):
+        eid = self.get_selected_eid()
+        if eid is not None:
+            self.process_client.assign_component(eid, action.text())
+            self._refresh_entity_component_list()
 
     def _remove_selected_component(self):
-        pass
-
-    def _on_selected_component_changed(self):
-        pass
+        eid = self.get_selected_eid()
+        component = self.get_selected_component_name()
+        if eid is not None and component is not None:
+            self.process_client.remove_component(eid, component)
+            self._refresh_entity_component_list()
 
     def _revert_selected_com_state(self):
         pass
