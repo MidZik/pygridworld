@@ -160,6 +160,7 @@ class Project:
         return project
 
     def get_temp_path(self):
+        self._temp_data_path().mkdir(exist_ok=True)
         return self._temp_data_path() / str(uuid4())
 
     def validate_temp_path(self, temp_path: Path, validate_exists=True):
