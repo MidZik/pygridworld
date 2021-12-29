@@ -375,5 +375,6 @@ if __name__ == "__main__":
     try:
         loop.run_until_complete(serve())
     finally:
-        loop.run_until_complete(*_cleanup_coroutines)
+        if _cleanup_coroutines:
+            loop.run_until_complete(*_cleanup_coroutines)
         loop.close()
