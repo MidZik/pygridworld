@@ -1,3 +1,5 @@
+import uuid
+
 import aiosqlite
 import appdirs
 import asyncio
@@ -9,6 +11,10 @@ from typing import Optional
 from uuid import uuid4, UUID
 
 from .binary import LocalSimbin, PackedSimbin
+
+
+aiosqlite.register_adapter(uuid.UUID, lambda u: str(u) if u else None)
+aiosqlite.register_converter('UUID', lambda u: UUID(u) if u else None)
 
 
 def _user_data_path():
@@ -118,7 +124,7 @@ class Project:
         async with project._db_connect() as db:
             await db.execute('''
                 CREATE TABLE binary (
-                    id TEXT NOT NULL,
+                    id UUID NOT NULL,
                     name TEXT,
                     filename TEXT NOT NULL,
                     creation_timestamp TEXT NOT NULL,
@@ -128,9 +134,9 @@ class Project:
 
             await db.execute('''
                 CREATE TABLE timeline (
-                    id TEXT NOT NULL,
-                    binary_id TEXT NOT NULL,
-                    parent_id TEXT,
+                    id UUID NOT NULL,
+                    binary_id UUID NOT NULL,
+                    parent_id UUID,
                     head_tick INTEGER NOT NULL,
                     creation_timestamp TEXT NOT NULL,
                     PRIMARY KEY(id),
@@ -140,7 +146,7 @@ class Project:
 
             await db.execute('''
                 CREATE TABLE timeline_tag (
-                    timeline_id TEXT NOT NULL,
+                    timeline_id UUID NOT NULL,
                     tag TEXT NOT NULL,
                     PRIMARY KEY(timeline_id, tag),
                     FOREIGN KEY(timeline_id) REFERENCES timeline(id) ON DELETE CASCADE
@@ -148,7 +154,7 @@ class Project:
 
             await db.execute('''
                 CREATE TABLE point (
-                    timeline_id TEXT NOT NULL,
+                    timeline_id UUID NOT NULL,
                     tick INTEGER NOT NULL,
                     creation_timestamp TEXT NOT NULL,
                     PRIMARY KEY(timeline_id, tick),
@@ -180,7 +186,7 @@ class Project:
             creation_time = datetime.utcnow()
             async with self._db_connect() as db:
                 await db.execute('INSERT INTO binary VALUES (?,?,?,?,?)',
-                                 (str(binary_id),
+                                 (binary_id,
                                   packed_simbin.name,
                                   packed_simbin.binary_name,
                                   str(creation_time),
@@ -203,7 +209,7 @@ class Project:
             creation_time = datetime.utcnow()
             async with self._db_connect() as db:
                 await db.execute('INSERT INTO binary VALUES (?,?,?,?,?)',
-                                 (str(binary_id),
+                                 (binary_id,
                                   packed_simbin.name,
                                   packed_simbin.binary_name,
                                   str(creation_time),
@@ -219,7 +225,7 @@ class Project:
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT name, filename, creation_timestamp, substr(description, 0, 100) FROM binary WHERE id = ?',
-                (str(binary_id),)
+                (binary_id,)
             )
             result = await cursor.fetchone()
             if result is None:
@@ -237,7 +243,6 @@ class Project:
             )
             while row := await cursor.fetchone():
                 binary_id, name, filename, creation_timestamp, description_head = row
-                binary_id = UUID(binary_id)
                 creation_time = datetime.fromisoformat(creation_timestamp)
                 yield BinaryInfo(binary_id, name, creation_time, description_head, self._binary_data_path(binary_id))
 
@@ -245,7 +250,7 @@ class Project:
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT description FROM binary WHERE id = ?',
-                (str(binary_id),)
+                (binary_id,)
             )
             description = await cursor.fetchone()
             if description is None:
@@ -258,7 +263,7 @@ class Project:
         async with self._db_connect() as db:
             await db.execute(
                 'UPDATE binary SET description = ? WHERE id = ?',
-                (description, str(binary_id))
+                (description, binary_id)
             )
             await db.commit()
 
@@ -268,14 +273,14 @@ class Project:
         async with self._db_connect() as db:
             await db.execute(
                 'UPDATE binary SET name = ? WHERE id = ?',
-                (name, str(binary_id))
+                (name, binary_id)
             )
 
     async def delete_binary(self, binary_id: UUID):
         async with self._db_connect() as db:
             await db.execute(
                 'DELETE FROM binary WHERE id = ?',
-                (str(binary_id),)
+                (binary_id,)
             )
             await db.commit()
         binary_dir_path = self._binary_data_path(binary_id)
@@ -298,9 +303,9 @@ class Project:
             async with self._db_connect() as db:
                 await db.execute(
                     'INSERT INTO timeline VALUES (?,?,?,?,?)', (
-                        str(timeline_id),
-                        str(binary_id),
-                        str(parent_timeline_id) if parent_timeline_id else None,
+                        timeline_id,
+                        binary_id,
+                        parent_timeline_id,
                         head_tick,
                         str(creation_time)
                     )
@@ -322,7 +327,7 @@ class Project:
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT id, binary_id, parent_id, head_tick, creation_timestamp FROM timeline WHERE id = ?',
-                (str(timeline_id),)
+                (timeline_id,)
             )
             timeline_id, binary_id, parent_id, head_tick, creation_timestamp = await cursor.fetchone()
             creation_time = datetime.fromisoformat(creation_timestamp)
@@ -394,18 +399,18 @@ class Project:
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT head_tick, creation_timestamp FROM timeline WHERE id = ?',
-                (str(timeline_id),)
+                (timeline_id,)
             )
             result = await cursor.fetchone()
             if result is None:
                 raise ValueError(f"Unable to find timeline with id {timeline_id}.")
             await db.execute(
                 'DELETE FROM point WHERE timeline_id = ?',
-                (str(timeline_id))
+                (timeline_id,)
             )
             await db.execute(
                 'DELETE FROM timeline WHERE id = ?',
-                (str(timeline_id),)
+                (timeline_id,)
             )
             await db.commit()
         timeline_dir_path = self._timeline_data_path(timeline_id)
@@ -457,7 +462,7 @@ class Project:
             async with self._db_connect() as db:
                 await db.execute(
                     'INSERT INTO points VALUES (?,?,?)', (
-                        str(timeline_id),
+                        timeline_id,
                         tick,
                         str(creation_time)
                     )
