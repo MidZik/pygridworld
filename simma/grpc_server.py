@@ -227,7 +227,7 @@ class Service(pb2_grpc.SimmaServicer):
                             elif message == 'save_to_new_timeline':
                                 new_timeline_id = await editor.save_state_as_new_timeline()
                                 save_to_new_timeline_response = pb2.TimelineCreatorResponse.SaveToNewTimeline(
-                                    new_timeline_id=new_timeline_id)
+                                    new_timeline_id=str(new_timeline_id))
                                 yield pb2.TimelineCreatorResponse(save_to_new_timeline=save_to_new_timeline_response)
                             else:
                                 yield pb2.TimelineCreatorResponse(
