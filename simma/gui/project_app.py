@@ -302,6 +302,7 @@ class ProjectApp(QtCore.QObject):
             simbin_paths_file.touch()
 
         self.refresh_timelines_model()
+        self.refresh_points_model()
         self.refresh_local_simbins_model()
         self.refresh_binaries_model()
 
@@ -372,9 +373,18 @@ class ProjectApp(QtCore.QObject):
             item.setData(detail)
             self.binaries_model.appendRow(item)
 
+    def refresh_points_model(self):
+        self.points_model.clear()
+        selected_timeline_details = self.get_selected_timeline_details()
+        if selected_timeline_details is not None:
+            self.points_model.appendRow(
+                [QtGui.QStandardItem(f"{tick}") for tick in
+                 self._client.get_timeline_ticks(selected_timeline_details.timeline_id)]
+            )
+
     def get_selected_timeline_item(self) -> Optional[QtGui.QStandardItem]:
         selection_model = self._ui.timelineTree.selectionModel()
-        if selection_model.hasSelection():
+        if selection_model and selection_model.hasSelection():
             index = selection_model.selectedRows()[0]
             return self.timelines_model.itemFromIndex(index)
         else:
@@ -413,16 +423,7 @@ class ProjectApp(QtCore.QObject):
         return items[0].text() if items else None
 
     def _on_timeline_tree_selection_changed(self):
-        ui = self._ui
-        ui.timelinePointList.clear()
-
-        selected_timeline_details = self.get_selected_timeline_details()
-        if selected_timeline_details is not None:
-            self.points_model.clear()
-            self.points_model.appendRow(
-                [QtGui.QStandardItem(tick) for tick in
-                 self._client.get_timeline_ticks(selected_timeline_details.timeline_id)]
-            )
+        self.refresh_points_model()
 
     def _on_timeline_tree_expanded(self, index):
         item = self.timelines_model.itemFromIndex(index)
