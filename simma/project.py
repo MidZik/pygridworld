@@ -15,6 +15,7 @@ from .binary import LocalSimbin, PackedSimbin
 
 aiosqlite.register_adapter(uuid.UUID, lambda u: str(u) if u else None)
 aiosqlite.register_converter('UUID', lambda u: UUID(u) if u else None)
+aiosqlite.register_adapter(datetime, lambda dt: str(dt) if dt else None)
 
 
 def _user_data_path():
@@ -189,7 +190,7 @@ class Project:
                                  (binary_id,
                                   packed_simbin.name,
                                   packed_simbin.binary_name,
-                                  str(creation_time),
+                                  creation_time,
                                   ""))
                 await db.commit()
             return BinaryInfo(binary_id, packed_simbin.name, creation_time, "", packed_simbin)
@@ -212,7 +213,7 @@ class Project:
                                  (binary_id,
                                   packed_simbin.name,
                                   packed_simbin.binary_name,
-                                  str(creation_time),
+                                  creation_time,
                                   ""))
                 await db.commit()
             return BinaryInfo(binary_id, packed_simbin.name, creation_time, "", packed_simbin)
@@ -307,14 +308,14 @@ class Project:
                         binary_id,
                         parent_timeline_id,
                         head_tick,
-                        str(creation_time)
+                        creation_time
                     )
                 )
                 await db.execute(
                     'INSERT INTO point VALUES (?,?,?)', (
                         timeline_id,
                         head_tick,
-                        str(creation_time)
+                        creation_time
                     )
                 )
                 timeline_point_dir.mkdir(exist_ok=False)
@@ -471,7 +472,7 @@ class Project:
                     'INSERT INTO points VALUES (?,?,?)', (
                         timeline_id,
                         tick,
-                        str(creation_time)
+                        creation_time
                     )
                 )
                 temp_point_path.rename(point_destination)
