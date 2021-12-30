@@ -310,6 +310,13 @@ class Project:
                         str(creation_time)
                     )
                 )
+                await db.execute(
+                    'INSERT INTO point VALUES (?,?,?)', (
+                        timeline_id,
+                        head_tick,
+                        str(creation_time)
+                    )
+                )
                 timeline_point_dir.mkdir(exist_ok=False)
                 temp_head_path.rename(head_point_destination)
                 await self._init_timeline_events_db(timeline_id)
