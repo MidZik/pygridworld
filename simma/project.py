@@ -62,10 +62,7 @@ class Project:
         return dt.strftime('%Y%m%d%H%M%S%f')
 
     def _timeline_point_path(self, timeline_id: UUID, tick: int, creation_time: datetime):
-        return self._timeline_data_path(timeline_id) / f'tick{tick}-{self._path_timestamp(creation_time)}.point'
-
-    def _timeline_head_path(self, timeline_id: UUID, head_tick: int, creation_time: datetime):
-        return self._timeline_data_path(timeline_id) / f'head{head_tick}-{self._path_timestamp(creation_time)}.point'
+        return self._timeline_data_path(timeline_id) / f'tick_{tick}-{self._path_timestamp(creation_time)}.point'
 
     def _timeline_events_db_path(self, timeline_id: UUID):
         return self._timeline_data_path(timeline_id) / 'events.db'
@@ -297,7 +294,7 @@ class Project:
         The temp_head_path file should be a value returned from `get_temp_path()`."""
         timeline_id = uuid4()
         creation_time = datetime.utcnow()
-        head_point_destination = self._timeline_head_path(timeline_id, head_tick, creation_time)
+        head_point_destination = self._timeline_point_path(timeline_id, head_tick, creation_time)
         timeline_point_dir = head_point_destination.parent
         try:
             self.validate_temp_path(temp_head_path)
@@ -340,7 +337,7 @@ class Project:
             timeline_id, binary_id, parent_id, head_tick, creation_timestamp = await cursor.fetchone()
             creation_time = datetime.fromisoformat(creation_timestamp)
             return TimelineInfo(timeline_id, binary_id, parent_id, head_tick, creation_time,
-                                self._timeline_head_path(timeline_id, head_tick, creation_time))
+                                self._timeline_point_path(timeline_id, head_tick, creation_time))
 
     async def find_timeline_infos(self, filter_parents=(), require_tags=(), disallow_tags=()):
         filter_parents = set(filter_parents)
@@ -400,7 +397,7 @@ class Project:
                 timeline_id, binary_id, parent_id, head_tick, creation_timestamp = row
                 creation_time = datetime.fromisoformat(creation_timestamp)
                 result.append(TimelineInfo(timeline_id, binary_id, parent_id, head_tick, creation_time,
-                                           self._timeline_head_path(timeline_id, head_tick, creation_time)))
+                                           self._timeline_point_path(timeline_id, head_tick, creation_time)))
         return result
 
     async def delete_timeline(self, timeline_id: UUID):
@@ -518,25 +515,26 @@ class Project:
     async def delete_timeline_points(self, timeline_id: UUID, *ticks_to_delete: int):
         async with self._db_connect() as db:
             await db.execute(
-                'CREATE TABLE temp.ticks_with_children (tick INTEGER UNIQUE);'
+                'CREATE TABLE temp.cannot_delete_ticks (tick INTEGER UNIQUE);'
             )
             await db.execute(
                 'CREATE TABLE temp.delete_ticks (tick INTEGER UNIQUE);'
             )
+            # Cannot delete the head tick, or a tick that child timelines descend from.
             await db.execute("""
-                INSERT INTO temp.ticks_with_children(tick)
-                SELECT head_tick FROM timeline WHERE parent_id = ?""",
+                INSERT INTO temp.cannot_delete_ticks(tick)
+                SELECT head_tick FROM timeline WHERE parent_id = ?1 or id = ?1""",
                              (timeline_id,))
             await db.executemany("INSERT INTO temp.delete_ticks(tick) VALUES (?)", zip(ticks_to_delete))
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT tick, creation_timestamp FROM point '
-                'WHERE timeline_id = ? and tick in temp.delete_ticks and tick not in temp.ticks_with_children',
+                'WHERE timeline_id = ? and tick in temp.delete_ticks and tick not in temp.cannot_delete_ticks',
                 (timeline_id,)
             )
             deleted_tick_info = [(tick, creation_timestamp) for tick, creation_timestamp in await cursor.fetchall()]
             await db.execute(
                 'DELETE FROM point '
-                'WHERE timeline_id = ? and tick in temp.delete_ticks and tick not in temp.ticks_with_children',
+                'WHERE timeline_id = ? and tick in temp.delete_ticks and tick not in temp.cannot_delete_ticks',
                 (timeline_id,)
             )
             await db.commit()
