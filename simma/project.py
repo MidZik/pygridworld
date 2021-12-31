@@ -486,7 +486,7 @@ class Project:
     async def get_timeline_point(self, timeline_id: UUID, tick: int):
         async with self._db_connect() as db:
             cursor: aiosqlite.Cursor = await db.execute(
-                'SELECT creation_timestamp FROM point WHERE id = ? and tick = ?',
+                'SELECT creation_timestamp FROM point WHERE timeline_id = ? and tick = ?',
                 (timeline_id, tick)
             )
             result = await cursor.fetchone()
@@ -530,13 +530,13 @@ class Project:
             await db.executemany("INSERT INTO temp.delete_ticks(tick) VALUES (?)", zip(ticks_to_delete))
             cursor: aiosqlite.Cursor = await db.execute(
                 'SELECT tick, creation_timestamp FROM point '
-                'WHERE id = ? and tick in temp.delete_ticks and tick not in temp.ticks_with_children',
+                'WHERE timeline_id = ? and tick in temp.delete_ticks and tick not in temp.ticks_with_children',
                 (timeline_id,)
             )
             deleted_tick_info = [(tick, creation_timestamp) for tick, creation_timestamp in await cursor.fetchall()]
             await db.execute(
                 'DELETE FROM point '
-                'WHERE id = ? and tick in temp.delete_ticks and tick not in temp.ticks_with_children',
+                'WHERE timeline_id = ? and tick in temp.delete_ticks and tick not in temp.ticks_with_children',
                 (timeline_id,)
             )
             await db.commit()
