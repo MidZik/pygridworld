@@ -6,7 +6,6 @@ import json
 import tempfile
 
 import appdirs
-import argparse
 from collections import defaultdict, deque
 from pathlib import Path
 from typing import Union, Optional
@@ -443,17 +442,17 @@ class ProjectApp(QtCore.QObject):
         print(binary)
         if binary is None:
             return
-        if timeline is None:
-            context = self._client.new_timeline_creator(binary.binary_id, None, 0)
-            widget = ProcessControlsWidget(self._main_window, context)
-            self._visualizations[widget] = context
+        timeline_id = timeline.timeline_id if timeline else None
+        context = self._client.new_timeline_creator(binary.binary_id, timeline_id, 0)
+        widget = ProcessControlsWidget(self._main_window, context)
+        self._visualizations[widget] = context
 
-            def cleanup():
-                print("Cleanup started")
-                context.disconnect()
-                del self._visualizations[widget]
-            widget.destroyed.connect(cleanup)
-            widget.show()
+        def cleanup():
+            print("Cleanup started")
+            context.disconnect()
+            del self._visualizations[widget]
+        widget.destroyed.connect(cleanup)
+        widget.show()
 
     def _create_simulator_at_selection(self):
         pass
