@@ -159,9 +159,9 @@ class TimelineCreator(ProcessOwner['TimelineCreatorRunningContext']):
             point_path = await self.project.get_timeline_point(self.initial_timeline_id, self.tick)
             state_binary = await asyncio.to_thread(point_path.read_bytes)
             async with self.editor_token_context() as etc:
-                etc.set_editor(self.owner_token)
+                await etc.set_editor(self.owner_token)
                 await client.set_state_binary(state_binary)
-                etc.set_editor(token_urlsafe(32))
+                await etc.set_editor(token_urlsafe(32))
 
     def _get_running_context(self, user_token: str):
         return TimelineCreatorRunningContext(self, user_token)
