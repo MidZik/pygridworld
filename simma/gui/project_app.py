@@ -124,8 +124,10 @@ class ProcessControlsWidget(QtWidgets.QWidget):
 
         self._last_selected_eid = None
         self._last_selected_component = None
+        self._last_selected_singleton = None
 
         self._refresh_entity_list()
+        self._refresh_singletons_list()
 
     def get_selected_eid(self):
         items = self._ui.entityList.selectedItems()
@@ -185,7 +187,7 @@ class ProcessControlsWidget(QtWidgets.QWidget):
             self._last_selected_component = component
             state_json, _ = self.process_client.get_component_json(eid, component)
             state = json.loads(state_json)
-            state_json = json.dumps(state, indent=2) # pretty print
+            state_json = json.dumps(state, indent=2)  # pretty print
             ui.comStateTextEdit.setPlainText(state_json)
 
     def _refresh_singletons_list(self):
@@ -195,6 +197,17 @@ class ProcessControlsWidget(QtWidgets.QWidget):
         singletons = self.process_client.get_singleton_names()
         for singleton in singletons:
             ui.singletonList.addItem(singleton)
+
+    def _refresh_singleton_json(self):
+        ui = self._ui
+        ui.singletonStateTextEdit.clear()
+        singleton = self.get_selected_singleton_name()
+        if singleton is not None:
+            self._last_selected_singleton = singleton
+            state_json, _ = self.process_client.get_singleton_json(singleton)
+            state = json.loads(state_json)
+            state_json = json.dumps(state, indent=2)  # pretty print
+            ui.singletonStateTextEdit.setPlainText(state_json)
 
     def _show_visualizer_for_current_timeline(self):
         if self.viz is None or not self.viz.is_alive():
@@ -265,13 +278,16 @@ class ProcessControlsWidget(QtWidgets.QWidget):
             self.process_client.replace_component(eid, component, content)
 
     def _on_selected_singleton_changed(self):
-        pass
+        self._refresh_singleton_json()
 
     def _revert_selected_singleton_state(self):
-        pass
+        self._refresh_singleton_json()
 
     def _save_selected_singleton_state(self):
-        pass
+        singleton = self.get_selected_singleton_name()
+        if singleton is not None:
+            content = self._ui.singletonStateTextEdit.toPlainText()
+            self.process_client.set_singleton_json(singleton, content)
 
 
 class ProjectApp(QtCore.QObject):
