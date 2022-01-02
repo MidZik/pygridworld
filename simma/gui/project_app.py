@@ -255,10 +255,14 @@ class ProcessControlsWidget(QtWidgets.QWidget):
             self._refresh_entity_component_list()
 
     def _revert_selected_com_state(self):
-        pass
+        self._refresh_entity_component_json()
 
     def _save_selected_com_state(self):
-        pass
+        eid = self.get_selected_eid()
+        component = self.get_selected_component_name()
+        if eid is not None and component is not None:
+            content = self._ui.comStateTextEdit.toPlainText()
+            self.process_client.replace_component(eid, component, content)
 
     def _on_selected_singleton_changed(self):
         pass
