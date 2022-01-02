@@ -91,7 +91,7 @@ namespace SimulationServer
 
                     if (event_messages.Count > 0)
                     {
-                        events_committed(new EventsData { tick = currentTick, events = event_messages });
+                        events_committed?.Invoke(new EventsData { tick = currentTick, events = event_messages });
                         event_messages = new List<EventMessage>();
                     }
 
@@ -636,7 +636,7 @@ namespace SimulationServer
                 })
             });
 
-            events_committed(new EventsData { tick = tick, events = event_messages });
+            events_committed?.Invoke(new EventsData { tick = tick, events = event_messages });
         }
 
         private void StartSimulationImpl(ulong p_stopAtTick = 0)
