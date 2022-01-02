@@ -229,6 +229,10 @@ class ProcessControlsWidget(QtWidgets.QWidget):
 
     def _stop_simulator(self):
         self.process_client.stop_simulation()
+        self._refresh_entity_list()
+        self._refresh_singleton_json()
+        self._refresh_entity_component_list()
+        self._refresh_entity_component_json()
 
     def _start_editing(self):
         self.process_context.start_editing()
