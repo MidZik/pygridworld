@@ -458,8 +458,6 @@ class ProjectApp(QtCore.QObject):
     def _create_creator_at_selection(self):
         timeline = self.get_selected_timeline_details()
         binary: BinaryDetails = self._ui.startCreatorBinaryComboBox.currentData(_UserRole + 1)
-        print(timeline)
-        print(binary)
         if binary is None:
             return
         timeline_id = timeline.timeline_id if timeline else None
@@ -468,14 +466,26 @@ class ProjectApp(QtCore.QObject):
         self._visualizations[widget] = context
 
         def cleanup():
-            print("Cleanup started")
             context.disconnect()
             del self._visualizations[widget]
         widget.destroyed.connect(cleanup)
         widget.show()
 
     def _create_simulator_at_selection(self):
-        pass
+        timeline = self.get_selected_timeline_details()
+        if timeline is None:
+            return
+        timeline_id = timeline.timeline_id if timeline else None
+        context = self._client.timeline_simulator(timeline_id)
+        widget = ProcessControlsWidget(self._main_window, context)
+        self._visualizations[widget] = context
+
+        def cleanup():
+            context.disconnect()
+            del self._visualizations[widget]
+
+        widget.destroyed.connect(cleanup)
+        widget.show()
 
     def _delete_selected_timeline(self):
         pass
