@@ -11,11 +11,12 @@ from multiprocessing import Process
 import pyglet
 from weakref import WeakValueDictionary
 
+from .. import ROOT_PATH
 from ..simulation.client import SyncClient, RpcError
 
 
 def _get_asset_path(asset):
-    return "../assets/" + asset
+    return ROOT_PATH / '../assets' / asset
 
 
 class RenderData:
