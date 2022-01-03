@@ -19,7 +19,6 @@ _logger = logging.getLogger(__name__)
 
 def _server_method_logger(f):
     if inspect.iscoroutinefunction(f):
-        print(f"Wrapping {f.__name__} as coroutinefunction")
         @functools.wraps(f)
         async def wrapper(*args, **kwargs):
             _logger.debug(args[1:])
@@ -28,7 +27,6 @@ def _server_method_logger(f):
             _logger.debug(result)
             return result
     elif inspect.isasyncgenfunction(f):
-        print(f"Wrapping {f.__name__} as asyncgenfunction")
         @functools.wraps(f)
         async def wrapper(*args, **kwargs):
             _logger.debug(args[1:])
@@ -36,7 +34,6 @@ def _server_method_logger(f):
             async for result in f(*args, **kwargs):
                 _logger.debug(result)
                 yield result
-            _logger.debug(f"{f.__name__} generator complete.")
     else:
         raise ValueError("Function is not a coroutinefunction or asyncgenfunction")
 
