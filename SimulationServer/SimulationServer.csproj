@@ -14,11 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.22.1" />
-    <PackageReference Include="Grpc" Version="2.46.6" />
-    <PackageReference Include="Grpc.Tools" Version="2.52.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.52.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="7.0.0" />
   </ItemGroup>

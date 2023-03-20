@@ -1,20 +1,26 @@
-using System;
-using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
-using System.IO;
-using System.Text;
-using System.Diagnostics;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace SimulationServer
 {
-    
+
     class Program
     {
         private static IEnumerable<Tuple<string, string>> IterateOptions(CommandOption input, CommandOption output)
         {
-            for(int i = 0; i < input.Values.Count; ++i)
+            for (int i = 0; i < input.Values.Count; ++i)
             {
                 string in_file = input.Values[i];
                 string out_file = null;
@@ -81,13 +87,15 @@ namespace SimulationServer
                         server_port = port.ParsedValue;
                     }
 
-                    Server server = new Server
-                    {
-                        Services = { Simma.Simulation.Simulation.BindService(new SimulationService(wrapper, ownerToken.Value())) },
-                        Ports = { new ServerPort("localhost", server_port, ServerCredentials.Insecure) }
-                    };
+                    var builder = WebApplication.CreateBuilder();
+                    builder.Services.AddGrpc();
+                    builder.WebHost.UseUrls($"https://127.0.0.1:{server_port}");
+                    builder.Logging.ClearProviders();
+                    var app = builder.Build();
+                    app.MapGrpcService<SimulationService>();
+                    app.Start();
 
-                    server.Start();
+                    var addressFeature = app.Services.GetService<IServer>().Features.Get<IServerAddressesFeature>();
 
                     while (true)
                     {
@@ -96,14 +104,21 @@ namespace SimulationServer
                         switch (input)
                         {
                             case "exit":
-                                server.ShutdownAsync();
-                                server.ShutdownTask.Wait();
+                                app.StopAsync().Wait();
                                 return 0;
                             case "port":
-                                Console.WriteLine(server.Ports.First().BoundPort);
+                                Uri uri = new Uri(addressFeature.Addresses.First());
+                                Console.WriteLine(uri.Port);
+                                break;
+                            case "addresses":
+                                foreach (var address in addressFeature.Addresses)
+                                {
+                                    Console.WriteLine(address);
+                                }
+                                Console.WriteLine();
                                 break;
                             default:
-                                Console.WriteLine("");
+                                Console.WriteLine();
                                 break;
                         }
 

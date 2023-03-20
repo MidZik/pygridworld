@@ -10,8 +10,6 @@ service Simma {
     rpc GetTimelineData (TimelineDataRequest) returns (stream TimelineDataResponse) {}
     rpc GetTimelineJson (TimelineJsonRequest) returns (stream TimelineJsonResponse) {}
     rpc GetTimelineEvents (TimelineEventsRequest) returns (stream TimelineEventsResponse) {}
-    rpc TimelineSimulator(stream TimelineSimulatorRequest) returns (stream TimelineSimulatorResponse) {}
-    rpc TimelineCreator(stream TimelineCreatorRequest) returns (stream TimelineCreatorResponse) {}
     rpc ModifyTimelineTags(ModifyTimelineTagsRequest) returns (ModifyTimelineTagsResponse) {}
     rpc DeleteTimeline (DeleteTimelineRequest) returns (DeleteTimelineResponse) {}
     rpc GetTimelineDetails (GetTimelineDetailsRequest) returns (GetTimelineDetailsResponse) {}
@@ -20,15 +18,37 @@ service Simma {
     rpc GetBinaryDescription (GetBinaryDescriptionRequest) returns (GetBinaryDescriptionResponse) {}
     rpc SetBinaryDescription (SetBinaryDescriptionRequest) returns (SetBinaryDescriptionResponse) {}
     rpc DeleteBinary (DeleteBinaryRequest) returns (DeleteBinaryResponse) {}
+    rpc DownloadBinary (DownloadBinaryRequest) returns (stream DownloadBinaryResponse);
+
+    // The following RPCs are intended for use by trusted simulation runners.
+    rpc UploadResults (stream UploadResultsRequest) returns (stream UploadResultsResponse);
+    rpc SaveToNewTimeline (stream SaveToNewTimelineRequest) returns (SaveToNewTimelineResponse);
 }
 
 message TickList {
-    repeated int64 ticks = 1;
+    repeated uint64 ticks = 1;
 }
 
 message TickRange {
-    int64 start_tick = 1;
-    int64 end_tick = 2;
+    optional uint64 start_tick = 1;
+    optional uint64 end_tick = 2;
+}
+
+message SimEvent {
+    string name = 1;
+    string json = 2;
+}
+
+message SimEventChunk {
+    uint64 tick = 1;
+    bool last_chunk = 2;
+    repeated SimEvent chunk = 3;
+}
+
+message PointChunk {
+    uint64 tick = 1;
+    bool last_chunk = 2;
+    bytes chunk = 3;
 }
 
 message TimelinesRequest {
@@ -58,8 +78,7 @@ message TimelineDataRequest {
 }
 
 message TimelineDataResponse {
-    int64 tick = 1;
-    bytes data = 2;
+    repeated PointChunk chunks = 1;
 }
 
 message TimelineJsonRequest {
@@ -71,8 +90,13 @@ message TimelineJsonRequest {
 }
 
 message TimelineJsonResponse {
-    int64 tick = 1;
-    string json = 2;
+    message JsonChunk {
+        uint64 tick = 1;
+        bool last_chunk = 2;
+        string chunk = 3;
+    }
+
+    repeated JsonChunk chunks = 1;
 }
 
 message TimelineEventsRequest {
@@ -81,117 +105,11 @@ message TimelineEventsRequest {
     repeated string event_name_filters = 3;
 }
 
-message EventMessage {
-    string name = 1;
-    string json = 2;
-}
 
 message TimelineEventsResponse {
     string timeline_id = 1;
-    int64 tick = 2;
-    repeated EventMessage events = 3;
-}
-
-message TimelineSimulatorRequest {
-    message Start {
-        string timeline_id = 1;
-    }
-    message SaveStateToPoint {
-    }
-    message MoveToTick {
-        int64 tick = 1;
-    }
-
-    oneof message {
-        Start start = 4;
-        SaveStateToPoint save_state_to_point = 5;
-        MoveToTick move_to_tick = 6;
-    }
-}
-
-message TimelineSimulatorResponse {
-    message Error {
-        string message = 1;
-    }
-    message Start {
-        string address = 1;
-        string user_token = 2;
-    }
-    message SaveStateToPoint {
-        int64 new_tick = 1;
-    }
-    message MoveToTick {
-    }
-
-    oneof message {
-        Error error = 1;
-        Start start = 4;
-        SaveStateToPoint save_state_to_point = 5;
-        MoveToTick move_to_tick = 6;
-    }
-}
-
-message TimelineCreatorRequest {
-    message StartNew {
-        string binary_id = 1;
-        string initial_timeline_id = 2;
-        int64 tick = 3;
-    }
-    message StartExisting {
-        string creator_id = 1;
-    }
-    message StartEditing {
-    }
-    message StopEditing {
-    }
-    message LoadState {
-        string timeline_id = 1;
-    }
-    message SaveToNewTimeline {
-    }
-
-    oneof message {
-        StartNew start_new = 4;
-        StartExisting start_existing = 5;
-        StartEditing start_editing = 6;
-        StopEditing stop_editing = 7;
-        LoadState load_state = 8;
-        SaveToNewTimeline save_to_new_timeline = 9;
-    }
-}
-
-message TimelineCreatorResponse{
-    message Error {
-        string message = 1;
-    }
-    message StartNew {
-        string creator_id = 1;
-        string address = 2;
-        string user_token = 3;
-    }
-    message StartExisting {
-        string address = 1;
-        string user_token = 2;
-    }
-    message StartEditing {
-    }
-    message StopEditing {
-    }
-    message LoadState {
-    }
-    message SaveToNewTimeline {
-        string new_timeline_id = 1;
-    }
-
-    oneof message {
-        Error error = 1;
-        StartNew start_new = 4;
-        StartExisting start_existing = 5;
-        StartEditing start_editing = 6;
-        StopEditing stop_editing = 7;
-        LoadState load_state = 8;
-        SaveToNewTimeline save_to_new_timeline = 9;
-    }
+    uint64 tick = 2;
+    repeated SimEvent events = 3;
 }
 
 message ModifyTimelineTagsRequest {
@@ -219,13 +137,14 @@ message GetTimelineDetailsRequest {
 message GetTimelineDetailsResponse {
     string binary_id = 1;
     string parent_id = 2;
-    int64 head_tick = 3;
+    uint64 head_tick = 3;
     string creation_timestamp = 4;
     repeated string tags = 5;
 }
 
 message UploadPackedSimbinRequest {
-    bytes data = 1;
+    bool last_chunk = 1;
+    bytes data_chunk = 2;
 }
 
 message UploadPackedSimbinResponse {
@@ -264,4 +183,59 @@ message DeleteBinaryRequest {
 }
 
 message DeleteBinaryResponse {
+}
+
+message DownloadBinaryRequest {
+    string binary_id = 1;
+}
+
+message DownloadBinaryResponse {
+    oneof message {
+        string entry_file = 1;
+        bytes zip_chunk = 2;
+    }
+}
+
+message UploadResultsRequest {
+    message RequestDetails {
+        TickRange event_ticks = 1;
+        repeated uint64 point_ticks = 2;
+    }
+
+    message Chunks {
+        repeated SimEventChunk sim_event_chunks = 1;
+        repeated PointChunk point_chunks = 2;
+    }
+
+    oneof message {
+        RequestDetails request = 1;
+        Chunks chunks = 2;
+    }
+}
+
+message UploadResultsResponse {
+    message ResponseDetails {
+        TickRange accept_event_ticks = 1;
+        repeated uint64 accept_point_ticks = 2;
+    }
+
+    oneof message {
+        ResponseDetails response = 1;
+    }
+}
+
+message SaveToNewTimelineRequest {
+    message ParentInfo {
+        string parent_timeline_id = 1;
+        uint64 parent_tick = 2;
+    }
+
+    oneof message {
+        ParentInfo parent_info = 1;
+        PointChunk point_chunk = 2;
+    }
+}
+
+message SaveToNewTimelineResponse {
+    string new_timeline_id = 1;
 }

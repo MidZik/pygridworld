@@ -1,12 +1,12 @@
 using Grpc.Core;
+using Grpc.Net.Client;
+using Simma.Simulation;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Simma.Simulation;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
-using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
 
@@ -16,7 +16,7 @@ namespace SimulationServer
     {
         public PermissionDeniedException() : base() { }
 
-        public PermissionDeniedException(string message): base(message) { }
+        public PermissionDeniedException(string message) : base(message) { }
     }
 
     class SimulationService : Simulation.SimulationBase
@@ -28,28 +28,39 @@ namespace SimulationServer
             EventsOccurred = 1,
         }
 
-        private struct EventsData
+        private abstract record Result
         {
-            public ulong tick;
-            public List<EventMessage> events;
+            public ulong Tick;
+            public record EventList(ulong Tick, List<SimEvent> events) : Result(Tick);
+            public record Point(ulong Tick, byte[] stateBinary) : Result(Tick);
+
+            private Result(ulong Tick) { this.Tick = Tick; }
         }
 
-        private SimulationWrapper simulation;
-        private delegate void CommitEventsDelegate(EventsData data);
-        private event CommitEventsDelegate events_committed;
+        private delegate void SimEventsHandler(ulong Tick, List<SimEvent> simEvents);
+        private event SimEventsHandler simEventsCommitted;
+        private delegate void RunnerEventHandler(RunnerEvent runnerEvent);
+        private event RunnerEventHandler runnerEventCommitted;
         private System.Diagnostics.Stopwatch performanceStopwatch = new System.Diagnostics.Stopwatch();
         private ulong performanceStartTick = 0, performanceStopTick = 0;
         private ulong stopAtTick = 0;
         private string ownerToken = "";
         private string editorToken = "";
+        private GrpcChannel simmaChannel = null;
 
         private ReaderWriterLockSlim readerWriterLock = new ReaderWriterLockSlim();
         private AutoResetEvent noReadersEvent = new AutoResetEvent(false);
         private volatile int readerCount = 0;
 
+        private SimulationWrapper simulation;
         private Thread simulationThread;
         private bool simulationRunning = false;
-        ulong currentTick = 0;
+        private ulong currentTick = 0;
+        private string simulationTimelineId = null;
+        private bool simulationStateEdited = false;
+        private bool recordResults = false;
+        private ulong recordResultsAfterTick = 0;
+        private List<Result> results = new List<Result>();
 
         public SimulationService(SimulationWrapper simulation, string ownerToken)
         {
@@ -59,13 +70,13 @@ namespace SimulationServer
 
         private void RunSimulation()
         {
-            List<EventMessage> event_messages = new List<EventMessage>();
+            List<SimEvent> sim_events = new List<SimEvent>();
 
             SimulationWrapper.SimEventHandler sim_event_handler = (string name, string json) =>
             {
-                event_messages.Add(new EventMessage()
+                sim_events.Add(new SimEvent()
                 {
-                    Name = "sim." + name,
+                    Name = name,
                     Json = json
                 });
             };
@@ -81,18 +92,19 @@ namespace SimulationServer
 
                     if (currentTick % 500000 == 0)
                     {
-                        byte[] state_binary = simulation.GetStateBinary();
-                        event_messages.Add(new EventMessage()
-                        {
-                            Name = "meta.state_bin",
-                            Bin = Google.Protobuf.ByteString.CopyFrom(state_binary)
-                        });
+                        // TODO: Save state to push as a result
+                        //byte[] state_binary = simulation.GetStateBinary();
+                        //sim_events.Add(new Event()
+                        //{
+                        //    Name = "meta.state_bin",
+                        //    Bin = Google.Protobuf.ByteString.CopyFrom(state_binary)
+                        //});
                     }
 
-                    if (event_messages.Count > 0)
+                    if (sim_events.Count > 0)
                     {
-                        events_committed?.Invoke(new EventsData { tick = currentTick, events = event_messages });
-                        event_messages = new List<EventMessage>();
+                        simEventsCommitted?.Invoke(currentTick, sim_events);
+                        sim_events = new List<SimEvent>();
                     }
 
                     if (stopAtTick > 0 && currentTick >= stopAtTick)
@@ -167,7 +179,7 @@ namespace SimulationServer
             {
                 readerWriterLock.ExitWriteLock();
             }
-            
+
             return Task.FromResult(new DestroyEntityResponse { });
         }
 
@@ -242,30 +254,56 @@ namespace SimulationServer
 
         public override async Task GetEvents(GetEventsRequest request, IServerStreamWriter<GetEventsResponse> responseStream, ServerCallContext context)
         {
-            var eventsDataQueue = new BufferBlock<EventsData>(new DataflowBlockOptions
+            var eventsDataQueue = new BufferBlock<object>(new DataflowBlockOptions
             {
                 CancellationToken = context.CancellationToken,
                 EnsureOrdered = true,
                 BoundedCapacity = 100
             });
 
-            CommitEventsDelegate addToQueueHandler = (EventsData data) =>
+            SimEventsHandler simEventsHandler = (ulong tick, List<SimEvent> events) =>
             {
-                eventsDataQueue.SendAsync(data).Wait();
+                eventsDataQueue.SendAsync((tick, events)).Wait();
             };
 
-            events_committed += addToQueueHandler;
-
-            while (!context.CancellationToken.IsCancellationRequested)
+            RunnerEventHandler runnerEventHandler = (RunnerEvent e) =>
             {
-                EventsData data = await eventsDataQueue.ReceiveAsync(context.CancellationToken);
-                GetEventsResponse response = new GetEventsResponse();
-                response.Tick = data.tick;
-                response.Events.AddRange(data.events);
-                await responseStream.WriteAsync(response);
-            }
+                eventsDataQueue.SendAsync(e).Wait();
+            };
 
-            events_committed -= addToQueueHandler;
+            simEventsCommitted += simEventsHandler;
+            runnerEventCommitted += runnerEventCommitted;
+
+            try
+            {
+                while (!context.CancellationToken.IsCancellationRequested)
+                {
+                    var data = await eventsDataQueue.ReceiveAsync(context.CancellationToken);
+                    GetEventsResponse response = new GetEventsResponse();
+                    switch (data)
+                    {
+                        case (ulong tick, List<SimEvent> events):
+                            // TODO: Handle actual chunking if there are too many events for one GRPC message.
+                            response.SimEventsChunk = new SimEventsChunk()
+                            {
+                                Tick = tick,
+                                LastChunk = true
+                            };
+                            response.SimEventsChunk.Chunk.AddRange(events);
+                            await responseStream.WriteAsync(response);
+                            break;
+                        case RunnerEvent e:
+                            response.RunnerEvent = e;
+                            await responseStream.WriteAsync(response);
+                            break;
+                    }
+                }
+            }
+            finally
+            {
+                simEventsCommitted -= simEventsHandler;
+                runnerEventCommitted -= runnerEventCommitted;
+            }
         }
 
         public override Task<GetSingletonJsonResponse> GetSingletonJson(GetSingletonJsonRequest request, ServerCallContext context)
@@ -350,7 +388,7 @@ namespace SimulationServer
             {
                 readerWriterLock.ExitWriteLock();
             }
-            
+
             return Task.FromResult(new RemoveComponentResponse { });
         }
 
@@ -388,7 +426,7 @@ namespace SimulationServer
             {
                 readerWriterLock.ExitWriteLock();
             }
-            
+
             return Task.FromResult(new SetSingletonJsonResponse { });
         }
 
@@ -407,7 +445,7 @@ namespace SimulationServer
             {
                 readerWriterLock.ExitWriteLock();
             }
-            
+
             return Task.FromResult(new SetStateJsonResponse { });
         }
 
@@ -459,7 +497,7 @@ namespace SimulationServer
             {
                 readerWriterLock.ExitWriteLock();
             }
-            
+
             return Task.FromResult(new SetStateBinaryResponse { });
         }
 
@@ -578,6 +616,40 @@ namespace SimulationServer
                                 output = simulation.GetTick().ToString();
                                 break;
                             }
+                        case "connect":
+                            {
+                                if (!IsOwner(context))
+                                {
+                                    err = $"'{args[0]}' can only be used by owner."; ;
+                                }
+                                else
+                                {
+                                    simmaChannel = args.Skip(1).ToList() switch
+                                    {
+                                        [var address] => GrpcChannel.ForAddress(address),
+                                        [var host, var portStr] when int.TryParse(portStr, out var port) && 0 < port && port < 65536 => GrpcChannel.ForAddress($"https://{host}:{port}"),
+                                        [var _, var portStr] => throw new ArgumentException($"'{portStr}' is not a valid port."),
+                                        _ => throw new ArgumentException($"'{args[0]}' command must take either an address, or a host and port.")
+                                    }; ;
+                                }
+                                break;
+                            }
+                        case "disconnect":
+                            {
+                                if (!IsOwner(context))
+                                {
+                                    err = $"'{args[0]}' can only be used by owner."; ;
+                                }
+                                else
+                                {
+                                    if (simmaChannel != null)
+                                    {
+                                        simmaChannel.ShutdownAsync();
+                                    }
+                                    simmaChannel = null;
+                                }
+                                break;
+                            }
                         default:
                             {
                                 throw new ArgumentException($"Unknown command '{args[0]}'");
@@ -625,18 +697,16 @@ namespace SimulationServer
 
         private void SendRunnerUpdateEvent(ulong tick, bool sim_running)
         {
-            List<EventMessage> event_messages = new List<EventMessage>();
-
-            event_messages.Add(new EventMessage
+            var runnerEvent = new RunnerEvent()
             {
-                Name = "runner.update",
+                Name = "running_changed",
                 Json = JsonSerializer.Serialize(new
                 {
                     sim_running = sim_running,
                 })
-            });
+            };
 
-            events_committed?.Invoke(new EventsData { tick = tick, events = event_messages });
+            runnerEventCommitted?.Invoke(runnerEvent);
         }
 
         private void StartSimulationImpl(ulong p_stopAtTick = 0)

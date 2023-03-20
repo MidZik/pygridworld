@@ -31,6 +31,22 @@ service Simulation {
     rpc IsEditing(IsEditingRequest) returns (IsEditingResponse);
 }
 
+message SimEvent {
+    string name = 1;
+    string json = 2;
+}
+
+message SimEventsChunk {
+    uint64 tick = 1;
+    bool last_chunk = 2;
+    repeated SimEvent chunk = 3;
+}
+
+message RunnerEvent {
+    string name = 1;
+    string json = 2;
+}
+
 message GetTickRequest {
 }
 
@@ -42,8 +58,8 @@ message GetStateJsonRequest {
 }
 
 message GetStateJsonResponse {
-    string json = 1;
-    uint64 tick = 2;
+    uint64 tick = 1;
+    string json = 2;
 }
 
 message SetStateJsonRequest {
@@ -169,21 +185,15 @@ message GetSingletonNamesResponse {
     repeated string singleton_names = 1;
 }
 
+
 message GetEventsRequest {
 }
 
-message EventMessage {
-    string name = 1;
-    oneof data
-    {
-        string json = 2;
-        bytes bin = 3;
-    }
-}
-
 message GetEventsResponse {
-    uint64 tick = 1;
-    repeated EventMessage events = 2;
+    oneof message {
+        SimEventsChunk sim_events_chunk = 1;
+        RunnerEvent runner_event = 2;
+    }
 }
 
 message GetStateBinaryRequest {
