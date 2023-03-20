@@ -36,4 +36,12 @@
     <Exec Command="if '$(PublishLibAfterBuild)' == 'false' (&#xD;&#xA;    echo Not publishing to inplace simma\lib&#xD;&#xA;) else (&#xD;&#xA;    dotnet publish -c $(ConfigurationName) --property:PublishDir=&quot;$(SolutionDir)..\simma\lib&quot; --no-self-contained --no-build&#xD;&#xA;)" />
   </Target>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Users\Matt\Documents\Python Projects\simma\SimulationServer\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Users\Matt\Documents\Python Projects\simma\SimulationServer\.editorconfig" />
+  </ItemGroup>
+
 </Project>

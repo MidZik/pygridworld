@@ -1,4 +1,3 @@
-﻿using Grpc.Core;
 using System;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
