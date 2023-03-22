@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace SimulationServer
 {
-    class SimulationWrapper
+    class SimulationWrapper : IDisposable
     {
         public delegate void StringResultHandler(string s);
         public delegate void ULongResultHandler(ulong l);
@@ -61,6 +61,7 @@ namespace SimulationServer
 
         IntPtr simulation_library_handle;
         IntPtr simulation_handle;
+        private bool disposedValue;
 
         public SimulationWrapper(string simulation_library_path)
         {
@@ -103,8 +104,7 @@ namespace SimulationServer
 
         ~SimulationWrapper()
         {
-            destroy_simulation(simulation_handle);
-            NativeLibrary.Free(simulation_library_handle);
+            Dispose(false);
         }
 
         private IntPtr GetExport(string name)
@@ -297,6 +297,28 @@ namespace SimulationServer
             GC.KeepAlive(handler);
 
             return (err, output);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // dispose managed state here
+                }
+
+                destroy_simulation(simulation_handle);
+                NativeLibrary.Free(simulation_library_handle);
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
